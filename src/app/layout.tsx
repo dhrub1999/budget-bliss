@@ -9,6 +9,7 @@ import NextTopLoader from 'nextjs-toploader';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import './globals.css';
 import './theme.css';
+import { Header } from './_components/header';
 
 const META_THEME_COLORS = {
   light: '#ffffff',
@@ -16,7 +17,7 @@ const META_THEME_COLORS = {
 };
 
 export const metadata: Metadata = {
-  title: 'Next Shadcn',
+  title: 'Budget Bliss',
   description: 'Basic dashboard with Next.js and Shadcn'
 };
 
@@ -30,7 +31,8 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const cookieStore = await cookies();
-  const activeThemeValue = cookieStore.get('active_theme')?.value;
+  const activeThemeValue = 'light';
+  // const activeThemeValue = cookieStore.get('active_theme')?.value;
   const isScaled = activeThemeValue?.endsWith('-scaled');
 
   return (
@@ -50,7 +52,7 @@ export default async function RootLayout({
       </head>
       <body
         className={cn(
-          'bg-background overflow-hidden overscroll-none font-sans antialiased',
+          'overflow-hidden overscroll-none bg-[#1E1E1E] font-sans antialiased',
           activeThemeValue ? `theme-${activeThemeValue}` : '',
           isScaled ? 'theme-scaled' : '',
           fontVariables
@@ -67,6 +69,7 @@ export default async function RootLayout({
           >
             <Providers activeThemeValue={activeThemeValue as string}>
               <Toaster />
+              <Header />
               {children}
             </Providers>
           </ThemeProvider>

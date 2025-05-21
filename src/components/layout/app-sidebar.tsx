@@ -29,7 +29,12 @@ import {
   SidebarRail
 } from '@/components/ui/sidebar';
 import { UserAvatarProfile } from '@/components/user-avatar-profile';
-import { navItems } from '@/constants/data';
+import {
+  overviewNavItems,
+  managementNavItems,
+  settingsNavItems,
+  supportNavItems
+} from '@/constants/data';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { useUser } from '@clerk/nextjs';
 import {
@@ -38,7 +43,6 @@ import {
   IconChevronsDown,
   IconCreditCard,
   IconLogout,
-  IconPhotoUp,
   IconUserCircle
 } from '@tabler/icons-react';
 import { SignOutButton } from '@clerk/nextjs';
@@ -47,9 +51,10 @@ import { usePathname, useRouter } from 'next/navigation';
 import * as React from 'react';
 import { Icons } from '../icons';
 import { OrgSwitcher } from '../org-switcher';
+
 export const company = {
-  name: 'Acme Inc',
-  logo: IconPhotoUp,
+  name: 'Budget Bliss',
+  logo: Icons.budgetBliss,
   plan: 'Enterprise'
 };
 
@@ -64,76 +69,122 @@ export default function AppSidebar() {
   const { isOpen } = useMediaQuery();
   const { user } = useUser();
   const router = useRouter();
+
   const handleSwitchTenant = (_tenantId: string) => {
-    // Tenant switching functionality would be implemented here
+    // Tenant switching functionality here
   };
 
   const activeTenant = tenants[0];
 
   React.useEffect(() => {
-    // Side effects based on sidebar state changes
+    // Side effects if needed
   }, [isOpen]);
+
+  // Helper to render nav items, including collapsibles for items with children
+  const renderNavItems = (
+    items:
+      | typeof overviewNavItems
+      | typeof managementNavItems
+      | typeof settingsNavItems
+  ) => {
+    return items.map((item) => {
+      const Icon = item.icon ? Icons[item.icon] : Icons.budgetBliss;
+      const isActive = pathname === item.url;
+
+      if (item.items && item.items.length > 0) {
+        // If there are nested items, render a collapsible
+        return (
+          <Collapsible
+            key={item.title}
+            asChild
+            defaultOpen={item.isActive}
+            className='group/collapsible'
+          >
+            <SidebarMenuItem>
+              <CollapsibleTrigger asChild>
+                <SidebarMenuButton tooltip={item.title} isActive={isActive}>
+                  {item.icon && <Icon />}
+                  <span>{item.title}</span>
+                  <IconChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
+                </SidebarMenuButton>
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <SidebarMenuSub>
+                  {item.items.map((subItem) => (
+                    <SidebarMenuSubItem key={subItem.title}>
+                      <SidebarMenuSubButton
+                        asChild
+                        isActive={pathname === subItem.url}
+                      >
+                        <Link href={subItem.url}>
+                          <span>{subItem.title}</span>
+                        </Link>
+                      </SidebarMenuSubButton>
+                    </SidebarMenuSubItem>
+                  ))}
+                </SidebarMenuSub>
+              </CollapsibleContent>
+            </SidebarMenuItem>
+          </Collapsible>
+        );
+      }
+
+      // No nested items, render a simple menu item
+      return (
+        <SidebarMenuItem key={item.title}>
+          <SidebarMenuButton asChild tooltip={item.title} isActive={isActive}>
+            <Link href={item.url}>
+              {item.icon && <Icon />}
+              <span>{item.title}</span>
+            </Link>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      );
+    });
+  };
 
   return (
     <Sidebar collapsible='icon'>
       <SidebarHeader>
-        <OrgSwitcher
-          tenants={tenants}
-          defaultTenant={activeTenant}
-          onTenantSwitch={handleSwitchTenant}
-        />
+        <Icons.budgetBliss />
       </SidebarHeader>
       <SidebarContent className='overflow-x-hidden'>
+        {/* Overview Group */}
         <SidebarGroup>
           <SidebarGroupLabel>Overview</SidebarGroupLabel>
+          <SidebarMenu>{renderNavItems(overviewNavItems)}</SidebarMenu>
+        </SidebarGroup>
+
+        {/* Management Group */}
+        <SidebarGroup>
+          <SidebarGroupLabel>Management</SidebarGroupLabel>
+          <SidebarMenu>{renderNavItems(managementNavItems)}</SidebarMenu>
+        </SidebarGroup>
+
+        {/* Settings Group */}
+        <SidebarGroup>
+          <SidebarGroupLabel>Settings</SidebarGroupLabel>
+          <SidebarMenu>{renderNavItems(settingsNavItems)}</SidebarMenu>
+        </SidebarGroup>
+      </SidebarContent>
+
+      <SidebarFooter>
+        {/* Support nav items */}
+        <SidebarGroup>
+          <SidebarGroupLabel>Support</SidebarGroupLabel>
           <SidebarMenu>
-            {navItems.map((item) => {
-              const Icon = item.icon ? Icons[item.icon] : Icons.logo;
-              return item?.items && item?.items?.length > 0 ? (
-                <Collapsible
-                  key={item.title}
-                  asChild
-                  defaultOpen={item.isActive}
-                  className='group/collapsible'
-                >
-                  <SidebarMenuItem>
-                    <CollapsibleTrigger asChild>
-                      <SidebarMenuButton
-                        tooltip={item.title}
-                        isActive={pathname === item.url}
-                      >
-                        {item.icon && <Icon />}
-                        <span>{item.title}</span>
-                        <IconChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
-                      </SidebarMenuButton>
-                    </CollapsibleTrigger>
-                    <CollapsibleContent>
-                      <SidebarMenuSub>
-                        {item.items?.map((subItem) => (
-                          <SidebarMenuSubItem key={subItem.title}>
-                            <SidebarMenuSubButton
-                              asChild
-                              isActive={pathname === subItem.url}
-                            >
-                              <Link href={subItem.url}>
-                                <span>{subItem.title}</span>
-                              </Link>
-                            </SidebarMenuSubButton>
-                          </SidebarMenuSubItem>
-                        ))}
-                      </SidebarMenuSub>
-                    </CollapsibleContent>
-                  </SidebarMenuItem>
-                </Collapsible>
-              ) : (
+            {supportNavItems.map((item) => {
+              const Icon = item.icon ? Icons[item.icon] : Icons.budgetBliss;
+              const isActive = pathname === item.url;
+              return (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
                     asChild
                     tooltip={item.title}
-                    isActive={pathname === item.url}
+                    isActive={isActive}
                   >
                     <Link href={item.url}>
-                      <Icon />
+                      {item.icon && <Icon />}
                       <span>{item.title}</span>
                     </Link>
                   </SidebarMenuButton>
@@ -142,8 +193,8 @@ export default function AppSidebar() {
             })}
           </SidebarMenu>
         </SidebarGroup>
-      </SidebarContent>
-      <SidebarFooter>
+
+        {/* User menu dropdown */}
         <SidebarMenu>
           <SidebarMenuItem>
             <DropdownMenu>
@@ -180,7 +231,6 @@ export default function AppSidebar() {
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-
                 <DropdownMenuGroup>
                   <DropdownMenuItem
                     onClick={() => router.push('/dashboard/profile')}

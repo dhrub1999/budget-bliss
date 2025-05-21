@@ -12,51 +12,79 @@ export type Product = {
 };
 
 //Info: The following data is used for the sidebar navigation and Cmd K bar.
-export const navItems: NavItem[] = [
+export const overviewNavItems: NavItem[] = [
   {
     title: 'Dashboard',
     url: '/dashboard/overview',
     icon: 'dashboard',
     isActive: false,
     shortcut: ['d', 'd'],
-    items: [] // Empty array as there are no child items for Dashboard
-  },
-  {
-    title: 'Product',
-    url: '/dashboard/product',
-    icon: 'product',
-    shortcut: ['p', 'p'],
-    isActive: false,
-    items: [] // No child items
-  },
-  {
-    title: 'Account',
-    url: '#', // Placeholder as there is no direct link for the parent
-    icon: 'billing',
-    isActive: true,
+    items: []
+  }
+];
 
-    items: [
-      {
-        title: 'Profile',
-        url: '/dashboard/profile',
-        icon: 'userPen',
-        shortcut: ['m', 'm']
-      },
-      {
-        title: 'Login',
-        shortcut: ['l', 'l'],
-        url: '/',
-        icon: 'login'
-      }
-    ]
+export const managementNavItems: NavItem[] = [
+  {
+    title: 'Transactions',
+    url: '/dashboard/transactions',
+    icon: 'transaction',
+    isActive: false,
+    shortcut: ['t', 't'],
+    items: []
   },
   {
-    title: 'Kanban',
-    url: '/dashboard/kanban',
-    icon: 'kanban',
-    shortcut: ['k', 'k'],
+    title: 'Budgeting',
+    url: '/dashboard/budgeting',
+    icon: 'budgeting',
     isActive: false,
-    items: [] // No child items
+    shortcut: ['b', 'b'],
+    items: []
+  },
+  {
+    title: 'Reports',
+    url: '/dashboard/reports',
+    icon: 'reports',
+    isActive: false,
+    shortcut: ['r', 'r'],
+    items: []
+  }
+];
+
+export const settingsNavItems: NavItem[] = [
+  {
+    title: 'Reminders',
+    url: '/dashboard/reminders',
+    icon: 'reminder',
+    isActive: false,
+    shortcut: ['r', 'r'],
+    items: []
+  },
+  {
+    title: 'Settings',
+    url: '/dashboard/settings',
+    icon: 'settings',
+    isActive: false,
+    shortcut: ['s', 's'],
+    items: []
+  }
+];
+
+export const supportNavItems: NavItem[] = [
+  {
+    title: 'Help',
+    url: '/dashboard/help',
+    icon: 'help',
+    isActive: false,
+    shortcut: ['h', 'h'],
+    items: []
+  },
+  {
+    title: 'Logout',
+    url: '/dashboard/logout',
+    icon: 'logout',
+    isActive: false,
+    shortcut: ['l', 'l'],
+    items: []
   }
 ];
 
