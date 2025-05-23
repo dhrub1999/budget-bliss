@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation';
 export default async function Page() {
   return (
     <div>
-      <h1 className='text-green-500'>Hello</h1>
+      <h1 className='font-nunito text-green-500'>Hello</h1>
     </div>
   );
 }

@@ -3,7 +3,8 @@ body {
 }
 
 :root {
-  --font-sans: var(--font-inter);
+  /* Default sans font to Nunito */
+  --font-nunito: var(--font-nunito);
   --header-height: calc(var(--spacing) * 12 + 1px);
 }
 
@@ -72,7 +73,7 @@ body {
 
 .theme-mono,
 .theme-mono-scaled {
-  --font-sans: var(--font-mono);
+  --font-karla: var(--font-karla);
   --primary: var(--color-neutral-600);
   --primary-foreground: var(--color-neutral-50);
 

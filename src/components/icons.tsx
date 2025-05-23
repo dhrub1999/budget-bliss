@@ -1,7 +1,8 @@
-import { LucideProps } from 'lucide-react';
+import { EllipsisVertical, LucideProps } from 'lucide-react';
 export type Icon = React.ComponentType<LucideProps>;
 
 export const Icons = {
+  hamburgerMenu: EllipsisVertical,
   budgetBliss: ({ ...props }: LucideProps) => (
     <svg
       xmlns='http://www.w3.org/2000/svg'

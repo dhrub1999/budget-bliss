@@ -4,7 +4,19 @@
 
 @custom-variant dark (&:is(.dark *));
 
-@import './theme.css';
+@theme {
+  --color-brand-50: #fcfffc;
+  --color-brand-100: #caf2cd;
+  --color-brand-200: #97e59f;
+  --color-brand-300: #65d970;
+  --color-brand-400: #32cc42;
+  --color-brand-500: #00bf13;
+  --color-brand-600: #00990f;
+  --color-brand-700: #00730b;
+  --color-brand-800: #003906;
+  --color-brand-900: #002604;
+  --color-brand-950: #001302;
+}
 
 :root {
   --radius: 0.625rem;
