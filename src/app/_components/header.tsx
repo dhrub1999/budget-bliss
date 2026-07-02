@@ -1,96 +1,109 @@
 'use client';
 import * as React from 'react';
-
 import { usePathname } from 'next/navigation';
 import { Icons } from '@/components/icons';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger
-} from '@/components/ui/sheet';
+import { useUser } from '@clerk/nextjs';
+import { UserNav } from '@/components/layout/user-nav';
 
 const Header = () => {
   const pathname = usePathname();
+  const { isSignedIn, isLoaded } = useUser();
 
-  // Adjust this check as per your route structure
   const isDashboardRoute = pathname.startsWith('/dashboard');
+  const isAuthRoute = pathname.startsWith('/auth');
 
-  if (isDashboardRoute) return null;
+  if (isDashboardRoute || isAuthRoute) return null;
 
   return (
-    <header>
+    <header className='sticky top-0 z-50 flex w-full items-center justify-between border-b border-white/5 bg-[#1E1E1E]/80 px-6 py-4 backdrop-blur-md'>
       <div>
-        <Icons.budgetBliss className='h-8 w-auto md:h-9 lg:h-10 xl:h-11 2xl:h-12' />
+        <Link
+          href='/'
+          className='animate-fade-in flex items-center gap-2 transition-opacity hover:opacity-95'
+        >
+          <Icons.budgetBliss className='h-8 w-auto md:h-9' />
+          <span className='font-nunito to-brand-300 bg-gradient-to-r from-white via-neutral-100 bg-clip-text text-lg font-extrabold tracking-tight text-transparent md:text-xl'>
+            Budget Bliss
+          </span>
+        </Link>
       </div>
 
-      {/* <nav className='absolute top-0 left-0 flex h-full w-full items-center justify-center'>
-        <ul className='flex flex-col gap-10'>
-          <li>
-            <Link href='#features'>Features</Link>
-          </li>
-          <li>
-            <Link href='#pricing'>Pricing</Link>
-          </li>
-          <li>
-            <Link href='#about-us'>About Us</Link>
-          </li>
-          <li>
-            <Link href='#testimonials'>Testimonials</Link>
-          </li>
-        </ul>
-      </nav> */}
+      <div className='flex items-center gap-3'>
+        {isLoaded ? (
+          isSignedIn ? (
+            <>
+              <Button
+                asChild
+                variant='outline'
+                className='border-brand-500/30 text-brand-400 hover:bg-brand-500/10 hover:text-brand-300 text-xs font-semibold transition-all duration-300 md:text-sm'
+              >
+                <Link href='/dashboard'>Go to Dashboard</Link>
+              </Button>
+              <UserNav />
+            </>
+          ) : (
+            <>
+              <Button
+                asChild
+                variant='ghost'
+                className='text-xs text-neutral-300 transition-all hover:bg-white/5 hover:text-white md:text-sm'
+              >
+                <Link href='/auth/sign-in'>Log In</Link>
+              </Button>
+              <Button
+                asChild
+                className='bg-brand-500 hover:bg-brand-600 shadow-brand-500/20 text-xs font-semibold text-white shadow-lg transition-all duration-300 hover:scale-[1.03] md:text-sm'
+              >
+                <Link href='/auth/sign-up'>Get Started</Link>
+              </Button>
+            </>
+          )
+        ) : (
+          <div className='h-9 w-24 animate-pulse rounded bg-neutral-800' />
+        )}
+      </div>
 
-      <Button variant='outline' className=''>
-        Log In / Sign Up
-      </Button>
-
-      <Sheet>
-        <SheetTrigger asChild>
-          <Button
-            size='icon'
-            variant='ghost'
-            className='fixed right-5 bottom-15 h-12 w-12'
-          >
-            <Icons.hamburgerMenu className='stroke-gray-200' />
-          </Button>
-        </SheetTrigger>
-        <SheetContent className='w-56' data-slot='content'>
-          <SheetHeader>
-            <SheetTitle className='sr-only'>Hamburger Menu</SheetTitle>
-          </SheetHeader>
-          <nav className='absolute top-0 left-0 flex h-full w-full items-center justify-center'>
-            <ul className='flex flex-col items-center gap-12'>
-              <li>
-                <Link className='text-center' href='#features'>
-                  Features
-                </Link>
-              </li>
-              <li>
-                <Link className='text-center' href='#pricing'>
-                  Pricing
-                </Link>
-              </li>
-              <li>
-                <Link className='text-center' href='#about-us'>
-                  About Us
-                </Link>
-              </li>
-              <li>
-                <Link className='text-center' href='#testimonials'>
-                  Testimonials
-                </Link>
-              </li>
-            </ul>
-          </nav>
-        </SheetContent>
-      </Sheet>
+      {/* Floating Bottom Navigation Bar */}
+      <div className='fixed bottom-6 left-1/2 z-50 w-[90%] max-w-[500px] -translate-x-1/2 rounded-full border border-white/10 bg-neutral-900/60 px-6 py-4 shadow-2xl shadow-black/40 backdrop-blur-xl'>
+        <nav className='flex items-center justify-between'>
+          <ul className='flex w-full items-center justify-around gap-4'>
+            <li>
+              <Link
+                className='hover:text-brand-400 text-center text-xs font-semibold text-nowrap text-neutral-300 transition-colors'
+                href='#features'
+              >
+                Features
+              </Link>
+            </li>
+            <li>
+              <Link
+                className='hover:text-brand-400 text-center text-xs font-semibold text-nowrap text-neutral-300 transition-colors'
+                href='#pricing'
+              >
+                Pricing
+              </Link>
+            </li>
+            <li>
+              <Link
+                className='hover:text-brand-400 text-center text-xs font-semibold text-nowrap text-neutral-300 transition-colors'
+                href='#about-us'
+              >
+                About Us
+              </Link>
+            </li>
+            <li>
+              <Link
+                className='hover:text-brand-400 text-center text-xs font-semibold text-nowrap text-neutral-300 transition-colors'
+                href='#testimonials'
+              >
+                Testimonials
+              </Link>
+            </li>
+          </ul>
+        </nav>
+      </div>
     </header>
   );
 };

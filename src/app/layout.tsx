@@ -52,7 +52,7 @@ export default async function RootLayout({
       </head>
       <body
         className={cn(
-          'font-nunito overflow-hidden overscroll-none bg-[#1E1E1E] antialiased',
+          'font-nunito bg-[#1E1E1E] antialiased',
           activeThemeValue ? `theme-${activeThemeValue}` : '',
           isScaled ? 'theme-scaled' : '',
           fontVariables
