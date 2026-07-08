@@ -17,7 +17,7 @@ const Header = () => {
   if (isDashboardRoute || isAuthRoute) return null;
 
   return (
-    <header className='sticky top-0 z-50 flex w-full items-center justify-between border-b border-white/5 bg-[#1E1E1E]/80 px-6 py-4 backdrop-blur-md'>
+    <header className='sticky top-0 z-50 flex h-28 w-full items-center justify-between border-b border-white/5 bg-[#1E1E1E]/80 px-6 py-4 backdrop-blur-md'>
       <div>
         <Link
           href='/'
