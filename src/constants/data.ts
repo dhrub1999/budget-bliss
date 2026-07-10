@@ -11,6 +11,40 @@ export type Product = {
   updated_at: string;
 };
 
+export type FeatureCardProps = {
+  title: string;
+  description: string;
+  imageUrl: string;
+};
+
+// Feature Cards Data
+export const featureCards: FeatureCardProps[] = [
+  {
+    title: 'Effortless Expense Tracking',
+    description:
+      'Track your daily spending with ease. Quickly log transactions, auto-categorize them, and view everything in one clean dashboard.',
+    imageUrl: '/images/feature-images/expense-tracking.png'
+  },
+  {
+    title: 'Smart Budget Planning',
+    description:
+      'Set monthly budgets by category and let BudgetBliss guide your spending with real-time insights and alerts before you overspend.',
+    imageUrl: '/images/feature-images/budget-planning.png'
+  },
+  {
+    title: 'Savings Goals & Progress Tracker',
+    description:
+      'Create financial goals and watch your progress grow with visual trackers and personalised saving tips.',
+    imageUrl: '/images/feature-images/savings-goals.png'
+  },
+  {
+    title: 'Bill & Subscription Reminders',
+    description:
+      'Never miss a payment again. Get notified before due dates for rent, subscriptions, EMIs, and more.',
+    imageUrl: '/images/feature-images/bill-reminders.png'
+  }
+];
+
 //Info: The following data is used for the sidebar navigation and Cmd K bar.
 export const overviewNavItems: NavItem[] = [
   {
