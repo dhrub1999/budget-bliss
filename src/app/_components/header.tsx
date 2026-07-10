@@ -21,12 +21,12 @@ const Header = () => {
   React.useEffect(() => {
     if (isDashboardRoute || isAuthRoute) return;
 
-    const sections = ['features', 'pricing', 'testimonials'];
+    const sections = ['features', 'testimonials', 'pricing'];
 
     const observerOptions = {
       root: null,
-      rootMargin: '-30% 0px -50% 0px',
-      threshold: 0.1
+      rootMargin: '-10% 0px -60% 0px',
+      threshold: 0
     };
 
     const observer = new IntersectionObserver((entries) => {
@@ -66,8 +66,8 @@ const Header = () => {
 
   const navItems = [
     { label: 'Features', href: '#features', id: 'features' },
-    { label: 'Pricing', href: '#pricing', id: 'pricing' },
-    { label: 'Testimonials', href: '#testimonials', id: 'testimonials' }
+    { label: 'Testimonials', href: '#testimonials', id: 'testimonials' },
+    { label: 'Pricing', href: '#pricing', id: 'pricing' }
   ];
 
   return (

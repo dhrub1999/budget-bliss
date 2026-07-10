@@ -16,10 +16,17 @@ import PricingSection from './_components/landing-page/PricingSection';
 import HowItWorks from './_components/landing-page/HowItWorks';
 import TestimonialsSection from './_components/landing-page/TestimonialsSection';
 import CTASection from './_components/landing-page/CTASection';
+import ScrollReveal, {
+  StaggerContainer,
+  StaggerItem
+} from './_components/landing-page/ScrollReveal';
 
 export default async function Page() {
   return (
-    <div className='min-h-screen overflow-x-hidden overflow-y-auto bg-[#1e1e1e] text-white'>
+    <div
+      className='min-h-screen overflow-x-hidden overflow-y-auto bg-[#1e1e1e] text-white'
+      style={{ scrollBehavior: 'smooth' }}
+    >
       {/* Radial glows for modern background aesthetics */}
       <div className='pointer-events-none absolute top-0 left-1/2 z-0 h-[600px] w-full max-w-7xl -translate-x-1/2 overflow-hidden opacity-30'>
         <div className='bg-brand-500 absolute -top-40 left-1/4 h-[500px] w-[500px] animate-pulse rounded-full blur-[150px] duration-4000' />
@@ -29,72 +36,84 @@ export default async function Page() {
       {/* Hero Section */}
       <section className='relative w-full bg-gradient-to-b from-[#212121] to-[#121212]'>
         <div className='relative z-10 mx-auto flex max-w-7xl flex-col items-center px-6 pt-20 pb-16 text-center md:pt-32 md:pb-24'>
-          <div className='border-brand-500/20 bg-brand-500/5 text-brand-400 animate-fade-in mb-6 inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold md:text-sm'>
-            <Sparkles className='text-brand-400 h-4 w-4' />
-            <span>Budgeting made blissful and automated</span>
-          </div>
+          <ScrollReveal delay={0.05}>
+            <div className='border-brand-500/20 bg-brand-500/5 text-brand-400 animate-fade-in mb-6 inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold md:text-sm'>
+              <Sparkles className='text-brand-400 h-4 w-4' />
+              <span>Budgeting made blissful and automated</span>
+            </div>
+          </ScrollReveal>
 
-          <h1 className='font-nunito mb-6 max-w-4xl text-4xl leading-tight font-extrabold tracking-tight text-white sm:text-5xl md:text-7xl'>
-            Your Finances, Organised <span className=''>& Optimised.</span>
-          </h1>
+          <ScrollReveal delay={0.12}>
+            <h1 className='font-nunito mb-6 max-w-4xl text-4xl leading-tight font-extrabold tracking-tight text-white sm:text-5xl md:text-7xl'>
+              Your Finances, Organised <span className=''>& Optimised.</span>
+            </h1>
+          </ScrollReveal>
 
-          <p className='font-karla mb-10 max-w-2xl text-2xl leading-relaxed text-neutral-400 md:text-xl'>
-            Gain complete visibility into your spending habits and make informed
-            financial decisions.
-          </p>
+          <ScrollReveal delay={0.2}>
+            <p className='font-karla mb-10 max-w-2xl text-2xl leading-relaxed text-neutral-400 md:text-xl'>
+              Gain complete visibility into your spending habits and make
+              informed financial decisions.
+            </p>
+          </ScrollReveal>
 
-          <div className='mb-16 flex flex-col items-center gap-4 sm:flex-row'>
-            <Button
-              asChild
-              size='lg'
-              className='bg-brand-500 hover:bg-brand-600 shadow-brand-500/30 flex items-center gap-2 rounded-xl px-8 py-6 text-base font-semibold text-white shadow-xl transition-all duration-300 hover:scale-105'
-            >
-              <Link href='/auth/sign-up'>
-                Get Started Free <ArrowRight className='h-5 w-5' />
-              </Link>
-            </Button>
-            <Button
-              asChild
-              variant='outline'
-              size='lg'
-              className='rounded-xl border-white/10 px-8 py-6 text-base text-neutral-300 transition-all hover:bg-white/5 hover:text-white'
-            >
-              <Link href='#features'>Explore Features</Link>
-            </Button>
-          </div>
+          <ScrollReveal delay={0.28}>
+            <div className='mb-16 flex flex-col items-center gap-4 sm:flex-row'>
+              <Button
+                asChild
+                size='lg'
+                className='bg-brand-500 hover:bg-brand-600 shadow-brand-500/30 flex items-center gap-2 rounded-xl px-8 py-6 text-base font-semibold text-white shadow-xl transition-all duration-300 hover:scale-105'
+              >
+                <Link href='/auth/sign-up'>
+                  Get Started Free <ArrowRight className='h-5 w-5' />
+                </Link>
+              </Button>
+              <Button
+                asChild
+                variant='outline'
+                size='lg'
+                className='rounded-xl border-white/10 px-8 py-6 text-base text-neutral-300 transition-all hover:bg-white/5 hover:text-white'
+              >
+                <Link href='#features'>Explore Features</Link>
+              </Button>
+            </div>
+          </ScrollReveal>
 
-          <div className='mx-auto mt-6 w-full max-w-6xl'>
-            <Image
-              src={'/images/hero-image.png'}
-              height={2160}
-              width={1440}
-              alt='Product dashboard image'
-              className='w-full'
-            />
-          </div>
+          <ScrollReveal delay={0.35} direction='none'>
+            <div className='mx-auto mt-6 w-full max-w-6xl'>
+              <Image
+                src={'/images/hero-image.png'}
+                height={2160}
+                width={1440}
+                alt='Product dashboard image'
+                className='w-full'
+              />
+            </div>
+          </ScrollReveal>
         </div>
       </section>
 
       {/* Trusted By Banner */}
       <section className='border-y border-white/5 bg-neutral-900/40 py-12 text-center'>
         <div className='mx-auto max-w-7xl px-6'>
-          <p className='mb-6 text-xs font-semibold tracking-widest text-neutral-500 uppercase'>
-            Loved by thousands of conscious spenders
-          </p>
-          <div className='flex flex-wrap items-center justify-center gap-8 opacity-40 md:gap-16'>
-            <span className='font-nunito text-xl font-extrabold tracking-tight'>
-              PRODUCT HUNT
-            </span>
-            <span className='font-nunito text-xl font-extrabold tracking-tight'>
-              FINTECH WEEKLY
-            </span>
-            <span className='font-nunito text-xl font-extrabold tracking-tight'>
-              VENTUREBEAT
-            </span>
-            <span className='font-nunito text-xl font-extrabold tracking-tight'>
-              SAAS CENTRAL
-            </span>
-          </div>
+          <ScrollReveal>
+            <p className='mb-6 text-xs font-semibold tracking-widest text-neutral-500 uppercase'>
+              Loved by thousands of conscious spenders
+            </p>
+          </ScrollReveal>
+          <StaggerContainer className='flex flex-wrap items-center justify-center gap-8 opacity-40 md:gap-16'>
+            {[
+              'PRODUCT HUNT',
+              'FINTECH WEEKLY',
+              'VENTUREBEAT',
+              'SAAS CENTRAL'
+            ].map((name) => (
+              <StaggerItem key={name} direction='up'>
+                <span className='font-nunito text-xl font-extrabold tracking-tight'>
+                  {name}
+                </span>
+              </StaggerItem>
+            ))}
+          </StaggerContainer>
         </div>
       </section>
 
@@ -103,30 +122,33 @@ export default async function Page() {
         id='features'
         className='mx-auto max-w-7xl scroll-mt-20 px-6 py-20 md:py-32'
       >
-        <div className='mx-auto mb-16 max-w-3xl text-center md:mb-24'>
-          <h2 className='font-nunito mb-6 text-3xl font-extrabold text-white sm:text-4xl md:text-5xl'>
-            Everything you Need to{' '}
-            <span className='from-brand-300 to-brand-500 bg-gradient-to-r bg-clip-text text-transparent'>
-              Master your Money
-            </span>
-          </h2>
-          <p className='text-base text-neutral-400 md:text-lg'>
-            Say goodbye to clunky spreadsheets and hidden bank fees. Budget
-            Bliss puts you back in the driver&apos;s seat of your financial
-            future.
-          </p>
-        </div>
+        <ScrollReveal>
+          <div className='mx-auto mb-16 max-w-3xl text-center md:mb-24'>
+            <h2 className='font-nunito mb-6 text-3xl font-extrabold text-white sm:text-4xl md:text-5xl'>
+              Everything you Need to{' '}
+              <span className='from-brand-300 to-brand-500 bg-gradient-to-r bg-clip-text text-transparent'>
+                Master your Money
+              </span>
+            </h2>
+            <p className='text-base text-neutral-400 md:text-lg'>
+              Say goodbye to clunky spreadsheets and hidden bank fees. Budget
+              Bliss puts you back in the driver&apos;s seat of your financial
+              future.
+            </p>
+          </div>
+        </ScrollReveal>
 
-        <div className='grid grid-cols-1 gap-8 md:grid-cols-2'>
+        <StaggerContainer className='grid grid-cols-1 gap-8 md:grid-cols-2'>
           {featureCards.map((feature, index) => (
-            <FeatureCard
-              key={index}
-              title={feature.title}
-              description={feature.description}
-              imageUrl={feature.imageUrl}
-            />
+            <StaggerItem key={index}>
+              <FeatureCard
+                title={feature.title}
+                description={feature.description}
+                imageUrl={feature.imageUrl}
+              />
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerContainer>
       </section>
 
       {/* How It Works Section */}
