@@ -210,7 +210,7 @@ export default function SignUpViewPage({ stars }: { stars: number }) {
       <div className='flex h-full items-center justify-center p-4 lg:p-8'>
         <div className='flex w-full max-w-md flex-col items-center justify-center space-y-6'>
           {/* github link  */}
-          <Link
+          {/* <Link
             className={cn('group inline-flex hover:text-yellow-200')}
             target='_blank'
             href={'https://github.com/kiranism/next-shadcn-dashboard-starter'}
@@ -226,7 +226,7 @@ export default function SignUpViewPage({ stars }: { stars: number }) {
               />
               <span className='font-display font-medium'>{stars}</span>
             </div>
-          </Link>
+          </Link> */}
           <ClerkSignUpForm
             initialValues={{
               emailAddress: 'your_mail+clerk_test@example.com'

@@ -1,4 +1,5 @@
 'use client';
+import ScrollReveal from './ScrollReveal';
 
 import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -79,23 +80,27 @@ export default function HowItWorks() {
       className='mx-auto max-w-7xl scroll-mt-20 px-6 py-20 md:py-32'
     >
       {/* Badge */}
-      <div className='mb-6 flex justify-center'>
-        <span className='border-brand-500/40 bg-brand-500/5 text-brand-400 inline-flex items-center rounded-full border px-5 py-1.5 text-sm font-semibold tracking-wide'>
-          How it works
-        </span>
-      </div>
+      <ScrollReveal>
+        <div className='mb-6 flex justify-center'>
+          <span className='border-brand-500/40 bg-brand-500/5 text-brand-400 inline-flex items-center rounded-full border px-5 py-1.5 text-sm font-semibold tracking-wide'>
+            How it works
+          </span>
+        </div>
+      </ScrollReveal>
 
       {/* Heading */}
-      <div className='mx-auto mb-16 max-w-3xl text-center'>
-        <h2 className='font-nunito mb-6 text-3xl font-extrabold text-white sm:text-4xl md:text-5xl'>
-          Plan. Track. Achieve.
-        </h2>
-        <p className='text-base leading-relaxed text-neutral-400 md:text-lg'>
-          Take control of your finances in just a few steps. BudgetBliss guides
-          you from setup to success —helping you plan better, track smarter, and
-          save more with ease.
-        </p>
-      </div>
+      <ScrollReveal delay={0.08}>
+        <div className='mx-auto mb-16 max-w-3xl text-center'>
+          <h2 className='font-nunito mb-6 text-3xl font-extrabold text-white sm:text-4xl md:text-5xl'>
+            Plan. Track. Achieve.
+          </h2>
+          <p className='text-base leading-relaxed text-neutral-400 md:text-lg'>
+            Take control of your finances in just a few steps. BudgetBliss
+            guides you from setup to success —helping you plan better, track
+            smarter, and save more with ease.
+          </p>
+        </div>
+      </ScrollReveal>
 
       {/* Main two-column layout */}
       <div className='grid grid-cols-1 items-start gap-12 md:grid-cols-2'>
