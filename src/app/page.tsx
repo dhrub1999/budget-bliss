@@ -9,6 +9,7 @@ import {
   Check,
   HelpCircle
 } from 'lucide-react';
+import Image from 'next/image';
 
 export default async function Page() {
   return (
@@ -56,10 +57,19 @@ export default async function Page() {
             </Button>
           </div>
 
+          <div className='mx-auto mt-6 w-full max-w-6xl'>
+            <Image
+              src={'/images/hero-image.png'}
+              height={2160}
+              width={1440}
+              alt='Product dashboard image'
+              className='w-full'
+            />
+          </div>
+
           {/* Dashboard Mockup Container */}
-          <div className='hover:border-brand-500/20 w-full max-w-5xl rounded-2xl border border-white/10 bg-neutral-900/60 p-3 shadow-2xl shadow-black/80 backdrop-blur-md transition-all duration-500 md:p-4'>
+          {/* <div className='hover:border-brand-500/20 w-full max-w-5xl rounded-2xl border border-white/10 bg-neutral-900/60 p-3 shadow-2xl shadow-black/80 backdrop-blur-md transition-all duration-500 md:p-4'>
             <div className='flex aspect-[16/10] w-full flex-col overflow-hidden rounded-xl border border-white/5 bg-[#141414]'>
-              {/* Mockup Header */}
               <div className='flex items-center justify-between border-b border-white/5 bg-[#1e1e1e] px-4 py-3'>
                 <div className='flex items-center gap-2'>
                   <span className='h-3 w-3 rounded-full bg-red-500/80' />
@@ -70,12 +80,12 @@ export default async function Page() {
                   </span>
                 </div>
                 <div className='h-4 w-20 rounded-full bg-neutral-800' />
-              </div>
+              </div> */}
 
-              {/* Mockup Body Layout */}
-              <div className='flex flex-1 overflow-hidden'>
-                {/* Mockup Sidebar */}
-                <div className='hidden w-1/5 flex-col gap-4 border-r border-white/5 bg-[#171717] p-3 md:flex'>
+          {/* Mockup Body Layout */}
+          {/* <div className='min-h-full w-full bg-[url(/images/hero-image.png)] bg-cover bg-center'> */}
+          {/* Mockup Sidebar */}
+          {/* <div className='hidden w-1/5 flex-col gap-4 border-r border-white/5 bg-[#171717] p-3 md:flex'>
                   <div className='bg-brand-500/10 border-brand-500/20 flex h-8 w-full items-center rounded-lg border px-2'>
                     <div className='bg-brand-500 h-3 w-3 rounded-full' />
                   </div>
@@ -87,11 +97,9 @@ export default async function Page() {
                       />
                     ))}
                   </div>
-                </div>
+                </div> */}
 
-                {/* Mockup Main Dashboard Area */}
-                <div className='flex flex-1 flex-col gap-4 overflow-hidden p-4 text-left md:p-6'>
-                  {/* Info Cards */}
+          {/* <div className='flex flex-1 flex-col gap-4 overflow-hidden p-4 text-left md:p-6'>
                   <div className='grid grid-cols-3 gap-3'>
                     <div className='rounded-xl border border-white/5 bg-[#1e1e1e] p-3'>
                       <span className='block text-[10px] font-bold tracking-wider text-neutral-500 uppercase'>
@@ -128,7 +136,6 @@ export default async function Page() {
                     </div>
                   </div>
 
-                  {/* Graph and Transactions Grid */}
                   <div className='grid flex-1 grid-cols-1 gap-3 overflow-hidden md:grid-cols-2'>
                     <div className='flex flex-col justify-between rounded-xl border border-white/5 bg-[#1e1e1e] p-3'>
                       <div className='mb-2 flex items-center justify-between'>
@@ -139,7 +146,6 @@ export default async function Page() {
                           Weekly
                         </span>
                       </div>
-                      {/* Simulated Graph Bar Chart */}
                       <div className='flex h-20 items-end justify-between gap-1 pt-4'>
                         <div className='bg-brand-500/25 h-[40%] w-full rounded-sm' />
                         <div className='bg-brand-500/40 h-[60%] w-full rounded-sm' />
@@ -198,10 +204,10 @@ export default async function Page() {
                       </div>
                     </div>
                   </div>
-                </div>
-              </div>
+                </div> */}
+          {/* </div>
             </div>
-          </div>
+          </div> */}
         </div>
       </section>
 
@@ -235,9 +241,9 @@ export default async function Page() {
       >
         <div className='mx-auto mb-16 max-w-3xl text-center md:mb-24'>
           <h2 className='font-nunito mb-6 text-3xl font-extrabold text-white sm:text-4xl md:text-5xl'>
-            All the tools you need to reach{' '}
+            Everything you Need to{' '}
             <span className='from-brand-300 to-brand-500 bg-gradient-to-r bg-clip-text text-transparent'>
-              financial freedom
+              Master your Money
             </span>
           </h2>
           <p className='text-base text-neutral-400 md:text-lg'>
