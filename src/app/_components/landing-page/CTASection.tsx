@@ -38,7 +38,7 @@ export default function CTASection() {
 
         {/* Sub-copy */}
         <p className='font-karla mx-auto mb-10 max-w-2xl text-lg leading-relaxed text-neutral-400 md:text-xl'>
-          Join thousands of people who've already transformed the way they
+          Join thousands of people who&apos;ve already transformed the way they
           budget. Get started in seconds — no credit card required.
         </p>
 
