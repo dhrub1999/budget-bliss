@@ -6,6 +6,7 @@ import FeatureCard from './_components/landing-page/FeatureCard';
 import { featureCards } from '@/constants/data';
 import PricingSection from './_components/landing-page/PricingSection';
 import HowItWorks from './_components/landing-page/HowItWorks';
+import TestimonialsSection from './_components/landing-page/TestimonialsSection';
 
 export default async function Page() {
   return (
@@ -62,148 +63,6 @@ export default async function Page() {
               className='w-full'
             />
           </div>
-
-          {/* Dashboard Mockup Container */}
-          {/* <div className='hover:border-brand-500/20 w-full max-w-5xl rounded-2xl border border-white/10 bg-neutral-900/60 p-3 shadow-2xl shadow-black/80 backdrop-blur-md transition-all duration-500 md:p-4'>
-            <div className='flex aspect-[16/10] w-full flex-col overflow-hidden rounded-xl border border-white/5 bg-[#141414]'>
-              <div className='flex items-center justify-between border-b border-white/5 bg-[#1e1e1e] px-4 py-3'>
-                <div className='flex items-center gap-2'>
-                  <span className='h-3 w-3 rounded-full bg-red-500/80' />
-                  <span className='h-3 w-3 rounded-full bg-yellow-500/80' />
-                  <span className='h-3 w-3 rounded-full bg-green-500/80' />
-                  <span className='ml-4 font-mono text-xs text-neutral-500'>
-                    budget-bliss.app/dashboard
-                  </span>
-                </div>
-                <div className='h-4 w-20 rounded-full bg-neutral-800' />
-              </div> */}
-
-          {/* Mockup Body Layout */}
-          {/* <div className='min-h-full w-full bg-[url(/images/hero-image.png)] bg-cover bg-center'> */}
-          {/* Mockup Sidebar */}
-          {/* <div className='hidden w-1/5 flex-col gap-4 border-r border-white/5 bg-[#171717] p-3 md:flex'>
-                  <div className='bg-brand-500/10 border-brand-500/20 flex h-8 w-full items-center rounded-lg border px-2'>
-                    <div className='bg-brand-500 h-3 w-3 rounded-full' />
-                  </div>
-                  <div className='flex flex-col gap-2'>
-                    {Array.from({ length: 4 }).map((_, i) => (
-                      <div
-                        key={i}
-                        className='h-6 w-full rounded-md bg-neutral-800/50'
-                      />
-                    ))}
-                  </div>
-                </div> */}
-
-          {/* <div className='flex flex-1 flex-col gap-4 overflow-hidden p-4 text-left md:p-6'>
-                  <div className='grid grid-cols-3 gap-3'>
-                    <div className='rounded-xl border border-white/5 bg-[#1e1e1e] p-3'>
-                      <span className='block text-[10px] font-bold tracking-wider text-neutral-500 uppercase'>
-                        Total Balance
-                      </span>
-                      <span className='mt-1 block text-sm font-bold text-white md:text-xl'>
-                        $14,248.50
-                      </span>
-                      <span className='text-brand-400 mt-1 block text-[9px] font-semibold'>
-                        +12.5% this month
-                      </span>
-                    </div>
-                    <div className='rounded-xl border border-white/5 bg-[#1e1e1e] p-3'>
-                      <span className='block text-[10px] font-bold tracking-wider text-neutral-500 uppercase'>
-                        Monthly Income
-                      </span>
-                      <span className='mt-1 block text-sm font-bold text-white md:text-xl'>
-                        $8,400.00
-                      </span>
-                      <span className='mt-1 block text-[9px] text-neutral-500'>
-                        Salary & Freelance
-                      </span>
-                    </div>
-                    <div className='rounded-xl border border-white/5 bg-[#1e1e1e] p-3'>
-                      <span className='block text-[10px] font-bold tracking-wider text-neutral-500 uppercase'>
-                        Total Expenses
-                      </span>
-                      <span className='mt-1 block text-sm font-bold text-neutral-200 md:text-xl'>
-                        $3,120.40
-                      </span>
-                      <span className='mt-1 block text-[9px] font-semibold text-red-400'>
-                        37.1% of monthly budget
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className='grid flex-1 grid-cols-1 gap-3 overflow-hidden md:grid-cols-2'>
-                    <div className='flex flex-col justify-between rounded-xl border border-white/5 bg-[#1e1e1e] p-3'>
-                      <div className='mb-2 flex items-center justify-between'>
-                        <span className='text-xs font-semibold text-neutral-400'>
-                          Spending Overview
-                        </span>
-                        <span className='bg-brand-500/10 text-brand-400 rounded px-2 py-0.5 text-[9px]'>
-                          Weekly
-                        </span>
-                      </div>
-                      <div className='flex h-20 items-end justify-between gap-1 pt-4'>
-                        <div className='bg-brand-500/25 h-[40%] w-full rounded-sm' />
-                        <div className='bg-brand-500/40 h-[60%] w-full rounded-sm' />
-                        <div className='bg-brand-500/20 h-[30%] w-full rounded-sm' />
-                        <div className='bg-brand-500/70 h-[80%] w-full rounded-sm' />
-                        <div className='bg-brand-500 h-[95%] w-full rounded-sm' />
-                        <div className='bg-brand-500/50 h-[55%] w-full rounded-sm' />
-                        <div className='bg-brand-500/80 h-[75%] w-full rounded-sm' />
-                      </div>
-                    </div>
-
-                    <div className='flex flex-col justify-between rounded-xl border border-white/5 bg-[#1e1e1e] p-3'>
-                      <span className='mb-2 block text-xs font-semibold text-neutral-400'>
-                        Recent Transactions
-                      </span>
-                      <div className='flex flex-col gap-2 overflow-hidden'>
-                        <div className='flex items-center justify-between border-b border-white/5 pb-1 text-[10px]'>
-                          <div>
-                            <p className='font-semibold text-white'>
-                              Groceries (Whole Foods)
-                            </p>
-                            <p className='text-[8px] text-neutral-500'>
-                              Today, 10:24 AM
-                            </p>
-                          </div>
-                          <span className='font-semibold text-red-400'>
-                            -$142.50
-                          </span>
-                        </div>
-                        <div className='flex items-center justify-between border-b border-white/5 pb-1 text-[10px]'>
-                          <div>
-                            <p className='font-semibold text-white'>
-                              Stripe Payout (Freelance)
-                            </p>
-                            <p className='text-[8px] text-neutral-500'>
-                              Yesterday, 4:15 PM
-                            </p>
-                          </div>
-                          <span className='text-brand-400 font-semibold'>
-                            +$2,450.00
-                          </span>
-                        </div>
-                        <div className='flex items-center justify-between text-[10px]'>
-                          <div>
-                            <p className='font-semibold text-white'>
-                              Netflix Subscription
-                            </p>
-                            <p className='text-[8px] text-neutral-500'>
-                              June 28, 2026
-                            </p>
-                          </div>
-                          <span className='font-semibold text-red-400'>
-                            -$15.49
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div> */}
-          {/* </div>
-            </div>
-          </div> */}
         </div>
       </section>
 
@@ -263,6 +122,9 @@ export default async function Page() {
 
       {/* How It Works Section */}
       <HowItWorks />
+
+      {/* Testimonials Section */}
+      <TestimonialsSection />
 
       {/* Pricing Section — interactive client component */}
       <PricingSection />
