@@ -1,12 +1,21 @@
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { ArrowRight, Sparkles, HelpCircle } from 'lucide-react';
+import {
+  ArrowRight,
+  Sparkles,
+  Mail,
+  Globe,
+  Facebook,
+  Linkedin,
+  Instagram
+} from 'lucide-react';
 import Image from 'next/image';
 import FeatureCard from './_components/landing-page/FeatureCard';
 import { featureCards } from '@/constants/data';
 import PricingSection from './_components/landing-page/PricingSection';
 import HowItWorks from './_components/landing-page/HowItWorks';
 import TestimonialsSection from './_components/landing-page/TestimonialsSection';
+import CTASection from './_components/landing-page/CTASection';
 
 export default async function Page() {
   return (
@@ -129,13 +138,12 @@ export default async function Page() {
       {/* Pricing Section — interactive client component */}
       <PricingSection />
 
-      {/* About Us & FAQ Section */}
+      {/* About Us & FAQ Section — temporarily commented out
       <section
         id='about-us'
         className='mx-auto max-w-5xl scroll-mt-20 border-t border-white/5 px-6 py-20 md:py-32'
       >
         <div className='grid grid-cols-1 gap-12 md:grid-cols-12'>
-          {/* About us */}
           <div className='md:col-span-5'>
             <h2 className='font-nunito mb-6 text-3xl font-extrabold text-white'>
               About Budget Bliss
@@ -152,7 +160,6 @@ export default async function Page() {
             </p>
           </div>
 
-          {/* FAQs using summary/details elements styled with tailwind */}
           <div
             id='testimonials'
             className='flex scroll-mt-20 flex-col gap-4 md:col-span-7'
@@ -160,96 +167,177 @@ export default async function Page() {
             <h2 className='font-nunito mb-6 text-3xl font-extrabold text-white'>
               Frequently Asked Questions
             </h2>
-
-            <div className='flex flex-col gap-3'>
-              <details className='group rounded-xl border border-white/5 bg-neutral-900/20 p-4 transition-all duration-300 [&_summary::-webkit-details-marker]:hidden'>
-                <summary className='flex cursor-pointer items-center justify-between focus:outline-none'>
-                  <h3 className='flex items-center gap-2 text-sm font-semibold text-neutral-200 transition-colors group-hover:text-white md:text-base'>
-                    <HelpCircle className='text-brand-400 h-4 w-4' />
-                    <span>Is my financial data secure?</span>
-                  </h3>
-                  <span className='text-neutral-400 transition-transform group-open:rotate-180'>
-                    &darr;
-                  </span>
-                </summary>
-                <p className='mt-3 pl-6 text-xs leading-relaxed text-neutral-400 md:text-sm'>
-                  Absolutely. Your authentication is secured by Clerk, a
-                  world-class identity system. We store your entries securely
-                  using industry-standard encrypted tables. We never see nor
-                  store your plaintext banking login details.
-                </p>
-              </details>
-
-              <details className='group rounded-xl border border-white/5 bg-neutral-900/20 p-4 transition-all duration-300 [&_summary::-webkit-details-marker]:hidden'>
-                <summary className='flex cursor-pointer items-center justify-between focus:outline-none'>
-                  <h3 className='flex items-center gap-2 text-sm font-semibold text-neutral-200 transition-colors group-hover:text-white md:text-base'>
-                    <HelpCircle className='text-brand-400 h-4 w-4' />
-                    <span>Can I import my data from other trackers?</span>
-                  </h3>
-                  <span className='text-neutral-400 transition-transform group-open:rotate-180'>
-                    &darr;
-                  </span>
-                </summary>
-                <p className='mt-3 pl-6 text-xs leading-relaxed text-neutral-400 md:text-sm'>
-                  Yes. Pro users can import CSV transactions from major banks
-                  and popular tools like Mint or YNAB directly in the settings
-                  dashboard.
-                </p>
-              </details>
-
-              <details className='group rounded-xl border border-white/5 bg-neutral-900/20 p-4 transition-all duration-300 [&_summary::-webkit-details-marker]:hidden'>
-                <summary className='flex cursor-pointer items-center justify-between focus:outline-none'>
-                  <h3 className='flex items-center gap-2 text-sm font-semibold text-neutral-200 transition-colors group-hover:text-white md:text-base'>
-                    <HelpCircle className='text-brand-400 h-4 w-4' />
-                    <span>Do you offer a refund if I upgrade to Pro?</span>
-                  </h3>
-                  <span className='text-neutral-400 transition-transform group-open:rotate-180'>
-                    &darr;
-                  </span>
-                </summary>
-                <p className='mt-3 pl-6 text-xs leading-relaxed text-neutral-400 md:text-sm'>
-                  Yes, we offer a 14-day money-back guarantee. If you decide Pro
-                  is not for you within the first 14 days, contact support and
-                  we will issue a full refund, no questions asked.
-                </p>
-              </details>
-            </div>
+            ... FAQs ...
           </div>
         </div>
       </section>
+      */}
+
+      {/* CTA Section */}
+      <CTASection />
 
       {/* Footer Section */}
-      <footer className='border-t border-white/5 bg-neutral-950/80 px-6 py-12'>
-        <div className='mx-auto flex max-w-7xl flex-col items-center justify-between gap-6 text-sm text-neutral-500 md:flex-row'>
-          <div className='flex items-center gap-2'>
-            <span className='font-nunito text-base font-bold text-white'>
-              Budget Bliss
+      <footer className='border-t border-white/5 bg-[#111111] px-6 pt-16 pb-0'>
+        <div className='mx-auto max-w-7xl'>
+          {/* Main grid: brand + 4 columns
+              Mobile  : 1 col (brand full-width, then 2×2 link grid below)
+              sm      : 2 col (brand | 2×2 links)
+              lg      : 5 col (brand | Quick Links | Services | Resources | Connect)
+          */}
+          <div className='grid grid-cols-1 gap-x-8 gap-y-12 pb-14 sm:grid-cols-2 lg:grid-cols-6 lg:gap-x-20'>
+            {/* Brand — spans full width on mobile, 1 col on lg */}
+            <div className='sm:col-span-1 lg:col-span-2 lg:border-r lg:border-white/5 lg:pr-8'>
+              <div className='mb-4'>
+                <Image
+                  src='/logo/Logo.svg'
+                  alt='Budget Bliss'
+                  width={182}
+                  height={26}
+                  className='h-7 w-auto'
+                  priority
+                />
+              </div>
+              <p className='max-w-xs text-sm leading-relaxed text-neutral-400'>
+                BudgetBliss helps individuals take control of their personal
+                finances with smart budgeting tools, insightful reports, and
+                timely reminders—all in a clean, intuitive, and user-friendly
+                platform.
+              </p>
+            </div>
+
+            {/* Link columns container
+                Mobile : 2×2 grid
+                sm     : single cell that fills the second column — keeps 2×2 internally
+                lg     : dissolves; each column becomes its own lg grid cell
+            */}
+            <div className='grid grid-cols-2 gap-x-8 gap-y-10 sm:col-span-1 lg:col-span-4 lg:grid-cols-4'>
+              {/* Quick Links */}
+              <div>
+                <h3 className='mb-5 text-sm font-semibold tracking-wide text-white'>
+                  Quick Links
+                </h3>
+                <ul className='flex flex-col gap-3 text-sm text-neutral-400'>
+                  {[
+                    { label: 'Home', href: '#' },
+                    { label: 'Pricing', href: '#pricing' },
+                    { label: 'Testimonials', href: '#testimonials' }
+                  ].map((item) => (
+                    <li key={item.label}>
+                      <Link
+                        href={item.href}
+                        className='transition-colors duration-200 hover:text-white'
+                      >
+                        {item.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Services */}
+              <div>
+                <h3 className='mb-5 text-sm font-semibold tracking-wide text-white'>
+                  Services
+                </h3>
+                <ul className='flex flex-col gap-3 text-sm text-neutral-400'>
+                  {[
+                    { label: 'Expense Management', href: '#features' },
+                    { label: 'Reminders', href: '#features' },
+                    { label: 'Goals', href: '#features' },
+                    { label: 'Budgeting', href: '#features' }
+                  ].map((item) => (
+                    <li key={item.label}>
+                      <Link
+                        href={item.href}
+                        className='transition-colors duration-200 hover:text-white'
+                      >
+                        {item.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Resources */}
+              <div>
+                <h3 className='mb-5 text-sm font-semibold tracking-wide text-white'>
+                  Resources
+                </h3>
+                <ul className='flex flex-col gap-3 text-sm text-neutral-400'>
+                  {[
+                    { label: 'Blog', href: '#' },
+                    { label: 'Help Center', href: '#' },
+                    { label: 'FAQs', href: '#about-us' },
+                    { label: 'Contact Us', href: '#' }
+                  ].map((item) => (
+                    <li key={item.label}>
+                      <Link
+                        href={item.href}
+                        className='transition-colors duration-200 hover:text-white'
+                      >
+                        {item.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Connect */}
+              <div>
+                <h3 className='mb-5 text-sm font-semibold tracking-wide text-white'>
+                  Connect
+                </h3>
+                <div className='flex flex-wrap gap-3'>
+                  {[
+                    {
+                      icon: Mail,
+                      label: 'Email',
+                      href: 'mailto:hello@budgetbliss.app'
+                    },
+                    { icon: Globe, label: 'Website', href: '#' },
+                    { icon: Facebook, label: 'Facebook', href: '#' },
+                    { icon: Linkedin, label: 'LinkedIn', href: '#' },
+                    { icon: Instagram, label: 'Instagram', href: '#' }
+                  ].map(({ icon: Icon, label, href }) => (
+                    <a
+                      key={label}
+                      href={href}
+                      aria-label={label}
+                      className='flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-neutral-400 transition-all duration-200 hover:border-white/20 hover:bg-white/10 hover:text-white'
+                    >
+                      <Icon className='h-4 w-4' />
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom bar */}
+          <div className='flex flex-col items-center justify-between gap-3 border-t border-white/5 py-5 text-xs text-neutral-500 sm:flex-row'>
+            <span>&copy; BudgetBliss</span>
+            <span>
+              Made with{' '}
+              <span className='text-red-500' aria-label='love'>
+                ♥
+              </span>{' '}
+              by{' '}
+              <span className='font-semibold text-neutral-300'>
+                Tamal Biswas
+              </span>
+              .
             </span>
-            <span className='text-neutral-600'>|</span>
-            <span>Budgeting made blissful.</span>
-          </div>
-          <div className='flex gap-6'>
-            <Link
-              href='#features'
-              className='transition-colors hover:text-neutral-300'
-            >
-              Features
-            </Link>
-            <Link
-              href='#pricing'
-              className='transition-colors hover:text-neutral-300'
-            >
-              Pricing
-            </Link>
-            <Link
-              href='#about-us'
-              className='transition-colors hover:text-neutral-300'
-            >
-              Privacy Policy
-            </Link>
-          </div>
-          <div>
-            &copy; {new Date().getFullYear()} Budget Bliss. All rights reserved.
+            <span className='flex items-center gap-1.5'>
+              <span
+                className='bg-clip-text font-semibold text-transparent'
+                style={{
+                  backgroundImage:
+                    'linear-gradient(90deg, #FF9933 0%, #FF9933 33%, #ffffff 33%, #ffffff 66%, #138808 66%, #138808 100%)'
+                }}
+              >
+                Proudly Indian
+              </span>
+            </span>
           </div>
         </div>
       </footer>

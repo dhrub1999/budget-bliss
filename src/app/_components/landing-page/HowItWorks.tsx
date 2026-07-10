@@ -87,7 +87,7 @@ export default function HowItWorks() {
 
       {/* Heading */}
       <div className='mx-auto mb-16 max-w-3xl text-center'>
-        <h2 className='font-nunito mb-5 text-4xl font-extrabold text-white sm:text-5xl md:text-6xl'>
+        <h2 className='font-nunito mb-6 text-3xl font-extrabold text-white sm:text-4xl md:text-5xl'>
           Plan. Track. Achieve.
         </h2>
         <p className='text-base leading-relaxed text-neutral-400 md:text-lg'>

@@ -98,7 +98,11 @@ export default function PricingSection() {
       {/* Heading */}
       <div className='mx-auto mb-8 max-w-3xl text-center md:mb-16'>
         <h2 className='font-nunito mb-6 text-3xl font-extrabold text-white sm:text-4xl md:text-5xl'>
-          Flexible Pricing That Grows With You
+          Flexible Pricing That{' '}
+          <span className='from-brand-300 to-brand-500 bg-gradient-to-r bg-clip-text text-transparent'>
+            Grows
+          </span>{' '}
+          with You
         </h2>
         <p className='font-karla text-base text-neutral-400 md:text-lg'>
           Choose a plan that suits your lifestyle - no hidden charges, no

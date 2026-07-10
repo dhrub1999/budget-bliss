@@ -239,7 +239,7 @@ export default function TestimonialsSection() {
           <div className='border-brand-500/20 bg-brand-500/5 text-brand-400 mb-6 inline-flex items-center rounded-full border px-4 py-1.5 text-xs font-semibold tracking-wide'>
             Testimonials
           </div>
-          <h2 className='font-nunito max-w-2xl text-3xl font-extrabold text-white sm:text-4xl md:text-5xl'>
+          <h2 className='font-nunito mb-6 max-w-2xl text-3xl font-extrabold text-white sm:text-4xl md:text-5xl'>
             What they{' '}
             <span className='from-brand-300 to-brand-500 bg-gradient-to-r bg-clip-text text-transparent'>
               Love
