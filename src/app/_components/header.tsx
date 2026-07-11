@@ -3,7 +3,7 @@ import * as React from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { useUser } from '@clerk/nextjs';
+import { authClient } from '@/lib/auth/client';
 import { UserNav } from '@/components/layout/user-nav';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
@@ -11,7 +11,9 @@ import { Menu, X } from 'lucide-react';
 
 const Header = () => {
   const pathname = usePathname();
-  const { isSignedIn, isLoaded } = useUser();
+  const { data: session, isPending } = authClient.useSession();
+  const isLoaded = !isPending;
+  const isSignedIn = !!session?.user;
   const [activeSection, setActiveSection] = React.useState<string>('');
   const [mobileOpen, setMobileOpen] = React.useState(false);
 

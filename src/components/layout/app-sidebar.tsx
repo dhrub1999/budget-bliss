@@ -36,7 +36,7 @@ import {
   supportNavItems
 } from '@/constants/data';
 import { useMediaQuery } from '@/hooks/use-media-query';
-import { useUser } from '@clerk/nextjs';
+import { authClient } from '@/lib/auth/client';
 import {
   IconBell,
   IconChevronRight,
@@ -45,7 +45,6 @@ import {
   IconLogout,
   IconUserCircle
 } from '@tabler/icons-react';
-import { SignOutButton } from '@clerk/nextjs';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import * as React from 'react';
@@ -67,7 +66,8 @@ const tenants = [
 export default function AppSidebar() {
   const pathname = usePathname();
   const { isOpen } = useMediaQuery();
-  const { user } = useUser();
+  const { data: session } = authClient.useSession();
+  const user = session?.user;
   const router = useRouter();
 
   const handleSwitchTenant = (_tenantId: string) => {
@@ -248,9 +248,14 @@ export default function AppSidebar() {
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={async () => {
+                    await authClient.signOut();
+                    router.push('/auth/sign-in');
+                  }}
+                >
                   <IconLogout className='mr-2 h-4 w-4' />
-                  <SignOutButton redirectUrl='/auth/sign-in' />
+                  Sign out
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
