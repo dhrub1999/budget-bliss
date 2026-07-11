@@ -1,4 +1,3 @@
-import { relations } from 'drizzle-orm';
 import {
   doublePrecision,
   pgTable,
@@ -8,15 +7,8 @@ import {
 } from 'drizzle-orm/pg-core';
 import { createId } from '@paralleldrive/cuid2';
 
-// ─── Users ───────────────────────────────────────────────────────────────────
-
-export const users = pgTable('users', {
-  id: uuid('id').primaryKey(),
-  email: text('email').notNull().unique(),
-  createdAt: timestamp('created_at').notNull().defaultNow()
-});
-
 // ─── Transactions ─────────────────────────────────────────────────────────────
+// userId references neon_auth.user.id — managed by Neon Auth, not Drizzle.
 
 export const transactions = pgTable('transactions', {
   id: text('id')
@@ -29,28 +21,11 @@ export const transactions = pgTable('transactions', {
   category: text('category').notNull(),
   description: text('description'),
   date: timestamp('date').notNull().defaultNow(),
-  userId: uuid('user_id')
-    .notNull()
-    .references(() => users.id, { onDelete: 'cascade' })
+  /** UUID of the authenticated user from neon_auth.user */
+  userId: uuid('user_id').notNull()
 });
 
-// ─── Relations ────────────────────────────────────────────────────────────────
-
-export const usersRelations = relations(users, ({ many }) => ({
-  transactions: many(transactions)
-}));
-
-export const transactionsRelations = relations(transactions, ({ one }) => ({
-  user: one(users, {
-    fields: [transactions.userId],
-    references: [users.id]
-  })
-}));
-
-// ─── Inferred types (handy for the app layer) ─────────────────────────────────
-
-export type User = typeof users.$inferSelect;
-export type NewUser = typeof users.$inferInsert;
+// ─── Inferred types ───────────────────────────────────────────────────────────
 
 export type Transaction = typeof transactions.$inferSelect;
 export type NewTransaction = typeof transactions.$inferInsert;
