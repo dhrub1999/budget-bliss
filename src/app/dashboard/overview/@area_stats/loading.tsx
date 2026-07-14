@@ -1,5 +1,5 @@
-import { AreaGraphSkeleton } from '@/features/overview/components/area-graph-skeleton';
+import { FinancialCalendarSkeleton } from '@/features/overview/components/overview-skeletons';
 
 export default function Loading() {
-  return <AreaGraphSkeleton />;
+  return <FinancialCalendarSkeleton />;
 }

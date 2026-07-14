@@ -1,5 +1,5 @@
-import { BarGraphSkeleton } from '@/features/overview/components/bar-graph-skeleton';
+import { SpendingCategoriesSkeleton } from '@/features/overview/components/overview-skeletons';
 
 export default function Loading() {
-  return <BarGraphSkeleton />;
+  return <SpendingCategoriesSkeleton />;
 }
