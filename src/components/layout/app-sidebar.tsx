@@ -53,7 +53,7 @@ import { OrgSwitcher } from '../org-switcher';
 
 export const company = {
   name: 'Budget Bliss',
-  logo: Icons.budgetBliss,
+  logo: Icons.onlyLogo,
   plan: 'Enterprise'
 };
 
@@ -146,7 +146,7 @@ export default function AppSidebar() {
   return (
     <Sidebar collapsible='icon'>
       <SidebarHeader>
-        <Icons.budgetBliss />
+        <Icons.onlyLogo />
       </SidebarHeader>
       <SidebarContent className='overflow-x-hidden'>
         {/* Overview Group */}

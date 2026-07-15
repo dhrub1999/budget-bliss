@@ -1,6 +1,5 @@
-import { RecentSalesSkeleton } from '@/features/overview/components/recent-sales-skeleton';
-import React from 'react';
+import { RecentTransactionsSkeleton } from '@/features/overview/components/overview-skeletons';
 
 export default function Loading() {
-  return <RecentSalesSkeleton />;
+  return <RecentTransactionsSkeleton />;
 }

@@ -1,7 +1,7 @@
 import { delay } from '@/constants/mock-api';
-import { PieGraph } from '@/features/overview/components/pie-graph';
+import { GoalsSavings } from '@/features/overview/components/goals-savings';
 
-export default async function Stats() {
-  await delay(1000);
-  return <PieGraph />;
+export default async function PieStats() {
+  await delay(900);
+  return <GoalsSavings />;
 }

@@ -1,5 +1,5 @@
-import { PieGraphSkeleton } from '@/features/overview/components/pie-graph-skeleton';
+import { GoalsSavingsSkeleton } from '@/features/overview/components/overview-skeletons';
 
 export default function Loading() {
-  return <PieGraphSkeleton />;
+  return <GoalsSavingsSkeleton />;
 }
