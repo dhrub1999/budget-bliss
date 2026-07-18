@@ -43,7 +43,21 @@ function formatDateTime(isoStr: string) {
   };
 }
 
-export function RecentTransactions() {
+interface RecentTransactionsProps {
+  dbTransactions?: Array<{
+    id: string;
+    amount: number;
+    type: string;
+    category: string;
+    description: string | null;
+    date: string;
+    userId: string;
+  }>;
+}
+
+export function RecentTransactions({
+  dbTransactions = []
+}: RecentTransactionsProps) {
   const [tab, setTab] = React.useState<FilterTab>('all');
   const [dateRange, setDateRange] = React.useState<DateRange | undefined>(
     undefined
@@ -52,8 +66,25 @@ export function RecentTransactions() {
   const [addOpen, setAddOpen] = React.useState(false);
   const [hasError, setHasError] = React.useState(false);
 
+  const allTransactions = React.useMemo(() => {
+    const mappedDb = dbTransactions.map((dt) => {
+      const icon = categoryIconMap[dt.category] || '📦';
+      return {
+        id: dt.id,
+        title: dt.description || dt.category,
+        category: dt.category as any,
+        amount: dt.amount,
+        type: dt.type === 'INCOME' ? ('credit' as const) : ('debit' as const),
+        date: dt.date,
+        icon
+      };
+    });
+
+    return [...mappedDb, ...transactions];
+  }, [dbTransactions]);
+
   const filtered = React.useMemo(() => {
-    let list = [...transactions];
+    let list = [...allTransactions];
 
     // Tab filter
     if (tab === 'credited') list = list.filter((t) => t.type === 'credit');
@@ -71,7 +102,7 @@ export function RecentTransactions() {
     }
 
     return list.slice(0, 12); // show last 12
-  }, [tab, dateRange]);
+  }, [tab, dateRange, allTransactions]);
 
   if (hasError) {
     return (

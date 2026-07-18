@@ -46,7 +46,36 @@ function getDateType(
   return null;
 }
 
-export function FinancialCalendar() {
+const categoryIconMap: Record<string, string> = {
+  Groceries: '🛒',
+  'Dining Out': '🍽️',
+  Subscriptions: '📺',
+  Bills: '🧾',
+  Transportation: '🚗',
+  Entertainment: '🎬',
+  Healthcare: '🏥',
+  Shopping: '🛍️',
+  Salary: '💼',
+  Freelance: '💻',
+  Investment: '📈',
+  Others: '📦'
+};
+
+interface FinancialCalendarProps {
+  dbTransactions?: Array<{
+    id: string;
+    amount: number;
+    type: string;
+    category: string;
+    description: string | null;
+    date: string;
+    userId: string;
+  }>;
+}
+
+export function FinancialCalendar({
+  dbTransactions = []
+}: FinancialCalendarProps) {
   const [currentMonth, setCurrentMonth] = React.useState<Date>(TODAY);
   const [selectedDate, setSelectedDate] = React.useState<Date | null>(null);
   const [popoverDate, setPopoverDate] = React.useState<Date | null>(null);
@@ -59,14 +88,48 @@ export function FinancialCalendar() {
     setIsClient(true);
   }, []);
 
-  const events = React.useMemo(
-    () =>
-      getCalendarEventsForMonth(
-        currentMonth.getFullYear(),
-        currentMonth.getMonth()
-      ),
-    [currentMonth]
-  );
+  const events = React.useMemo(() => {
+    const result = getCalendarEventsForMonth(
+      currentMonth.getFullYear(),
+      currentMonth.getMonth()
+    );
+
+    dbTransactions.forEach((dt) => {
+      const d = new Date(dt.date);
+      if (
+        d.getFullYear() === currentMonth.getFullYear() &&
+        d.getMonth() === currentMonth.getMonth()
+      ) {
+        const key = d.toISOString().split('T')[0];
+        if (!result[key]) {
+          result[key] = { debits: [], credits: [] };
+        }
+
+        const icon = categoryIconMap[dt.category] || '📦';
+        const frontendTxn = {
+          id: dt.id,
+          title: dt.description || dt.category,
+          category: dt.category as any,
+          amount: dt.amount,
+          type: dt.type === 'INCOME' ? ('credit' as const) : ('debit' as const),
+          date: dt.date,
+          icon
+        };
+
+        if (dt.type === 'INCOME') {
+          if (!result[key].credits.some((c) => c.id === dt.id)) {
+            result[key].credits.push(frontendTxn);
+          }
+        } else {
+          if (!result[key].debits.some((d) => d.id === dt.id)) {
+            result[key].debits.push(frontendTxn);
+          }
+        }
+      }
+    });
+
+    return result;
+  }, [currentMonth, dbTransactions]);
 
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(currentMonth);
