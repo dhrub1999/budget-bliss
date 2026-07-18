@@ -29,7 +29,21 @@ const chartConfig = {
   }
 } satisfies ChartConfig;
 
-export function SpendingCategories() {
+interface SpendingCategoriesProps {
+  dbTransactions?: Array<{
+    id: string;
+    amount: number;
+    type: string;
+    category: string;
+    description: string | null;
+    date: string;
+    userId: string;
+  }>;
+}
+
+export function SpendingCategories({
+  dbTransactions = []
+}: SpendingCategoriesProps) {
   const [isClient, setIsClient] = React.useState(false);
   const [hasError, setHasError] = React.useState(false);
 
@@ -37,9 +51,59 @@ export function SpendingCategories() {
     setIsClient(true);
   }, []);
 
-  const maxAmount = Math.max(...spendingCategories.map((c) => c.amount));
+  const computedCategories = React.useMemo(() => {
+    const categoriesMap: Record<
+      string,
+      { category: string; amount: number; color: string; icon: string }
+    > = {};
 
-  const isEmpty = spendingCategories.length === 0;
+    spendingCategories.forEach((sc) => {
+      categoriesMap[sc.category] = { ...sc };
+    });
+
+    dbTransactions.forEach((dt) => {
+      if (dt.type === 'EXPENSE') {
+        const cat = dt.category;
+        if (categoriesMap[cat]) {
+          categoriesMap[cat].amount += dt.amount;
+        } else {
+          const colorsMap: Record<string, string> = {
+            Entertainment: '#cbd5e1',
+            Healthcare: '#f43f5e',
+            Shopping: '#ec4899',
+            Salary: '#10b981',
+            Freelance: '#8b5cf6',
+            Investment: '#3b82f6',
+            Others: '#94a3b8'
+          };
+          const iconsMap: Record<string, string> = {
+            Entertainment: '🎬',
+            Healthcare: '🏥',
+            Shopping: '🛍️',
+            Salary: '💼',
+            Freelance: '💻',
+            Investment: '📈',
+            Others: '📦'
+          };
+          categoriesMap[cat] = {
+            category: cat,
+            amount: dt.amount,
+            color: colorsMap[cat] || '#94a3b8',
+            icon: iconsMap[cat] || '📦'
+          };
+        }
+      }
+    });
+
+    return Object.values(categoriesMap).sort((a, b) => b.amount - a.amount);
+  }, [dbTransactions]);
+
+  const computedTotalSpent = React.useMemo(() => {
+    return computedCategories.reduce((sum, c) => sum + c.amount, 0);
+  }, [computedCategories]);
+
+  const maxAmount = Math.max(...computedCategories.map((c) => c.amount), 1);
+  const isEmpty = computedCategories.length === 0;
 
   if (hasError) {
     return (
@@ -73,7 +137,7 @@ export function SpendingCategories() {
           <div className='text-right'>
             <p className='text-muted-foreground text-xs'>Total Spent</p>
             <p className='text-foreground text-lg font-bold'>
-              {formatINRFull(totalSpentLast30Days)}
+              {formatINRFull(computedTotalSpent)}
             </p>
           </div>
         </div>
@@ -103,7 +167,7 @@ export function SpendingCategories() {
           </div>
         ) : (
           <div className='space-y-2'>
-            {spendingCategories.map((cat) => {
+            {computedCategories.map((cat) => {
               const pct = (cat.amount / maxAmount) * 100;
               return (
                 <div key={cat.category} className='flex items-center gap-2'>

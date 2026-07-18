@@ -1,6 +1,8 @@
 'use client';
 
 import * as React from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Dialog,
   DialogContent,
@@ -9,7 +11,6 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
@@ -24,10 +25,25 @@ import {
 } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { Textarea } from '@/components/ui/textarea';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage
+} from '@/components/ui/form';
 import { CalendarIcon, Download, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
-import { type TransactionCategory } from './overview-data';
+import {
+  transactionSchema,
+  type TransactionSchemaOutput,
+  expenseCategories,
+  incomeCategories,
+  expenseVendors,
+  incomeVendors
+} from '@/lib/validations/transaction';
 
 interface AddTransactionDialogProps {
   open: boolean;
@@ -35,47 +51,6 @@ interface AddTransactionDialogProps {
   defaultDate?: string;
   defaultType?: 'debit' | 'credit';
 }
-
-const expenseCategories: TransactionCategory[] = [
-  'Groceries',
-  'Dining Out',
-  'Subscriptions',
-  'Bills',
-  'Transportation',
-  'Entertainment',
-  'Healthcare',
-  'Shopping',
-  'Others'
-];
-
-const incomeCategories: TransactionCategory[] = [
-  'Salary',
-  'Freelance',
-  'Investment',
-  'Others'
-];
-
-const expenseVendors = [
-  'Swiggy',
-  'Zomato',
-  'Amazon',
-  'Netflix',
-  'Uber',
-  'Ola Cabs',
-  'Blinkit',
-  'Big Basket',
-  'Myntra',
-  'Spotify',
-  'Others'
-];
-
-const incomeVendors = [
-  'Company Salary',
-  'Freelance Client',
-  'Stock Dividend',
-  'Investment Return',
-  'Others'
-];
 
 // Helper to safely parse YYYY-MM-DD local dates
 function parseDateString(dateStr: string) {
@@ -89,45 +64,59 @@ export function AddTransactionDialog({
   defaultDate,
   defaultType
 }: AddTransactionDialogProps) {
-  const [type, setType] = React.useState<'debit' | 'credit'>(
-    defaultType ?? 'debit'
-  );
-  const [amount, setAmount] = React.useState('');
-  const [category, setCategory] = React.useState<TransactionCategory>('Others');
-  const [account, setAccount] = React.useState('Others');
-  const [date, setDate] = React.useState<Date>(
-    defaultDate ? parseDateString(defaultDate) : new Date()
-  );
-  const [notes, setNotes] = React.useState('');
   const [submitting, setSubmitting] = React.useState(false);
 
-  // Sync with default values when dialog opens or defaults change
+  const form = useForm<TransactionSchemaOutput>({
+    resolver: zodResolver(transactionSchema),
+    defaultValues: {
+      type: defaultType ?? 'debit',
+      amount: '' as any,
+      category: 'Others',
+      account: 'Others',
+      date: defaultDate ? parseDateString(defaultDate) : new Date(),
+      notes: ''
+    }
+  });
+
+  const type = form.watch('type');
+  const category = form.watch('category');
+  const account = form.watch('account');
+
+  // Reset form when dialog visibility or defaults change
   React.useEffect(() => {
-    if (defaultDate) setDate(parseDateString(defaultDate));
-    if (defaultType) setType(defaultType);
-  }, [defaultDate, defaultType, open]);
+    if (open) {
+      form.reset({
+        type: defaultType ?? 'debit',
+        amount: '' as any,
+        category: 'Others',
+        account: 'Others',
+        date: defaultDate ? parseDateString(defaultDate) : new Date(),
+        notes: ''
+      });
+    }
+  }, [defaultDate, defaultType, open, form]);
 
   // Adjust Category and Account selections if type changes
   React.useEffect(() => {
     if (type === 'debit') {
-      if (!expenseCategories.includes(category)) {
-        setCategory('Others');
+      if (!expenseCategories.includes(category as any)) {
+        form.setValue('category', 'Others');
       }
-      if (!expenseVendors.includes(account)) {
-        setAccount('Others');
+      if (!expenseVendors.includes(account as any)) {
+        form.setValue('account', 'Others');
       }
     } else {
-      if (!incomeCategories.includes(category)) {
-        setCategory('Others');
+      if (!incomeCategories.includes(category as any)) {
+        form.setValue('category', 'Others');
       }
-      if (!incomeVendors.includes(account)) {
-        setAccount('Others');
+      if (!incomeVendors.includes(account as any)) {
+        form.setValue('account', 'Others');
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [type]);
+  }, [type, category, account, form]);
 
   function formatFriendlyDate(dateObj: Date) {
+    if (!dateObj) return '';
     const today = new Date();
     const yesterday = new Date();
     yesterday.setDate(today.getDate() - 1);
@@ -155,29 +144,47 @@ export function AddTransactionDialog({
     }
   }
 
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  async function onSubmit(values: TransactionSchemaOutput) {
     setSubmitting(true);
 
-    // Simulate submission (no real DB in this demo)
-    setTimeout(() => {
+    try {
+      const response = await fetch('/api/transactions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount: values.amount,
+          type: values.type,
+          category: values.category,
+          account: values.account,
+          date: values.date.toISOString(),
+          notes: values.notes?.trim() || undefined
+        })
+      });
+
+      const result = await response.json();
+      console.log('Transaction API response:', result);
       setSubmitting(false);
 
-      const successMessage =
-        type === 'credit'
-          ? `Successfully added income of ₹${Number(amount).toLocaleString('en-IN')} from ${account}!`
-          : `Successfully added expense of ₹${Number(amount).toLocaleString('en-IN')} to ${account}!`;
+      if (result && result.success) {
+        const successMessage =
+          values.type === 'credit'
+            ? `Successfully added income of ₹${Number(values.amount).toLocaleString('en-IN')} from ${values.account}!`
+            : `Successfully added expense of ₹${Number(values.amount).toLocaleString('en-IN')} to ${values.account}!`;
 
-      toast.success(successMessage);
+        toast.success(successMessage);
 
-      // Reset form fields
-      setAmount('');
-      setCategory('Others');
-      setAccount('Others');
-      setNotes('');
-      setDate(new Date());
-      onOpenChange(false);
-    }, 600);
+        form.reset();
+        onOpenChange(false);
+
+        // Trigger a page refresh to show new data
+        window.location.reload();
+      } else {
+        toast.error(result?.error || 'Failed to add transaction');
+      }
+    } catch (error: any) {
+      setSubmitting(false);
+      toast.error(error.message || 'An error occurred while saving');
+    }
   }
 
   return (
@@ -201,7 +208,7 @@ export function AddTransactionDialog({
             <div className='border-zinc-850 flex h-9 items-center gap-1 rounded-full border bg-zinc-900 p-1'>
               <button
                 type='button'
-                onClick={() => setType('credit')}
+                onClick={() => form.setValue('type', 'credit')}
                 className={cn(
                   'flex h-7 w-7 cursor-pointer items-center justify-center rounded-full p-1.5 transition-all duration-200 focus:outline-none',
                   type === 'credit'
@@ -214,7 +221,7 @@ export function AddTransactionDialog({
               </button>
               <button
                 type='button'
-                onClick={() => setType('debit')}
+                onClick={() => form.setValue('type', 'debit')}
                 className={cn(
                   'flex h-7 w-7 cursor-pointer items-center justify-center rounded-full p-1.5 transition-all duration-200 focus:outline-none',
                   type === 'debit'
@@ -229,175 +236,205 @@ export function AddTransactionDialog({
           </div>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className='space-y-4 pt-2'>
-          {/* Date Picker */}
-          <div className='space-y-1.5'>
-            <Label
-              htmlFor='txn-date'
-              className='text-sm font-medium text-zinc-400'
-            >
-              Date
-            </Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  id='txn-date'
-                  variant='outline'
-                  className='relative h-12 w-full cursor-pointer justify-between rounded-xl border border-zinc-800/80 bg-[#18181b] px-4 text-left font-normal text-white hover:bg-zinc-900 hover:text-white focus:ring-1 focus:ring-emerald-500'
-                >
-                  <span className='text-zinc-200'>
-                    {formatFriendlyDate(date)}
-                  </span>
-                  <CalendarIcon className='absolute right-4 h-5 w-5 text-zinc-400' />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent
-                className='w-auto border-zinc-800 bg-[#18181b] p-0 text-white'
-                align='start'
-              >
-                <Calendar
-                  mode='single'
-                  selected={date}
-                  onSelect={(d) => d && setDate(d)}
-                  initialFocus
-                  className='rounded-xl border border-zinc-800 bg-[#18181b] text-white'
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
-
-          {/* Amount Input */}
-          <div className='space-y-1.5'>
-            <Label
-              htmlFor='txn-amount'
-              className='text-sm font-medium text-zinc-400'
-            >
-              Amount
-            </Label>
-            <Input
-              id='txn-amount'
-              type='number'
-              placeholder='Enter amount here'
-              min='1'
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              required
-              className='h-12 w-full rounded-xl border-zinc-800/80 bg-[#18181b] px-4 text-white placeholder:text-zinc-500 focus-visible:border-emerald-500 focus-visible:ring-1 focus-visible:ring-emerald-500 focus-visible:ring-offset-0'
-            />
-          </div>
-
-          {/* Category & Account Grid */}
-          <div className='grid grid-cols-2 gap-4'>
-            <div className='space-y-1.5'>
-              <Label
-                htmlFor='txn-category'
-                className='text-sm font-medium text-zinc-400'
-              >
-                Category
-              </Label>
-              <Select
-                value={category}
-                onValueChange={(v) => setCategory(v as TransactionCategory)}
-              >
-                <SelectTrigger
-                  id='txn-category'
-                  className='h-12 w-full rounded-xl border-zinc-800/80 bg-[#18181b] px-4 text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:ring-offset-0'
-                >
-                  <SelectValue placeholder='Select a category' />
-                </SelectTrigger>
-                <SelectContent className='border-zinc-800 bg-[#18181b] text-white'>
-                  {(type === 'credit'
-                    ? incomeCategories
-                    : expenseCategories
-                  ).map((c) => (
-                    <SelectItem
-                      key={c}
-                      value={c}
-                      className='text-white hover:bg-zinc-800 focus:bg-zinc-800 focus:text-white'
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className='space-y-4 pt-2'
+          >
+            {/* Date Picker */}
+            <FormField
+              control={form.control}
+              name='date'
+              render={({ field }) => (
+                <FormItem className='space-y-1.5'>
+                  <FormLabel className='text-sm font-medium text-zinc-400'>
+                    Date
+                  </FormLabel>
+                  <Popover modal={true}>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          id='txn-date'
+                          variant='outline'
+                          className='relative h-12 w-full cursor-pointer justify-between rounded-xl border border-zinc-800/80 bg-[#18181b] px-4 text-left font-normal text-white hover:bg-zinc-900 hover:text-white focus:ring-1 focus:ring-emerald-500'
+                        >
+                          <span className='text-zinc-200'>
+                            {formatFriendlyDate(field.value)}
+                          </span>
+                          <CalendarIcon className='absolute right-4 h-5 w-5 text-zinc-400' />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent
+                      className='w-auto border-zinc-800 bg-[#18181b] p-0 text-white'
+                      align='start'
                     >
-                      {c}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className='space-y-1.5'>
-              <Label
-                htmlFor='txn-account'
-                className='text-sm font-medium text-zinc-400'
-              >
-                Account
-              </Label>
-              <Select value={account} onValueChange={(v) => setAccount(v)}>
-                <SelectTrigger
-                  id='txn-account'
-                  className='h-12 rounded-xl border-zinc-800/80 bg-[#18181b] px-4 text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:ring-offset-0'
-                >
-                  <SelectValue placeholder='Select the vendor' />
-                </SelectTrigger>
-                <SelectContent className='border-zinc-800 bg-[#18181b] text-white'>
-                  {(type === 'credit' ? incomeVendors : expenseVendors).map(
-                    (v) => (
-                      <SelectItem
-                        key={v}
-                        value={v}
-                        className='text-white hover:bg-zinc-800 focus:bg-zinc-800 focus:text-white'
-                      >
-                        {v}
-                      </SelectItem>
-                    )
-                  )}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          {/* Notes Field */}
-          <div className='space-y-1.5'>
-            <Label
-              htmlFor='txn-notes'
-              className='text-sm font-medium text-zinc-400'
-            >
-              Notes
-            </Label>
-            <Textarea
-              id='txn-notes'
-              placeholder='Anything for later..'
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              className='min-h-[100px] w-full resize-none rounded-xl border-zinc-800/80 bg-[#18181b] p-4 text-white placeholder:text-zinc-500 focus-visible:border-emerald-500 focus-visible:ring-1 focus-visible:ring-emerald-500 focus-visible:ring-offset-0'
-            />
-          </div>
-
-          {/* Action Buttons */}
-          <div className='flex items-center gap-3 pt-4'>
-            <Button
-              type='submit'
-              disabled={submitting}
-              className={cn(
-                'h-12 w-[72%] cursor-pointer rounded-xl border-0 text-base font-medium text-white shadow-lg transition-all duration-200 focus:outline-none',
-                type === 'credit'
-                  ? 'bg-[#00c853] hover:bg-[#00b24a] active:scale-[0.98]'
-                  : 'bg-[#f43f5e] hover:bg-[#e11d48] active:scale-[0.98]'
+                      <Calendar
+                        mode='single'
+                        selected={field.value}
+                        onSelect={field.onChange}
+                        initialFocus
+                        className='rounded-xl border border-zinc-800 bg-[#18181b] text-white'
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <FormMessage />
+                </FormItem>
               )}
-            >
-              {submitting
-                ? 'Saving...'
-                : type === 'credit'
-                  ? 'Add Income'
-                  : 'Add Expense'}
-            </Button>
-            <Button
-              type='button'
-              variant='outline'
-              onClick={() => onOpenChange(false)}
-              className='h-12 w-[28%] cursor-pointer rounded-xl border border-zinc-800 bg-transparent text-base font-medium text-zinc-300 transition-all duration-200 hover:bg-zinc-800/40 hover:text-white active:scale-[0.98]'
-            >
-              Cancel
-            </Button>
-          </div>
-        </form>
+            />
+
+            {/* Amount Input */}
+            <FormField
+              control={form.control}
+              name='amount'
+              render={({ field }) => (
+                <FormItem className='space-y-1.5'>
+                  <FormLabel className='text-sm font-medium text-zinc-400'>
+                    Amount
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      id='txn-amount'
+                      type='number'
+                      placeholder='Enter amount here'
+                      min='1'
+                      {...field}
+                      className='h-12 w-full rounded-xl border-zinc-800/80 bg-[#18181b] px-4 text-white placeholder:text-zinc-500 focus-visible:border-emerald-500 focus-visible:ring-1 focus-visible:ring-emerald-500 focus-visible:ring-offset-0'
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Category & Account Grid */}
+            <div className='grid grid-cols-2 gap-4'>
+              <FormField
+                control={form.control}
+                name='category'
+                render={({ field }) => (
+                  <FormItem className='space-y-1.5'>
+                    <FormLabel className='text-sm font-medium text-zinc-400'>
+                      Category
+                    </FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger
+                          id='txn-category'
+                          className='h-12 w-full rounded-xl border-zinc-800/80 bg-[#18181b] px-4 text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:ring-offset-0'
+                        >
+                          <SelectValue placeholder='Select a category' />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent className='border-zinc-800 bg-[#18181b] text-white'>
+                        {(type === 'credit'
+                          ? incomeCategories
+                          : expenseCategories
+                        ).map((c) => (
+                          <SelectItem
+                            key={c}
+                            value={c}
+                            className='text-white hover:bg-zinc-800 focus:bg-zinc-800 focus:text-white'
+                          >
+                            {c}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name='account'
+                render={({ field }) => (
+                  <FormItem className='space-y-1.5'>
+                    <FormLabel className='text-sm font-medium text-zinc-400'>
+                      Account
+                    </FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger
+                          id='txn-account'
+                          className='h-12 rounded-xl border-zinc-800/80 bg-[#18181b] px-4 text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:ring-offset-0'
+                        >
+                          <SelectValue placeholder='Select the vendor' />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent className='border-zinc-800 bg-[#18181b] text-white'>
+                        {(type === 'credit'
+                          ? incomeVendors
+                          : expenseVendors
+                        ).map((v) => (
+                          <SelectItem
+                            key={v}
+                            value={v}
+                            className='text-white hover:bg-zinc-800 focus:bg-zinc-800 focus:text-white'
+                          >
+                            {v}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            {/* Notes Field */}
+            <FormField
+              control={form.control}
+              name='notes'
+              render={({ field }) => (
+                <FormItem className='space-y-1.5'>
+                  <FormLabel className='text-sm font-medium text-zinc-400'>
+                    Notes
+                  </FormLabel>
+                  <FormControl>
+                    <Textarea
+                      id='txn-notes'
+                      placeholder='Anything for later..'
+                      {...field}
+                      className='min-h-[100px] w-full resize-none rounded-xl border-zinc-800/80 bg-[#18181b] p-4 text-white placeholder:text-zinc-500 focus-visible:border-emerald-500 focus-visible:ring-1 focus-visible:ring-emerald-500 focus-visible:ring-offset-0'
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Action Buttons */}
+            <div className='flex items-center gap-3 pt-4'>
+              <Button
+                type='submit'
+                disabled={submitting}
+                className={cn(
+                  'h-12 w-[72%] cursor-pointer rounded-xl border-0 text-base font-medium text-white shadow-lg transition-all duration-200 focus:outline-none',
+                  type === 'credit'
+                    ? 'bg-[#00c853] hover:bg-[#00b24a] active:scale-[0.98]'
+                    : 'bg-[#f43f5e] hover:bg-[#e11d48] active:scale-[0.98]'
+                )}
+              >
+                {submitting
+                  ? 'Saving...'
+                  : type === 'credit'
+                    ? 'Add Income'
+                    : 'Add Expense'}
+              </Button>
+              <Button
+                type='button'
+                variant='outline'
+                onClick={() => onOpenChange(false)}
+                className='h-12 w-[28%] cursor-pointer rounded-xl border border-zinc-800 bg-transparent text-base font-medium text-zinc-300 transition-all duration-200 hover:bg-zinc-800/40 hover:text-white active:scale-[0.98]'
+              >
+                Cancel
+              </Button>
+            </div>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );
