@@ -321,7 +321,7 @@ export function AddTransactionDialog({
                       <FormControl>
                         <SelectTrigger
                           id='txn-category'
-                          className='h-12 w-full rounded-xl border-zinc-800/80 bg-[#18181b] px-4 text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:ring-offset-0'
+                          className='!h-12 w-full rounded-xl border-zinc-800/80 bg-[#18181b] px-4 text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:ring-offset-0'
                         >
                           <SelectValue placeholder='Select a category' />
                         </SelectTrigger>
@@ -358,7 +358,7 @@ export function AddTransactionDialog({
                       <FormControl>
                         <SelectTrigger
                           id='txn-account'
-                          className='h-12 rounded-xl border-zinc-800/80 bg-[#18181b] px-4 text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:ring-offset-0'
+                          className='!h-12 w-full rounded-xl border-zinc-800/80 bg-[#18181b] px-4 text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:ring-offset-0'
                         >
                           <SelectValue placeholder='Select the vendor' />
                         </SelectTrigger>
