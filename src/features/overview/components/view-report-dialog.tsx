@@ -21,11 +21,20 @@ import {
   YAxis,
   ResponsiveContainer
 } from 'recharts';
-import { monthlyFinancials, formatINRFull } from './overview-data';
+import { formatINRFull } from './overview-data';
 
 interface ViewReportDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  dbTransactions?: Array<{
+    id: string;
+    amount: number;
+    type: string;
+    category: string;
+    description: string | null;
+    date: string;
+    userId: string;
+  }>;
 }
 
 const chartConfig = {
@@ -39,15 +48,70 @@ const chartConfig = {
   }
 } satisfies ChartConfig;
 
-const totalIncome = monthlyFinancials.reduce((s, m) => s + m.income, 0);
-const totalExpense = monthlyFinancials.reduce((s, m) => s + m.expense, 0);
-const netSavings = totalIncome - totalExpense;
-const savingRate = Math.round((netSavings / totalIncome) * 100);
-
 export function ViewReportDialog({
   open,
-  onOpenChange
+  onOpenChange,
+  dbTransactions = []
 }: ViewReportDialogProps) {
+  const computedMonthlyFinancials = React.useMemo(() => {
+    const result: Array<{
+      year: number;
+      monthNum: number;
+      month: string;
+      income: number;
+      expense: number;
+    }> = [];
+    const now = new Date();
+
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const label = d.toLocaleString('en-US', { month: 'short' });
+      result.push({
+        year: d.getFullYear(),
+        monthNum: d.getMonth(),
+        month: label,
+        income: 0,
+        expense: 0
+      });
+    }
+
+    dbTransactions.forEach((dt) => {
+      const txDate = new Date(dt.date);
+      const txYear = txDate.getFullYear();
+      const txMonth = txDate.getMonth();
+
+      const match = result.find(
+        (m) => m.year === txYear && m.monthNum === txMonth
+      );
+
+      if (match) {
+        if (dt.type === 'INCOME') {
+          match.income += dt.amount;
+        } else if (dt.type === 'EXPENSE') {
+          match.expense += dt.amount;
+        }
+      }
+    });
+
+    return result.map(({ month, income, expense }) => ({
+      month,
+      income,
+      expense
+    }));
+  }, [dbTransactions]);
+
+  const totalIncome = React.useMemo(() => {
+    return computedMonthlyFinancials.reduce((s, m) => s + m.income, 0);
+  }, [computedMonthlyFinancials]);
+
+  const totalExpense = React.useMemo(() => {
+    return computedMonthlyFinancials.reduce((s, m) => s + m.expense, 0);
+  }, [computedMonthlyFinancials]);
+
+  const netSavings = totalIncome - totalExpense;
+  const savingRate =
+    totalIncome > 0 ? Math.round((netSavings / totalIncome) * 100) : 0;
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className='sm:max-w-[560px]'>
@@ -84,7 +148,7 @@ export function ViewReportDialog({
           </p>
           <ChartContainer config={chartConfig} className='h-[220px] w-full'>
             <AreaChart
-              data={monthlyFinancials}
+              data={computedMonthlyFinancials}
               margin={{ top: 4, right: 12, left: 0, bottom: 0 }}
             >
               <defs>
@@ -164,7 +228,7 @@ export function ViewReportDialog({
                 </tr>
               </thead>
               <tbody>
-                {monthlyFinancials.map((row, i) => {
+                {computedMonthlyFinancials.map((row, i) => {
                   const saved = row.income - row.expense;
                   return (
                     <tr

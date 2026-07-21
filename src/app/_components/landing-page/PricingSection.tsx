@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { Star, SquareCheck, Users, Flame } from 'lucide-react';
+import { Star, SquareCheck, Users, Flame, PartyPopper } from 'lucide-react';
 
 const plans = [
   {
@@ -173,7 +173,7 @@ export default function PricingSection() {
         }`}
       >
         <div className='bg-brand-500/10 border-brand-500/30 text-brand-400 flex items-center justify-center gap-2 rounded-full border px-5 py-2 text-center text-sm font-medium'>
-          <span>🎉</span>
+          <PartyPopper className='text-brand-400 h-4 w-4 shrink-0' />
           <span>You&apos;re saving 20% with the yearly plan!</span>
         </div>
       </div>

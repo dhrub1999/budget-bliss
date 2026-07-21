@@ -5,26 +5,10 @@ import { RadialBar, RadialBarChart, PolarAngleAxis } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartConfig, ChartContainer } from '@/components/ui/chart';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
-import { Plus } from 'lucide-react';
-import {
-  goals,
-  totalSavedAmount,
-  totalTargetAmount,
-  formatINRFull,
-  formatINR
-} from './overview-data';
+import { Plus, AlertTriangle, Target } from 'lucide-react';
+import { formatINRFull, formatINR } from './overview-data';
 import { AddGoalDialog } from './add-goal-dialog';
-
-const savingsRate = Math.round((totalSavedAmount / totalTargetAmount) * 100);
-
-const radialData = [
-  {
-    name: 'Savings Rate',
-    value: savingsRate,
-    fill: '#4ade80'
-  }
-];
+import { DynamicIcon } from '@/components/ui/dynamic-icon';
 
 const chartConfig = {
   value: {
@@ -32,7 +16,21 @@ const chartConfig = {
   }
 } satisfies ChartConfig;
 
-export function GoalsSavings() {
+interface GoalsSavingsProps {
+  dbGoals?: Array<{
+    id: string;
+    name: string;
+    targetAmount: number;
+    savedAmount: number;
+    icon: string;
+    color: string;
+    deadline: string;
+    userId: string;
+    createdAt: string;
+  }>;
+}
+
+export function GoalsSavings({ dbGoals = [] }: GoalsSavingsProps) {
   const [isClient, setIsClient] = React.useState(false);
   const [hasError, setHasError] = React.useState(false);
   const [dialogOpen, setDialogOpen] = React.useState(false);
@@ -41,11 +39,34 @@ export function GoalsSavings() {
     setIsClient(true);
   }, []);
 
+  const totalSavedAmount = React.useMemo(() => {
+    return dbGoals.reduce((sum, g) => sum + g.savedAmount, 0);
+  }, [dbGoals]);
+
+  const totalTargetAmount = React.useMemo(() => {
+    return dbGoals.reduce((sum, g) => sum + g.targetAmount, 0);
+  }, [dbGoals]);
+
+  const savingsRate = React.useMemo(() => {
+    if (totalTargetAmount === 0) return 0;
+    return Math.round((totalSavedAmount / totalTargetAmount) * 100);
+  }, [totalSavedAmount, totalTargetAmount]);
+
+  const radialData = React.useMemo(() => {
+    return [
+      {
+        name: 'Savings Rate',
+        value: savingsRate,
+        fill: '#4ade80'
+      }
+    ];
+  }, [savingsRate]);
+
   if (hasError) {
     return (
       <Card className='bg-card h-full border-red-500/40'>
         <CardContent className='flex h-full min-h-[320px] flex-col items-center justify-center gap-3 p-6'>
-          <div className='text-4xl'>⚠️</div>
+          <AlertTriangle className='h-10 w-10 text-red-500' />
           <p className='text-muted-foreground text-center text-sm'>
             Failed to load goals & savings.
           </p>
@@ -60,7 +81,7 @@ export function GoalsSavings() {
     );
   }
 
-  const isEmpty = goals.length === 0;
+  const isEmpty = dbGoals.length === 0;
 
   return (
     <>
@@ -90,7 +111,7 @@ export function GoalsSavings() {
             </div>
           ) : isEmpty ? (
             <div className='flex flex-1 flex-col items-center justify-center gap-2 text-center'>
-              <div className='text-3xl'>🎯</div>
+              <Target className='text-muted-foreground h-8 w-8' />
               <p className='text-muted-foreground text-sm'>No goals yet.</p>
               <p className='text-muted-foreground text-xs'>
                 Add a goal to start tracking your savings progress.
@@ -148,15 +169,20 @@ export function GoalsSavings() {
 
               {/* Per-goal progress bars */}
               <div className='flex flex-1 flex-col gap-3 overflow-auto'>
-                {goals.map((goal) => {
-                  const pct = Math.round(
-                    (goal.savedAmount / goal.targetAmount) * 100
-                  );
+                {dbGoals.map((goal) => {
+                  const pct =
+                    goal.targetAmount > 0
+                      ? Math.round((goal.savedAmount / goal.targetAmount) * 100)
+                      : 0;
                   return (
                     <div key={goal.id} className='space-y-1'>
                       <div className='flex items-center justify-between'>
                         <div className='flex items-center gap-1.5'>
-                          <span className='text-sm'>{goal.icon}</span>
+                          <DynamicIcon
+                            emoji={goal.icon}
+                            className='h-4 w-4'
+                            style={{ color: goal.color }}
+                          />
                           <span className='text-foreground text-xs font-medium'>
                             {goal.name}
                           </span>
@@ -177,7 +203,7 @@ export function GoalsSavings() {
                         <div
                           className='h-full rounded-full transition-all duration-700 ease-out'
                           style={{
-                            width: `${pct}%`,
+                            width: `${Math.min(pct, 100)}%`,
                             backgroundColor: goal.color
                           }}
                         />

@@ -2,7 +2,14 @@
 
 import * as React from 'react';
 import { format, isWithinInterval, startOfDay, endOfDay } from 'date-fns';
-import { CalendarIcon, ChevronRight, Plus } from 'lucide-react';
+import {
+  CalendarIcon,
+  ChevronRight,
+  Plus,
+  AlertTriangle,
+  Search
+} from 'lucide-react';
+import { DynamicIcon } from '@/components/ui/dynamic-icon';
 import { DateRange } from 'react-day-picker';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -15,25 +22,14 @@ import {
 } from '@/components/ui/popover';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
-import { transactions, formatINRFull, type Transaction } from './overview-data';
+import {
+  formatINRFull,
+  categoryConfig,
+  type TransactionCategory
+} from './overview-data';
 import { AddTransactionDialog } from './add-transaction-dialog';
 
 type FilterTab = 'all' | 'credited' | 'debited';
-
-const categoryIconMap: Record<string, string> = {
-  Groceries: '🛒',
-  'Dining Out': '🍽️',
-  Subscriptions: '📺',
-  Bills: '🧾',
-  Transportation: '🚗',
-  Entertainment: '🎬',
-  Healthcare: '🏥',
-  Shopping: '🛍️',
-  Salary: '💼',
-  Freelance: '💻',
-  Investment: '📈',
-  Others: '📦'
-};
 
 function formatDateTime(isoStr: string) {
   const d = new Date(isoStr);
@@ -67,8 +63,9 @@ export function RecentTransactions({
   const [hasError, setHasError] = React.useState(false);
 
   const allTransactions = React.useMemo(() => {
-    const mappedDb = dbTransactions.map((dt) => {
-      const icon = categoryIconMap[dt.category] || '📦';
+    return dbTransactions.map((dt) => {
+      const icon =
+        categoryConfig[dt.category as TransactionCategory]?.icon || '📦';
       return {
         id: dt.id,
         title: dt.description || dt.category,
@@ -79,8 +76,6 @@ export function RecentTransactions({
         icon
       };
     });
-
-    return [...mappedDb, ...transactions];
   }, [dbTransactions]);
 
   const filtered = React.useMemo(() => {
@@ -108,7 +103,7 @@ export function RecentTransactions({
     return (
       <Card className='bg-card h-full border-red-500/40'>
         <CardContent className='flex h-full min-h-[420px] flex-col items-center justify-center gap-3 p-6'>
-          <div className='text-4xl'>⚠️</div>
+          <AlertTriangle className='h-10 w-10 text-red-500' />
           <p className='text-muted-foreground text-center text-sm'>
             Failed to load transactions.
           </p>
@@ -233,7 +228,7 @@ export function RecentTransactions({
         <CardContent className='flex-1 overflow-auto px-4 pb-4'>
           {filtered.length === 0 ? (
             <div className='flex h-[200px] flex-col items-center justify-center gap-2 text-center'>
-              <div className='text-3xl'>🔍</div>
+              <Search className='text-muted-foreground h-8 w-8' />
               <p className='text-muted-foreground text-sm'>
                 No transactions found.
               </p>
@@ -254,8 +249,16 @@ export function RecentTransactions({
                     className='hover:bg-muted/30 flex items-center gap-3 py-2.5 transition-colors'
                   >
                     {/* Icon */}
-                    <div className='bg-muted flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-lg'>
-                      {categoryIconMap[txn.category] ?? '💳'}
+                    <div className='bg-muted flex h-9 w-9 shrink-0 items-center justify-center rounded-xl'>
+                      <DynamicIcon
+                        emoji={txn.icon ?? '💳'}
+                        className='h-5 w-5'
+                        style={{
+                          color:
+                            categoryConfig[txn.category as TransactionCategory]
+                              ?.color
+                        }}
+                      />
                     </div>
 
                     {/* Title + category */}

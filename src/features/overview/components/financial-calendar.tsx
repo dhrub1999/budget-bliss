@@ -14,9 +14,10 @@ import {
   addMonths,
   isSameMonth
 } from 'date-fns';
-import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, AlertTriangle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { DynamicIcon } from '@/components/ui/dynamic-icon';
 import {
   Popover,
   PopoverContent,
@@ -24,16 +25,14 @@ import {
 } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 import {
-  getCalendarEventsForMonth,
   formatINRFull,
-  type Transaction
+  categoryConfig,
+  type TransactionCategory
 } from './overview-data';
 import { AddTransactionDialog } from './add-transaction-dialog';
 
-const TODAY = new Date('2025-07-14');
-
 function getDateType(
-  events: Record<string, { debits: Transaction[]; credits: Transaction[] }>,
+  events: Record<string, { debits: any[]; credits: any[] }>,
   dateStr: string
 ): 'debit' | 'credit' | 'both' | null {
   const e = events[dateStr];
@@ -45,21 +44,6 @@ function getDateType(
   if (hasDebit) return 'debit';
   return null;
 }
-
-const categoryIconMap: Record<string, string> = {
-  Groceries: '🛒',
-  'Dining Out': '🍽️',
-  Subscriptions: '📺',
-  Bills: '🧾',
-  Transportation: '🚗',
-  Entertainment: '🎬',
-  Healthcare: '🏥',
-  Shopping: '🛍️',
-  Salary: '💼',
-  Freelance: '💻',
-  Investment: '📈',
-  Others: '📦'
-};
 
 interface FinancialCalendarProps {
   dbTransactions?: Array<{
@@ -76,7 +60,10 @@ interface FinancialCalendarProps {
 export function FinancialCalendar({
   dbTransactions = []
 }: FinancialCalendarProps) {
-  const [currentMonth, setCurrentMonth] = React.useState<Date>(TODAY);
+  const [today, setToday] = React.useState<Date>(() => new Date('2026-07-21'));
+  const [currentMonth, setCurrentMonth] = React.useState<Date>(
+    () => new Date('2026-07-21')
+  );
   const [selectedDate, setSelectedDate] = React.useState<Date | null>(null);
   const [popoverDate, setPopoverDate] = React.useState<Date | null>(null);
   const [addOpen, setAddOpen] = React.useState(false);
@@ -85,14 +72,14 @@ export function FinancialCalendar({
   const [isClient, setIsClient] = React.useState(false);
 
   React.useEffect(() => {
+    const now = new Date();
+    setToday(now);
+    setCurrentMonth(now);
     setIsClient(true);
   }, []);
 
   const events = React.useMemo(() => {
-    const result = getCalendarEventsForMonth(
-      currentMonth.getFullYear(),
-      currentMonth.getMonth()
-    );
+    const result: Record<string, { debits: any[]; credits: any[] }> = {};
 
     dbTransactions.forEach((dt) => {
       const d = new Date(dt.date);
@@ -100,12 +87,19 @@ export function FinancialCalendar({
         d.getFullYear() === currentMonth.getFullYear() &&
         d.getMonth() === currentMonth.getMonth()
       ) {
-        const key = d.toISOString().split('T')[0];
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        const key = `${year}-${month}-${day}`;
+
         if (!result[key]) {
           result[key] = { debits: [], credits: [] };
         }
 
-        const icon = categoryIconMap[dt.category] || '📦';
+        const config = categoryConfig[dt.category as TransactionCategory] || {
+          color: '#94a3b8',
+          icon: '📦'
+        };
         const frontendTxn = {
           id: dt.id,
           title: dt.description || dt.category,
@@ -113,7 +107,7 @@ export function FinancialCalendar({
           amount: dt.amount,
           type: dt.type === 'INCOME' ? ('credit' as const) : ('debit' as const),
           date: dt.date,
-          icon
+          icon: config.icon
         };
 
         if (dt.type === 'INCOME') {
@@ -138,7 +132,7 @@ export function FinancialCalendar({
   // Sunday = 0 (pad days before month starts)
   const startPadding = getDay(monthStart);
 
-  const canGoForward = !isSameMonth(currentMonth, TODAY);
+  const canGoForward = !isSameMonth(currentMonth, today);
 
   function handlePrevMonth() {
     setCurrentMonth((m) => subMonths(m, 1));
@@ -149,7 +143,7 @@ export function FinancialCalendar({
   }
 
   function handleDayClick(day: Date) {
-    const isFuture = isAfter(startOfDay(day), startOfDay(TODAY));
+    const isFuture = isAfter(startOfDay(day), startOfDay(today));
     if (isFuture) return;
     setSelectedDate(day);
     setPopoverDate(day);
@@ -159,7 +153,7 @@ export function FinancialCalendar({
     return (
       <Card className='bg-card h-full border-red-500/40'>
         <CardContent className='flex h-full min-h-[320px] flex-col items-center justify-center gap-3 p-6'>
-          <div className='text-4xl'>⚠️</div>
+          <AlertTriangle className='h-10 w-10 text-red-500' />
           <p className='text-muted-foreground text-center text-sm'>
             Failed to load calendar.
           </p>
@@ -203,7 +197,7 @@ export function FinancialCalendar({
             </div>
           </div>
           <p className='text-xs font-medium text-emerald-400'>
-            {format(TODAY, 'EEEE, do MMMM')}
+            {format(today, 'EEEE, do MMMM')}
           </p>
         </CardHeader>
         <CardContent className='px-3 pb-4'>
@@ -236,8 +230,8 @@ export function FinancialCalendar({
 
                 {days.map((day) => {
                   const dateStr = format(day, 'yyyy-MM-dd');
-                  const isFuture = isAfter(startOfDay(day), startOfDay(TODAY));
-                  const isToday = isSameDay(day, TODAY);
+                  const isFuture = isAfter(startOfDay(day), startOfDay(today));
+                  const isToday = isSameDay(day, today);
                   const isSelected = selectedDate
                     ? isSameDay(day, selectedDate)
                     : false;
@@ -318,7 +312,16 @@ export function FinancialCalendar({
                                   className='bg-muted/50 flex items-center justify-between rounded-md px-2 py-1.5'
                                 >
                                   <div className='flex items-center gap-2'>
-                                    <span className='text-sm'>{txn.icon}</span>
+                                    <DynamicIcon
+                                      emoji={txn.icon}
+                                      className='h-4 w-4'
+                                      style={{
+                                        color:
+                                          categoryConfig[
+                                            txn.category as TransactionCategory
+                                          ]?.color
+                                      }}
+                                    />
                                     <div>
                                       <p className='text-foreground text-xs font-medium'>
                                         {txn.title}

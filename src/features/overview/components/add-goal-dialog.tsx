@@ -13,6 +13,7 @@ import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 
 import { goalSchema, goalIcons, iconColorMap } from '@/lib/validations/goal';
+import { DynamicIcon } from '@/components/ui/dynamic-icon';
 
 interface AddGoalDialogProps {
   open: boolean;
@@ -92,7 +93,7 @@ export function AddGoalDialog({ open, onOpenChange }: AddGoalDialogProps) {
       }
 
       if (result.success) {
-        toast.success('Goal created successfully! 🎯');
+        toast.success('Goal created successfully!');
         resetForm();
         onOpenChange(false);
         // Trigger a page refresh to show new data
@@ -142,7 +143,7 @@ export function AddGoalDialog({ open, onOpenChange }: AddGoalDialogProps) {
                       : undefined
                   }
                 >
-                  {i}
+                  <DynamicIcon emoji={i} className='h-5 w-5' />
                 </button>
               ))}
             </div>
