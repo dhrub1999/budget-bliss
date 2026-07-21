@@ -12,7 +12,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 
-import { createGoalAction } from '@/app/actions/goals';
 import { goalSchema, goalIcons, iconColorMap } from '@/lib/validations/goal';
 
 interface AddGoalDialogProps {
@@ -70,12 +69,18 @@ export function AddGoalDialog({ open, onOpenChange }: AddGoalDialogProps) {
       return;
     }
 
-    // ── Submit to server action ─────────────────────────────────────────
+    // ── Submit to API route ─────────────────────────────────────────────
     setSubmitting(true);
     try {
-      const result = await createGoalAction(rawData);
+      const response = await fetch('/api/goals', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(rawData)
+      });
+
+      const result = await response.json();
       console.log(
-        '[DEBUG] createGoalAction result:',
+        '[DEBUG] createGoal API result:',
         JSON.stringify(result),
         typeof result,
         result
@@ -90,6 +95,8 @@ export function AddGoalDialog({ open, onOpenChange }: AddGoalDialogProps) {
         toast.success('Goal created successfully! 🎯');
         resetForm();
         onOpenChange(false);
+        // Trigger a page refresh to show new data
+        window.location.reload();
       } else {
         toast.error(result.error || 'Failed to create goal');
       }
