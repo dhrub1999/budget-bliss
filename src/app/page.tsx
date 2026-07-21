@@ -7,7 +7,8 @@ import {
   Globe,
   Facebook,
   Linkedin,
-  Instagram
+  Instagram,
+  Heart
 } from 'lucide-react';
 import Image from 'next/image';
 import FeatureCard from './_components/landing-page/FeatureCard';
@@ -340,9 +341,10 @@ export default async function Page() {
             <span>&copy; BudgetBliss</span>
             <span>
               Made with{' '}
-              <span className='text-red-500' aria-label='love'>
-                ♥
-              </span>{' '}
+              <Heart
+                className='inline h-3.5 w-3.5 fill-red-500 text-red-500'
+                aria-label='love'
+              />{' '}
               by{' '}
               <span className='font-semibold text-neutral-300'>
                 Tamal Biswas

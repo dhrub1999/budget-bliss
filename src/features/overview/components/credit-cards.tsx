@@ -1,7 +1,12 @@
 'use client';
 
 import * as React from 'react';
-import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
+import {
+  ChevronLeft,
+  ChevronRight,
+  Plus,
+  CreditCard as CreditCardIcon
+} from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -151,7 +156,7 @@ export function CreditCards() {
       <CardContent className='px-4 pb-4'>
         {isEmpty ? (
           <div className='flex h-[160px] flex-col items-center justify-center gap-2 text-center'>
-            <div className='text-3xl'>💳</div>
+            <CreditCardIcon className='text-muted-foreground h-8 w-8' />
             <p className='text-muted-foreground text-sm'>
               No credit cards added.
             </p>

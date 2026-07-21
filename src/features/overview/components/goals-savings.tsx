@@ -5,9 +5,10 @@ import { RadialBar, RadialBarChart, PolarAngleAxis } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartConfig, ChartContainer } from '@/components/ui/chart';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Plus, AlertTriangle, Target } from 'lucide-react';
 import { formatINRFull, formatINR } from './overview-data';
 import { AddGoalDialog } from './add-goal-dialog';
+import { DynamicIcon } from '@/components/ui/dynamic-icon';
 
 const chartConfig = {
   value: {
@@ -65,7 +66,7 @@ export function GoalsSavings({ dbGoals = [] }: GoalsSavingsProps) {
     return (
       <Card className='bg-card h-full border-red-500/40'>
         <CardContent className='flex h-full min-h-[320px] flex-col items-center justify-center gap-3 p-6'>
-          <div className='text-4xl'>⚠️</div>
+          <AlertTriangle className='h-10 w-10 text-red-500' />
           <p className='text-muted-foreground text-center text-sm'>
             Failed to load goals & savings.
           </p>
@@ -110,7 +111,7 @@ export function GoalsSavings({ dbGoals = [] }: GoalsSavingsProps) {
             </div>
           ) : isEmpty ? (
             <div className='flex flex-1 flex-col items-center justify-center gap-2 text-center'>
-              <div className='text-3xl'>🎯</div>
+              <Target className='text-muted-foreground h-8 w-8' />
               <p className='text-muted-foreground text-sm'>No goals yet.</p>
               <p className='text-muted-foreground text-xs'>
                 Add a goal to start tracking your savings progress.
@@ -177,7 +178,11 @@ export function GoalsSavings({ dbGoals = [] }: GoalsSavingsProps) {
                     <div key={goal.id} className='space-y-1'>
                       <div className='flex items-center justify-between'>
                         <div className='flex items-center gap-1.5'>
-                          <span className='text-sm'>{goal.icon}</span>
+                          <DynamicIcon
+                            emoji={goal.icon}
+                            className='h-4 w-4'
+                            style={{ color: goal.color }}
+                          />
                           <span className='text-foreground text-xs font-medium'>
                             {goal.name}
                           </span>

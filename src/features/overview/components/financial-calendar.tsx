@@ -14,9 +14,10 @@ import {
   addMonths,
   isSameMonth
 } from 'date-fns';
-import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, AlertTriangle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { DynamicIcon } from '@/components/ui/dynamic-icon';
 import {
   Popover,
   PopoverContent,
@@ -152,7 +153,7 @@ export function FinancialCalendar({
     return (
       <Card className='bg-card h-full border-red-500/40'>
         <CardContent className='flex h-full min-h-[320px] flex-col items-center justify-center gap-3 p-6'>
-          <div className='text-4xl'>⚠️</div>
+          <AlertTriangle className='h-10 w-10 text-red-500' />
           <p className='text-muted-foreground text-center text-sm'>
             Failed to load calendar.
           </p>
@@ -311,7 +312,16 @@ export function FinancialCalendar({
                                   className='bg-muted/50 flex items-center justify-between rounded-md px-2 py-1.5'
                                 >
                                   <div className='flex items-center gap-2'>
-                                    <span className='text-sm'>{txn.icon}</span>
+                                    <DynamicIcon
+                                      emoji={txn.icon}
+                                      className='h-4 w-4'
+                                      style={{
+                                        color:
+                                          categoryConfig[
+                                            txn.category as TransactionCategory
+                                          ]?.color
+                                      }}
+                                    />
                                     <div>
                                       <p className='text-foreground text-xs font-medium'>
                                         {txn.title}

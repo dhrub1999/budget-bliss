@@ -1,14 +1,14 @@
 import { z } from 'zod';
 
 export const goalIcons = [
-  '🎯',
-  '🏠',
-  '✈️',
-  '💻',
-  '🚗',
-  '🎓',
-  '💍',
-  '🌴'
+  'target',
+  'home',
+  'plane',
+  'laptop',
+  'car',
+  'graduation-cap',
+  'gem',
+  'palmtree'
 ] as const;
 
 /**
@@ -16,14 +16,26 @@ export const goalIcons = [
  * Auto-assigned based on icon selection — no color picker needed.
  */
 export const iconColorMap: Record<string, string> = {
-  '🎯': '#FFB3BA', // pastel pink
-  '🏠': '#BAE1FF', // pastel blue
-  '✈️': '#FFFFBA', // pastel yellow
-  '💻': '#E8BAFF', // pastel purple
-  '🚗': '#BAFFC9', // pastel green
-  '🎓': '#FFD9BA', // pastel orange
-  '💍': '#FFBAE8', // pastel rose
-  '🌴': '#BAFFED' // pastel teal
+  // Lucide Names
+  target: '#FFB3BA', // pastel pink
+  home: '#BAE1FF', // pastel blue
+  plane: '#FFFFBA', // pastel yellow
+  laptop: '#E8BAFF', // pastel purple
+  car: '#BAFFC9', // pastel green
+  'graduation-cap': '#FFD9BA', // pastel orange
+  gem: '#FFBAE8', // pastel rose
+  palmtree: '#BAFFED', // pastel teal
+
+  // Emojis for backwards compatibility
+  '🎯': '#FFB3BA',
+  '🏠': '#BAE1FF',
+  '✈️': '#FFFFBA',
+  '✈': '#FFFFBA',
+  '💻': '#E8BAFF',
+  '🚗': '#BAFFC9',
+  '🎓': '#FFD9BA',
+  '💍': '#FFBAE8',
+  '🌴': '#BAFFED'
 };
 
 export const goalSchema = z.object({
@@ -44,9 +56,14 @@ export const goalSchema = z.object({
   icon: z
     .string()
     .min(1, { message: 'Icon is required' })
-    .refine((val) => goalIcons.includes(val as any), {
-      message: 'Please select a valid icon'
-    }),
+    .refine(
+      (val) =>
+        goalIcons.includes(val as any) ||
+        ['🎯', '🏠', '✈️', '✈', '💻', '🚗', '🎓', '💍', '🌴'].includes(val),
+      {
+        message: 'Please select a valid icon'
+      }
+    ),
 
   deadline: z.preprocess(
     (val) => {

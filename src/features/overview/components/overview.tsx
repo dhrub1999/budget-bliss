@@ -15,14 +15,16 @@ import { PieGraph } from './pie-graph';
 import { RecentSales } from './recent-sales';
 import { IconTrendingUp, IconTrendingDown } from '@tabler/icons-react';
 import { Badge } from '@/components/ui/badge';
+import { Hand } from 'lucide-react';
 
 export default function OverViewPage() {
   return (
     <PageContainer>
       <div className='flex flex-1 flex-col space-y-2'>
         <div className='flex items-center justify-between space-y-2'>
-          <h2 className='text-2xl font-bold tracking-tight'>
-            Hi, Welcome back 👋
+          <h2 className='flex items-center gap-1.5 text-2xl font-bold tracking-tight'>
+            Hi, Welcome back{' '}
+            <Hand className='h-6 w-6 fill-amber-400 text-amber-400' />
           </h2>
           <div className='hidden items-center space-x-2 md:flex'>
             <Button>Download</Button>

@@ -2,6 +2,8 @@
 
 import * as React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { AlertTriangle, BarChart3 } from 'lucide-react';
+import { DynamicIcon } from '@/components/ui/dynamic-icon';
 import {
   categoryConfig,
   formatINRFull,
@@ -77,7 +79,7 @@ export function SpendingCategories({
     return (
       <Card className='bg-card h-full border-red-500/40'>
         <CardContent className='flex h-full min-h-[320px] flex-col items-center justify-center gap-3 p-6'>
-          <div className='text-4xl'>⚠️</div>
+          <AlertTriangle className='h-10 w-10 text-red-500' />
           <p className='text-muted-foreground text-center text-sm'>
             Failed to load spending categories.
           </p>
@@ -125,7 +127,7 @@ export function SpendingCategories({
           </div>
         ) : isEmpty ? (
           <div className='flex h-[220px] flex-col items-center justify-center gap-2 text-center'>
-            <div className='text-3xl'>📊</div>
+            <BarChart3 className='text-muted-foreground h-8 w-8' />
             <p className='text-muted-foreground text-sm'>
               No spending data for the last 30 days.
             </p>
@@ -139,8 +141,13 @@ export function SpendingCategories({
               const pct = (cat.amount / maxAmount) * 100;
               return (
                 <div key={cat.category} className='flex items-center gap-2'>
-                  <span className='text-foreground w-28 shrink-0 truncate text-xs font-medium'>
-                    {cat.icon} {cat.category}
+                  <span className='text-foreground flex w-28 shrink-0 items-center gap-1.5 truncate text-xs font-medium'>
+                    <DynamicIcon
+                      emoji={cat.icon}
+                      className='h-3.5 w-3.5'
+                      style={{ color: cat.color }}
+                    />
+                    <span>{cat.category}</span>
                   </span>
                   <div className='relative flex h-7 flex-1 items-center'>
                     <div

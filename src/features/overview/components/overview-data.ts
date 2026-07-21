@@ -65,18 +65,18 @@ export const categoryConfig: Record<
   TransactionCategory,
   { color: string; icon: string }
 > = {
-  Groceries: { color: '#4ade80', icon: '🛒' },
-  'Dining Out': { color: '#fb923c', icon: '🍽️' },
-  Subscriptions: { color: '#f87171', icon: '📺' },
-  Bills: { color: '#60a5fa', icon: '🧾' },
-  Transportation: { color: '#c084fc', icon: '🚗' },
-  Entertainment: { color: '#cbd5e1', icon: '🎬' },
-  Healthcare: { color: '#f43f5e', icon: '🏥' },
-  Shopping: { color: '#ec4899', icon: '🛍️' },
-  Salary: { color: '#10b981', icon: '💼' },
-  Freelance: { color: '#8b5cf6', icon: '💻' },
-  Investment: { color: '#3b82f6', icon: '📈' },
-  Others: { color: '#94a3b8', icon: '📦' }
+  Groceries: { color: '#4ade80', icon: 'shopping-cart' },
+  'Dining Out': { color: '#fb923c', icon: 'utensils' },
+  Subscriptions: { color: '#f87171', icon: 'tv' },
+  Bills: { color: '#60a5fa', icon: 'receipt' },
+  Transportation: { color: '#c084fc', icon: 'car' },
+  Entertainment: { color: '#cbd5e1', icon: 'clapperboard' },
+  Healthcare: { color: '#f43f5e', icon: 'heart-pulse' },
+  Shopping: { color: '#ec4899', icon: 'shopping-bag' },
+  Salary: { color: '#10b981', icon: 'briefcase' },
+  Freelance: { color: '#8b5cf6', icon: 'laptop' },
+  Investment: { color: '#3b82f6', icon: 'trending-up' },
+  Others: { color: '#94a3b8', icon: 'package' }
 };
 
 // ─── Credit Cards (Cosmetic Visual Component Data Only) ──────────────────────

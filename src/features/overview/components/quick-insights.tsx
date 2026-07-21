@@ -2,6 +2,8 @@
 
 import * as React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Sparkles } from 'lucide-react';
+import { DynamicIcon } from '@/components/ui/dynamic-icon';
 interface QuickInsightsProps {
   dbTransactions?: Array<{
     id: string;
@@ -117,7 +119,7 @@ export function QuickInsights({
       <CardContent className='flex flex-col gap-3 px-4 pb-4'>
         {insights.length === 0 ? (
           <div className='flex h-[160px] flex-col items-center justify-center gap-2 text-center'>
-            <div className='text-3xl'>✨</div>
+            <Sparkles className='h-8 w-8 animate-pulse text-yellow-400' />
             <p className='text-muted-foreground text-sm'>
               No insights available yet.
             </p>
@@ -132,10 +134,14 @@ export function QuickInsights({
               className='group border-border/50 bg-muted/30 hover:bg-muted/60 flex items-start gap-3 rounded-lg border p-3 transition-all duration-200'
             >
               <div
-                className='flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-base'
+                className='flex h-8 w-8 shrink-0 items-center justify-center rounded-full'
                 style={{ backgroundColor: `${insight.color}20` }}
               >
-                <span>{insight.icon}</span>
+                <DynamicIcon
+                  emoji={insight.icon}
+                  className='h-4 w-4'
+                  style={{ color: insight.color }}
+                />
               </div>
               <p className='text-muted-foreground group-hover:text-foreground text-sm leading-relaxed'>
                 {insight.text}
