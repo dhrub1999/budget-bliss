@@ -8,7 +8,19 @@ import { AddTransactionDialog } from './add-transaction-dialog';
 import { ViewReportDialog } from './view-report-dialog';
 import { cn } from '@/lib/utils';
 
-export function QuickActions() {
+interface QuickActionsProps {
+  dbTransactions?: Array<{
+    id: string;
+    amount: number;
+    type: string;
+    category: string;
+    description: string | null;
+    date: string;
+    userId: string;
+  }>;
+}
+
+export function QuickActions({ dbTransactions = [] }: QuickActionsProps) {
   const [incomeOpen, setIncomeOpen] = React.useState(false);
   const [expenseOpen, setExpenseOpen] = React.useState(false);
   const [reportOpen, setReportOpen] = React.useState(false);
@@ -82,7 +94,11 @@ export function QuickActions() {
         onOpenChange={setExpenseOpen}
         defaultType='debit'
       />
-      <ViewReportDialog open={reportOpen} onOpenChange={setReportOpen} />
+      <ViewReportDialog
+        open={reportOpen}
+        onOpenChange={setReportOpen}
+        dbTransactions={dbTransactions}
+      />
     </>
   );
 }

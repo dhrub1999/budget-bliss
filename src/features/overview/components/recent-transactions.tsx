@@ -15,25 +15,14 @@ import {
 } from '@/components/ui/popover';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
-import { transactions, formatINRFull, type Transaction } from './overview-data';
+import {
+  formatINRFull,
+  categoryConfig,
+  type TransactionCategory
+} from './overview-data';
 import { AddTransactionDialog } from './add-transaction-dialog';
 
 type FilterTab = 'all' | 'credited' | 'debited';
-
-const categoryIconMap: Record<string, string> = {
-  Groceries: '🛒',
-  'Dining Out': '🍽️',
-  Subscriptions: '📺',
-  Bills: '🧾',
-  Transportation: '🚗',
-  Entertainment: '🎬',
-  Healthcare: '🏥',
-  Shopping: '🛍️',
-  Salary: '💼',
-  Freelance: '💻',
-  Investment: '📈',
-  Others: '📦'
-};
 
 function formatDateTime(isoStr: string) {
   const d = new Date(isoStr);
@@ -67,8 +56,9 @@ export function RecentTransactions({
   const [hasError, setHasError] = React.useState(false);
 
   const allTransactions = React.useMemo(() => {
-    const mappedDb = dbTransactions.map((dt) => {
-      const icon = categoryIconMap[dt.category] || '📦';
+    return dbTransactions.map((dt) => {
+      const icon =
+        categoryConfig[dt.category as TransactionCategory]?.icon || '📦';
       return {
         id: dt.id,
         title: dt.description || dt.category,
@@ -79,8 +69,6 @@ export function RecentTransactions({
         icon
       };
     });
-
-    return [...mappedDb, ...transactions];
   }, [dbTransactions]);
 
   const filtered = React.useMemo(() => {
@@ -255,7 +243,7 @@ export function RecentTransactions({
                   >
                     {/* Icon */}
                     <div className='bg-muted flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-lg'>
-                      {categoryIconMap[txn.category] ?? '💳'}
+                      {txn.icon ?? '💳'}
                     </div>
 
                     {/* Title + category */}

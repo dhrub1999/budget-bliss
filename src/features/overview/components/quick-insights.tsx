@@ -2,10 +2,113 @@
 
 import * as React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { insights } from './overview-data';
-import { cn } from '@/lib/utils';
+interface QuickInsightsProps {
+  dbTransactions?: Array<{
+    id: string;
+    amount: number;
+    type: string;
+    category: string;
+    description: string | null;
+    date: string;
+    userId: string;
+  }>;
+  dbGoals?: Array<{
+    id: string;
+    name: string;
+    targetAmount: number;
+    savedAmount: number;
+    icon: string;
+    color: string;
+    deadline: string;
+    userId: string;
+    createdAt: string;
+  }>;
+}
 
-export function QuickInsights() {
+export function QuickInsights({
+  dbTransactions = [],
+  dbGoals = []
+}: QuickInsightsProps) {
+  const insights = React.useMemo(() => {
+    const list: Array<{
+      id: string;
+      type: 'goal' | 'warning' | 'bill' | 'savings';
+      icon: string;
+      color: string;
+      text: string;
+    }> = [];
+
+    // 1. Goal Insight
+    if (dbGoals.length > 0) {
+      let bestGoal = dbGoals[0];
+      let maxPct = 0;
+      dbGoals.forEach((g) => {
+        const pct =
+          g.targetAmount > 0 ? (g.savedAmount / g.targetAmount) * 100 : 0;
+        if (pct > maxPct) {
+          maxPct = pct;
+          bestGoal = g;
+        }
+      });
+
+      if (maxPct > 0) {
+        list.push({
+          id: 'dyn-goal',
+          type: 'goal',
+          icon: bestGoal.icon || '🎯',
+          color: bestGoal.color || '#4ade80',
+          text: `You have saved ${Math.round(
+            maxPct
+          )}% of your target for "${bestGoal.name}"! Keep it up!`
+        });
+      } else {
+        list.push({
+          id: 'dyn-goal-start',
+          type: 'goal',
+          icon: '🎯',
+          color: '#4ade80',
+          text: `You have ${dbGoals.length} active goal(s). Add contributions to start building your savings!`
+        });
+      }
+    }
+
+    // 2. Transaction Summary
+    if (dbTransactions.length > 0) {
+      let totalIncome = 0;
+      let totalExpense = 0;
+
+      dbTransactions.forEach((t) => {
+        if (t.type === 'INCOME') {
+          totalIncome += t.amount;
+        } else {
+          totalExpense += t.amount;
+        }
+      });
+
+      list.push({
+        id: 'dyn-summary',
+        type: 'savings',
+        icon: '💰',
+        color: '#c084fc',
+        text: `Summary: You have recorded a total of ₹${totalIncome.toLocaleString(
+          'en-IN'
+        )} in income and ₹${totalExpense.toLocaleString('en-IN')} in expenses.`
+      });
+
+      if (totalExpense > totalIncome) {
+        list.push({
+          id: 'dyn-warning',
+          type: 'warning',
+          icon: '⚠️',
+          color: '#fb923c',
+          text: 'Your total expenses exceed your income. Consider reviewing your category caps.'
+        });
+      }
+    }
+
+    return list;
+  }, [dbTransactions, dbGoals]);
+
   return (
     <Card className='bg-card h-full'>
       <CardHeader className='pb-3'>

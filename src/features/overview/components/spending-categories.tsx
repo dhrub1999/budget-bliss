@@ -1,33 +1,12 @@
 'use client';
 
 import * as React from 'react';
-import {
-  Bar,
-  BarChart,
-  Cell,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  LabelList
-} from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
-  ChartConfig,
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent
-} from '@/components/ui/chart';
-import {
-  spendingCategories,
-  totalSpentLast30Days,
-  formatINRFull
+  categoryConfig,
+  formatINRFull,
+  type TransactionCategory
 } from './overview-data';
-
-const chartConfig = {
-  amount: {
-    label: 'Amount'
-  }
-} satisfies ChartConfig;
 
 interface SpendingCategoriesProps {
   dbTransactions?: Array<{
@@ -57,40 +36,29 @@ export function SpendingCategories({
       { category: string; amount: number; color: string; icon: string }
     > = {};
 
-    spendingCategories.forEach((sc) => {
-      categoriesMap[sc.category] = { ...sc };
-    });
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
     dbTransactions.forEach((dt) => {
       if (dt.type === 'EXPENSE') {
-        const cat = dt.category;
-        if (categoriesMap[cat]) {
-          categoriesMap[cat].amount += dt.amount;
-        } else {
-          const colorsMap: Record<string, string> = {
-            Entertainment: '#cbd5e1',
-            Healthcare: '#f43f5e',
-            Shopping: '#ec4899',
-            Salary: '#10b981',
-            Freelance: '#8b5cf6',
-            Investment: '#3b82f6',
-            Others: '#94a3b8'
+        const txnDate = new Date(dt.date);
+        if (txnDate >= thirtyDaysAgo) {
+          const cat = dt.category;
+          const config = categoryConfig[cat as TransactionCategory] || {
+            color: '#94a3b8',
+            icon: '📦'
           };
-          const iconsMap: Record<string, string> = {
-            Entertainment: '🎬',
-            Healthcare: '🏥',
-            Shopping: '🛍️',
-            Salary: '💼',
-            Freelance: '💻',
-            Investment: '📈',
-            Others: '📦'
-          };
-          categoriesMap[cat] = {
-            category: cat,
-            amount: dt.amount,
-            color: colorsMap[cat] || '#94a3b8',
-            icon: iconsMap[cat] || '📦'
-          };
+
+          if (categoriesMap[cat]) {
+            categoriesMap[cat].amount += dt.amount;
+          } else {
+            categoriesMap[cat] = {
+              category: cat,
+              amount: dt.amount,
+              color: config.color,
+              icon: config.icon
+            };
+          }
         }
       }
     });

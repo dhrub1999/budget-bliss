@@ -5,26 +5,9 @@ import { RadialBar, RadialBarChart, PolarAngleAxis } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartConfig, ChartContainer } from '@/components/ui/chart';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
 import { Plus } from 'lucide-react';
-import {
-  goals,
-  totalSavedAmount,
-  totalTargetAmount,
-  formatINRFull,
-  formatINR
-} from './overview-data';
+import { formatINRFull, formatINR } from './overview-data';
 import { AddGoalDialog } from './add-goal-dialog';
-
-const savingsRate = Math.round((totalSavedAmount / totalTargetAmount) * 100);
-
-const radialData = [
-  {
-    name: 'Savings Rate',
-    value: savingsRate,
-    fill: '#4ade80'
-  }
-];
 
 const chartConfig = {
   value: {
@@ -32,7 +15,21 @@ const chartConfig = {
   }
 } satisfies ChartConfig;
 
-export function GoalsSavings() {
+interface GoalsSavingsProps {
+  dbGoals?: Array<{
+    id: string;
+    name: string;
+    targetAmount: number;
+    savedAmount: number;
+    icon: string;
+    color: string;
+    deadline: string;
+    userId: string;
+    createdAt: string;
+  }>;
+}
+
+export function GoalsSavings({ dbGoals = [] }: GoalsSavingsProps) {
   const [isClient, setIsClient] = React.useState(false);
   const [hasError, setHasError] = React.useState(false);
   const [dialogOpen, setDialogOpen] = React.useState(false);
@@ -40,6 +37,29 @@ export function GoalsSavings() {
   React.useEffect(() => {
     setIsClient(true);
   }, []);
+
+  const totalSavedAmount = React.useMemo(() => {
+    return dbGoals.reduce((sum, g) => sum + g.savedAmount, 0);
+  }, [dbGoals]);
+
+  const totalTargetAmount = React.useMemo(() => {
+    return dbGoals.reduce((sum, g) => sum + g.targetAmount, 0);
+  }, [dbGoals]);
+
+  const savingsRate = React.useMemo(() => {
+    if (totalTargetAmount === 0) return 0;
+    return Math.round((totalSavedAmount / totalTargetAmount) * 100);
+  }, [totalSavedAmount, totalTargetAmount]);
+
+  const radialData = React.useMemo(() => {
+    return [
+      {
+        name: 'Savings Rate',
+        value: savingsRate,
+        fill: '#4ade80'
+      }
+    ];
+  }, [savingsRate]);
 
   if (hasError) {
     return (
@@ -60,7 +80,7 @@ export function GoalsSavings() {
     );
   }
 
-  const isEmpty = goals.length === 0;
+  const isEmpty = dbGoals.length === 0;
 
   return (
     <>
@@ -148,10 +168,11 @@ export function GoalsSavings() {
 
               {/* Per-goal progress bars */}
               <div className='flex flex-1 flex-col gap-3 overflow-auto'>
-                {goals.map((goal) => {
-                  const pct = Math.round(
-                    (goal.savedAmount / goal.targetAmount) * 100
-                  );
+                {dbGoals.map((goal) => {
+                  const pct =
+                    goal.targetAmount > 0
+                      ? Math.round((goal.savedAmount / goal.targetAmount) * 100)
+                      : 0;
                   return (
                     <div key={goal.id} className='space-y-1'>
                       <div className='flex items-center justify-between'>
@@ -177,7 +198,7 @@ export function GoalsSavings() {
                         <div
                           className='h-full rounded-full transition-all duration-700 ease-out'
                           style={{
-                            width: `${pct}%`,
+                            width: `${Math.min(pct, 100)}%`,
                             backgroundColor: goal.color
                           }}
                         />

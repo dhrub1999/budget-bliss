@@ -3,8 +3,12 @@ import React from 'react';
 import { QuickActions } from '@/features/overview/components/quick-actions';
 import { QuickInsights } from '@/features/overview/components/quick-insights';
 import { CreditCards } from '@/features/overview/components/credit-cards';
+import { db } from '@/db';
+import { transactions, goals as dbGoalsTable } from '@/db/schema';
+import { auth } from '@/lib/auth/server';
+import { eq } from 'drizzle-orm';
 
-export default function OverViewLayout({
+export default async function OverViewLayout({
   bar_stats,
   pie_stats,
   sales,
@@ -15,11 +19,40 @@ export default function OverViewLayout({
   sales: React.ReactNode;
   area_stats: React.ReactNode;
 }) {
+  const { data: session } = await auth.getSession();
+  const userId = session?.user?.id;
+
+  let dbTxns: any[] = [];
+  let dbGoals: any[] = [];
+
+  if (userId) {
+    dbTxns = await db
+      .select()
+      .from(transactions)
+      .where(eq(transactions.userId, userId));
+
+    dbGoals = await db
+      .select()
+      .from(dbGoalsTable)
+      .where(eq(dbGoalsTable.userId, userId));
+  }
+
+  const serializedTxns = dbTxns.map((t) => ({
+    ...t,
+    date: t.date.toISOString()
+  }));
+
+  const serializedGoals = dbGoals.map((g) => ({
+    ...g,
+    deadline: g.deadline.toISOString(),
+    createdAt: g.createdAt.toISOString()
+  }));
+
   return (
     <PageContainer>
       <div className='flex w-full flex-1 flex-col gap-4'>
         {/* ─── Row 1: Quick Action Buttons ─────────────────────────────── */}
-        <QuickActions />
+        <QuickActions dbTransactions={serializedTxns} />
 
         {/* ─── Row 2: Main Dashboard Grid ──────────────────────────────── */}
         {/*
@@ -33,8 +66,11 @@ export default function OverViewLayout({
           <div className='flex flex-col gap-4 lg:col-span-4'>
             {/* Spending Categories (parallel route @bar_stats) */}
             <div>{bar_stats}</div>
-            {/* Quick Insights (static, no streaming needed) */}
-            <QuickInsights />
+            {/* Quick Insights */}
+            <QuickInsights
+              dbTransactions={serializedTxns}
+              dbGoals={serializedGoals}
+            />
           </div>
 
           {/* ── Column 2 ── */}
