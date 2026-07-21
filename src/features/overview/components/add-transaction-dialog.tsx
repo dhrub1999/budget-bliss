@@ -173,10 +173,23 @@ export function AddTransactionDialog({
 
         toast.success(successMessage);
 
+        if (result.budgetAlert) {
+          const { status, category: catName, pct } = result.budgetAlert;
+          if (status === 'EXCEEDED') {
+            toast.error(
+              `⚠️ Budget Alert: You have EXCEEDED your ${catName} budget! (${pct}% spent)`
+            );
+          } else if (status === 'WARNING') {
+            toast.warning(
+              `⚠️ Budget Warning: You have reached ${pct}% of your ${catName} budget limit.`
+            );
+          }
+        }
+
         form.reset();
         onOpenChange(false);
 
-        // Trigger a page refresh to show new data
+        // Trigger a page refresh to update overall state
         window.location.reload();
       } else {
         toast.error(result?.error || 'Failed to add transaction');

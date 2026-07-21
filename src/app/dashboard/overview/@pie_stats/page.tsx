@@ -21,6 +21,7 @@ export default async function PieStats() {
   const serializedGoals = dbGoals.map((g) => ({
     ...g,
     deadline: g.deadline.toISOString(),
+    completedAt: g.completedAt ? g.completedAt.toISOString() : null,
     createdAt: g.createdAt.toISOString()
   }));
 
