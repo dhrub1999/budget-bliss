@@ -25,7 +25,27 @@ export const transactions = pgTable('transactions', {
   userId: uuid('user_id').notNull()
 });
 
+// ─── Goals ────────────────────────────────────────────────────────────────────
+// userId references neon_auth.user.id — managed by Neon Auth, not Drizzle.
+
+export const goals = pgTable('goals', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => createId()),
+  name: text('name').notNull(),
+  targetAmount: doublePrecision('target_amount').notNull(),
+  savedAmount: doublePrecision('saved_amount').notNull().default(0),
+  icon: text('icon').notNull(),
+  color: text('color').notNull(),
+  deadline: timestamp('deadline').notNull(),
+  /** UUID of the authenticated user from neon_auth.user */
+  userId: uuid('user_id').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow()
+});
+
 // ─── Inferred types ───────────────────────────────────────────────────────────
 
 export type Transaction = typeof transactions.$inferSelect;
 export type NewTransaction = typeof transactions.$inferInsert;
+export type Goal = typeof goals.$inferSelect;
+export type NewGoal = typeof goals.$inferInsert;
