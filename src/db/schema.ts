@@ -1,4 +1,5 @@
 import {
+  boolean,
   doublePrecision,
   pgTable,
   text,
@@ -38,9 +39,29 @@ export const goals = pgTable('goals', {
   icon: text('icon').notNull(),
   color: text('color').notNull(),
   deadline: timestamp('deadline').notNull(),
+  isCompleted: boolean('is_completed').notNull().default(false),
+  completedAt: timestamp('completed_at'),
   /** UUID of the authenticated user from neon_auth.user */
   userId: uuid('user_id').notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow()
+});
+
+// ─── Budgets ──────────────────────────────────────────────────────────────────
+// userId references neon_auth.user.id — managed by Neon Auth, not Drizzle.
+
+export const budgets = pgTable('budgets', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => createId()),
+  /** e.g. "Groceries", "Rent" or "TOTAL" for overall budget */
+  category: text('category').notNull(),
+  amount: doublePrecision('amount').notNull(),
+  /** "MONTHLY" | "YEARLY" */
+  period: text('period').notNull().default('MONTHLY'),
+  /** UUID of the authenticated user from neon_auth.user */
+  userId: uuid('user_id').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow()
 });
 
 // ─── Inferred types ───────────────────────────────────────────────────────────
@@ -49,3 +70,5 @@ export type Transaction = typeof transactions.$inferSelect;
 export type NewTransaction = typeof transactions.$inferInsert;
 export type Goal = typeof goals.$inferSelect;
 export type NewGoal = typeof goals.$inferInsert;
+export type Budget = typeof budgets.$inferSelect;
+export type NewBudget = typeof budgets.$inferInsert;

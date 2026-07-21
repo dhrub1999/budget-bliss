@@ -82,5 +82,20 @@ export const goalSchema = z.object({
   )
 });
 
+export const updateGoalSchema = goalSchema.partial().extend({
+  isCompleted: z.boolean().optional()
+});
+
+export const contributeGoalSchema = z.object({
+  amount: z.coerce
+    .number({ invalid_type_error: 'Amount must be a number' })
+    .positive({ message: 'Amount must be greater than zero' }),
+  note: z.string().optional()
+});
+
 export type GoalSchemaInput = z.input<typeof goalSchema>;
 export type GoalSchemaOutput = z.output<typeof goalSchema>;
+export type UpdateGoalSchemaInput = z.input<typeof updateGoalSchema>;
+export type UpdateGoalSchemaOutput = z.output<typeof updateGoalSchema>;
+export type ContributeGoalSchemaInput = z.input<typeof contributeGoalSchema>;
+export type ContributeGoalSchemaOutput = z.output<typeof contributeGoalSchema>;
