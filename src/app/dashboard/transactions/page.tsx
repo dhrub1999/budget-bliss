@@ -1,9 +1,10 @@
 import { auth } from '@/lib/auth/server';
 import { redirect } from 'next/navigation';
 import { db } from '@/db';
-import { transactions } from '@/db/schema';
+import { transactions, goals } from '@/db/schema';
 import { eq, desc } from 'drizzle-orm';
 import { TransactionsView } from '@/features/transactions/components/transactions-view';
+import { getAccountsWithBalances } from '@/features/accounts/lib/get-accounts';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,11 +23,15 @@ export default async function TransactionsPage() {
 
   const userId = session.user.id;
 
-  const dbTxns = await db
-    .select()
-    .from(transactions)
-    .where(eq(transactions.userId, userId))
-    .orderBy(desc(transactions.date));
+  const [dbTxns, { accounts }, dbGoals] = await Promise.all([
+    db
+      .select()
+      .from(transactions)
+      .where(eq(transactions.userId, userId))
+      .orderBy(desc(transactions.date)),
+    getAccountsWithBalances(userId),
+    db.select().from(goals).where(eq(goals.userId, userId))
+  ]);
 
   const formattedTransactions = dbTxns.map((t) => ({
     id: t.id,
@@ -34,8 +39,20 @@ export default async function TransactionsPage() {
     type: t.type as 'INCOME' | 'EXPENSE',
     category: t.category,
     description: t.description,
-    date: t.date.toISOString()
+    date: t.date.toISOString(),
+    accountId: t.accountId,
+    goalId: t.goalId
   }));
 
-  return <TransactionsView initialTransactions={formattedTransactions} />;
+  const goalOptions = dbGoals
+    .filter((g) => !g.isCompleted)
+    .map((g) => ({ id: g.id, name: g.name, icon: g.icon, color: g.color }));
+
+  return (
+    <TransactionsView
+      initialTransactions={formattedTransactions}
+      accounts={accounts}
+      goals={goalOptions}
+    />
+  );
 }

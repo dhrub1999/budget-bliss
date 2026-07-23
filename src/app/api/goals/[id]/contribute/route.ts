@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
-import { goals } from '@/db/schema';
 import { auth } from '@/lib/auth/server';
 import { revalidatePath } from 'next/cache';
-import { eq, and } from 'drizzle-orm';
 import { contributeGoalSchema } from '@/lib/validations/goal';
+import { applyGoalContribution } from '@/lib/goals/contribute';
 
 export async function POST(
   request: NextRequest,
@@ -35,40 +34,27 @@ export async function POST(
 
     const { amount } = parsed.data;
 
-    // Fetch existing goal
-    const [existingGoal] = await db
-      .select()
-      .from(goals)
-      .where(and(eq(goals.id, id), eq(goals.userId, session.user.id)));
-
-    if (!existingGoal) {
-      return NextResponse.json(
-        { success: false, error: 'Goal not found' },
-        { status: 404 }
+    let result;
+    try {
+      result = await db.transaction((tx) =>
+        applyGoalContribution(tx, session.user.id, id, amount)
       );
+    } catch (err: any) {
+      if (err?.message === 'Goal not found') {
+        return NextResponse.json(
+          { success: false, error: 'Goal not found' },
+          { status: 404 }
+        );
+      }
+      throw err;
     }
-
-    const newSavedAmount = existingGoal.savedAmount + amount;
-    const isCompleted = newSavedAmount >= existingGoal.targetAmount;
-    const completedAt = isCompleted
-      ? existingGoal.completedAt || new Date()
-      : null;
-
-    await db
-      .update(goals)
-      .set({
-        savedAmount: newSavedAmount,
-        isCompleted,
-        completedAt
-      })
-      .where(and(eq(goals.id, id), eq(goals.userId, session.user.id)));
 
     revalidatePath('/dashboard/overview');
     revalidatePath('/dashboard/budgeting');
     return NextResponse.json({
       success: true,
-      savedAmount: newSavedAmount,
-      isCompleted
+      savedAmount: result.savedAmount,
+      isCompleted: result.isCompleted
     });
   } catch (error: any) {
     console.error('Error contributing to goal:', error);

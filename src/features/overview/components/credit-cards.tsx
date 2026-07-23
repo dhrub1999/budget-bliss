@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { useRouter } from 'next/navigation';
 import {
   ChevronLeft,
   ChevronRight,
@@ -9,8 +10,11 @@ import {
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
-import { creditCards, type CreditCard } from './overview-data';
+import { type CreditCard, formatINRFull } from './overview-data';
+import type { AccountOption } from '@/features/accounts/types';
+import { UTIL_AMBER, UTIL_ROSE } from '@/features/accounts/constants';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import {
@@ -30,6 +34,24 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select';
+
+/** Maps a real credit-card account to the cosmetic card view. */
+function toCardView(acc: AccountOption): CreditCard {
+  return {
+    id: acc.id,
+    cardNumber: acc.last4 || '',
+    cardHolder: acc.cardHolder || acc.name,
+    validThru: acc.validThru || '••/••',
+    brand: (acc.brand as CreditCard['brand']) || 'visa',
+    gradient: acc.gradient || ''
+  };
+}
+
+function utilBarColor(util: number): string {
+  if (util >= UTIL_ROSE) return 'bg-rose-500';
+  if (util >= UTIL_AMBER) return 'bg-amber-500';
+  return 'bg-emerald-500';
+}
 
 function ContactlessIcon() {
   return (
@@ -286,13 +308,17 @@ function CreditCardItem({ card }: CreditCardItemProps) {
   );
 }
 
-export function CreditCards() {
-  const [cards, setCards] = React.useState<CreditCard[]>(creditCards);
+export function CreditCards({ cards = [] }: { cards?: AccountOption[] }) {
+  const router = useRouter();
   const [currentIndex, setCurrentIndex] = React.useState(0);
   const [isPaused, setIsPaused] = React.useState(false);
   const [dialogOpen, setDialogOpen] = React.useState(false);
+  const [submitting, setSubmitting] = React.useState(false);
 
   // Form states
+  const [cardName, setCardName] = React.useState('');
+  const [creditLimitInput, setCreditLimitInput] = React.useState('');
+  const [outstandingInput, setOutstandingInput] = React.useState('');
   const [cardHolder, setCardHolder] = React.useState('');
   const [cardNumberInput, setCardNumberInput] = React.useState('');
   const [validThruInput, setValidThruInput] = React.useState('');
@@ -304,6 +330,12 @@ export function CreditCards() {
 
   const isEmpty = cards.length === 0;
   const total = cards.length;
+
+  React.useEffect(() => {
+    if (currentIndex > total - 1) setCurrentIndex(Math.max(0, total - 1));
+  }, [total, currentIndex]);
+
+  const activeCard = cards[currentIndex];
 
   // Handle autoplay rotations
   React.useEffect(() => {
@@ -337,9 +369,23 @@ export function CreditCards() {
     setValidThruInput(value);
   };
 
-  const handleAddCardSubmit = (e: React.FormEvent) => {
+  const handleAddCardSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const errors: Record<string, string> = {};
+
+    if (!cardName.trim()) {
+      errors.cardName = 'Card name is required';
+    }
+
+    const limit = Number(creditLimitInput);
+    if (!creditLimitInput || isNaN(limit) || limit <= 0) {
+      errors.creditLimit = 'Enter a valid credit limit';
+    }
+
+    const outstanding = outstandingInput ? Number(outstandingInput) : 0;
+    if (outstandingInput && (isNaN(outstanding) || outstanding < 0)) {
+      errors.outstanding = 'Enter a valid amount';
+    }
 
     if (!cardHolder.trim()) {
       errors.cardHolder = 'Cardholder name is required';
@@ -375,31 +421,44 @@ export function CreditCards() {
       return;
     }
 
-    const newCard: CreditCard = {
-      id: `cc_${Date.now()}`,
-      cardNumber: digitsOnlyNumber,
-      cardHolder: cardHolder.trim(),
-      validThru: validThruInput,
-      brand: brandInput,
-      gradient: ''
-    };
+    setSubmitting(true);
+    try {
+      const res = await fetch('/api/accounts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'CREDIT_CARD',
+          name: cardName.trim(),
+          creditLimit: limit,
+          currentOutstanding: outstanding,
+          last4: digitsOnlyNumber.slice(-4),
+          cardHolder: cardHolder.trim(),
+          validThru: validThruInput,
+          brand: brandInput
+        })
+      });
+      const data = await res.json();
+      setSubmitting(false);
 
-    const newCards = [...cards, newCard];
-    setCards(newCards);
-    toast.success('Credit card added successfully!');
-
-    // Reset Form
-    setCardHolder('');
-    setCardNumberInput('');
-    setValidThruInput('');
-    setBrandInput('mastercard');
-    setFormErrors({});
-    setDialogOpen(false);
-
-    // Slide to the new card
-    setTimeout(() => {
-      setCurrentIndex(newCards.length - 1);
-    }, 100);
+      if (data?.success) {
+        toast.success('Credit card added successfully!');
+        setCardName('');
+        setCreditLimitInput('');
+        setOutstandingInput('');
+        setCardHolder('');
+        setCardNumberInput('');
+        setValidThruInput('');
+        setBrandInput('mastercard');
+        setFormErrors({});
+        setDialogOpen(false);
+        router.refresh();
+      } else {
+        toast.error(data?.error || 'Failed to add credit card');
+      }
+    } catch (err: any) {
+      setSubmitting(false);
+      toast.error(err?.message || 'Failed to add credit card');
+    }
   };
 
   return (
@@ -495,20 +554,54 @@ export function CreditCards() {
                 >
                   <AnimatePresence initial={false} mode='wait'>
                     <motion.div
-                      key={cards[currentIndex]?.id || 'empty'}
+                      key={activeCard?.id || 'empty'}
                       initial={{ opacity: 0, x: 45, scale: 0.97 }}
                       animate={{ opacity: 1, x: 0, scale: 1 }}
                       exit={{ opacity: 0, x: -45, scale: 0.97 }}
                       transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
                       className='w-full'
                     >
-                      {cards[currentIndex] && (
-                        <CreditCardItem card={cards[currentIndex]} />
+                      {activeCard && (
+                        <CreditCardItem card={toCardView(activeCard)} />
                       )}
                     </motion.div>
                   </AnimatePresence>
                 </div>
               </div>
+
+              {/* Real-data utilization strip for the active card */}
+              {activeCard && (
+                <div className='space-y-1.5 rounded-xl border border-zinc-800 bg-[#141416] px-3.5 py-3'>
+                  <div className='flex items-center justify-between text-xs'>
+                    <span className='text-zinc-400'>
+                      {formatINRFull(activeCard.owed ?? 0)} /{' '}
+                      {formatINRFull(activeCard.creditLimit ?? 0)}
+                    </span>
+                    <span
+                      className={cn(
+                        'font-semibold',
+                        (activeCard.utilization ?? 0) >= UTIL_ROSE
+                          ? 'text-rose-400'
+                          : (activeCard.utilization ?? 0) >= UTIL_AMBER
+                            ? 'text-amber-400'
+                            : 'text-emerald-400'
+                      )}
+                    >
+                      {Math.round((activeCard.utilization ?? 0) * 100)}% used
+                    </span>
+                  </div>
+                  <Progress
+                    value={Math.min(100, (activeCard.utilization ?? 0) * 100)}
+                    className='h-1.5 bg-zinc-800'
+                    indicatorClassName={utilBarColor(
+                      activeCard.utilization ?? 0
+                    )}
+                  />
+                  <p className='text-[11px] text-zinc-500'>
+                    {formatINRFull(activeCard.available)} available
+                  </p>
+                </div>
+              )}
 
               {/* Navigation controls */}
               {total > 1 && (
@@ -540,12 +633,83 @@ export function CreditCards() {
               Add Credit Card
             </DialogTitle>
             <DialogDescription className='text-[11px] leading-normal text-zinc-500'>
-              Enter your credit card credentials to render in the carousel. All
-              values are processed locally.
+              Add a credit card with its limit to track utilization and keep
+              your balances in sync.
             </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleAddCardSubmit} className='space-y-4 pt-2'>
+            {/* Card name */}
+            <div className='space-y-1.5'>
+              <Label
+                htmlFor='card-name'
+                className='text-[11px] font-semibold tracking-wider text-zinc-400 uppercase'
+              >
+                Card Name
+              </Label>
+              <Input
+                id='card-name'
+                type='text'
+                placeholder='e.g. HDFC Regalia'
+                value={cardName}
+                onChange={(e) => setCardName(e.target.value)}
+                className='rounded-xl border border-zinc-800 bg-zinc-950/80 px-3 py-2 text-sm text-white placeholder:text-zinc-600 focus:ring-1 focus:ring-purple-500'
+              />
+              {formErrors.cardName && (
+                <p className='text-[10px] text-red-400'>
+                  {formErrors.cardName}
+                </p>
+              )}
+            </div>
+
+            {/* Credit limit + outstanding */}
+            <div className='grid grid-cols-2 gap-3'>
+              <div className='space-y-1.5'>
+                <Label
+                  htmlFor='credit-limit'
+                  className='text-[11px] font-semibold tracking-wider text-zinc-400 uppercase'
+                >
+                  Credit Limit (₹)
+                </Label>
+                <Input
+                  id='credit-limit'
+                  type='number'
+                  min='1'
+                  placeholder='200000'
+                  value={creditLimitInput}
+                  onChange={(e) => setCreditLimitInput(e.target.value)}
+                  className='rounded-xl border border-zinc-800 bg-zinc-950/80 px-3 py-2 text-sm text-white placeholder:text-zinc-600 focus:ring-1 focus:ring-purple-500'
+                />
+                {formErrors.creditLimit && (
+                  <p className='text-[10px] text-red-400'>
+                    {formErrors.creditLimit}
+                  </p>
+                )}
+              </div>
+              <div className='space-y-1.5'>
+                <Label
+                  htmlFor='outstanding'
+                  className='text-[11px] font-semibold tracking-wider text-zinc-400 uppercase'
+                >
+                  Outstanding (₹)
+                </Label>
+                <Input
+                  id='outstanding'
+                  type='number'
+                  min='0'
+                  placeholder='0'
+                  value={outstandingInput}
+                  onChange={(e) => setOutstandingInput(e.target.value)}
+                  className='rounded-xl border border-zinc-800 bg-zinc-950/80 px-3 py-2 text-sm text-white placeholder:text-zinc-600 focus:ring-1 focus:ring-purple-500'
+                />
+                {formErrors.outstanding && (
+                  <p className='text-[10px] text-red-400'>
+                    {formErrors.outstanding}
+                  </p>
+                )}
+              </div>
+            </div>
+
             {/* Brand select */}
             <div className='space-y-1.5'>
               <Label className='text-[11px] font-semibold tracking-wider text-zinc-400 uppercase'>
@@ -671,9 +835,10 @@ export function CreditCards() {
               </Button>
               <Button
                 type='submit'
+                disabled={submitting}
                 className='rounded-xl bg-purple-600 px-4 text-xs font-semibold text-white hover:bg-purple-500'
               >
-                Add Card
+                {submitting ? 'Adding...' : 'Add Card'}
               </Button>
             </DialogFooter>
           </form>

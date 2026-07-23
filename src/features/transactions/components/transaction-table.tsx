@@ -49,7 +49,7 @@ import {
   ArrowUpRight,
   Tag
 } from 'lucide-react';
-import { TransactionRecord } from './add-edit-transaction-dialog';
+import { TransactionRecord } from './transaction-form-dialog';
 import { getTransactionColumns } from './columns';
 import {
   expenseCategories,
