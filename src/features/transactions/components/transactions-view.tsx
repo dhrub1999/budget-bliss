@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { useRouter } from 'next/navigation';
 import PageContainer from '@/components/layout/page-container';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -14,21 +15,28 @@ import {
 } from 'lucide-react';
 import {
   TransactionRecord,
-  AddEditTransactionDialog
-} from './add-edit-transaction-dialog';
+  TransactionFormDialog,
+  type GoalOption
+} from './transaction-form-dialog';
 import { ImportCsvModal } from './import-csv-modal';
 import { ExportCsvButton } from './export-csv-button';
 import { TransactionTable } from './transaction-table';
 import { formatINRFull } from '@/features/overview/components/overview-data';
+import type { AccountOption } from '@/features/accounts/types';
 import { toast } from 'sonner';
 
 interface TransactionsViewProps {
   initialTransactions: TransactionRecord[];
+  accounts?: AccountOption[];
+  goals?: GoalOption[];
 }
 
 export function TransactionsView({
-  initialTransactions
+  initialTransactions,
+  accounts = [],
+  goals = []
 }: TransactionsViewProps) {
+  const router = useRouter();
   const [addEditOpen, setAddEditOpen] = React.useState(false);
   const [importOpen, setImportOpen] = React.useState(false);
   const [selectedTxn, setSelectedTxn] =
@@ -54,7 +62,7 @@ export function TransactionsView({
 
       if (data && data.success) {
         toast.success('Transaction deleted');
-        window.location.reload();
+        router.refresh();
       } else {
         toast.error(data?.error || 'Failed to delete transaction');
       }
@@ -199,22 +207,24 @@ export function TransactionsView({
           data={initialTransactions}
           onEdit={handleEdit}
           onDelete={handleDeleteSingle}
-          onRefresh={() => window.location.reload()}
+          onRefresh={() => router.refresh()}
         />
       </div>
 
       {/* Modals */}
-      <AddEditTransactionDialog
+      <TransactionFormDialog
         open={addEditOpen}
         onOpenChange={setAddEditOpen}
+        accounts={accounts}
+        goals={goals}
         transactionToEdit={selectedTxn}
-        onSuccess={() => window.location.reload()}
+        onSuccess={() => router.refresh()}
       />
 
       <ImportCsvModal
         open={importOpen}
         onOpenChange={setImportOpen}
-        onSuccess={() => window.location.reload()}
+        onSuccess={() => router.refresh()}
       />
     </PageContainer>
   );

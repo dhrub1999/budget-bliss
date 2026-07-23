@@ -3,6 +3,9 @@ import React from 'react';
 import { QuickActions } from '@/features/overview/components/quick-actions';
 import { QuickInsights } from '@/features/overview/components/quick-insights';
 import { CreditCards } from '@/features/overview/components/credit-cards';
+import { AccountsSummary } from '@/features/overview/components/accounts-summary';
+import { getAccountsWithBalances } from '@/features/accounts/lib/get-accounts';
+import type { AccountOption, PortfolioTotals } from '@/features/accounts/types';
 import { db } from '@/db';
 import { transactions, goals as dbGoalsTable } from '@/db/schema';
 import { auth } from '@/lib/auth/server';
@@ -24,6 +27,12 @@ export default async function OverViewLayout({
 
   let dbTxns: any[] = [];
   let dbGoals: any[] = [];
+  let accountList: AccountOption[] = [];
+  let portfolio: PortfolioTotals = {
+    totalAssets: 0,
+    totalCardDebt: 0,
+    netWorth: 0
+  };
 
   if (userId) {
     dbTxns = await db
@@ -35,7 +44,13 @@ export default async function OverViewLayout({
       .select()
       .from(dbGoalsTable)
       .where(eq(dbGoalsTable.userId, userId));
+
+    const accountsData = await getAccountsWithBalances(userId);
+    accountList = accountsData.accounts;
+    portfolio = accountsData.portfolio;
   }
+
+  const cardAccounts = accountList.filter((a) => a.type === 'CREDIT_CARD');
 
   const serializedTxns = dbTxns.map((t) => ({
     ...t,
@@ -53,6 +68,9 @@ export default async function OverViewLayout({
       <div className='flex w-full flex-1 flex-col gap-4'>
         {/* ─── Row 1: Quick Action Buttons ─────────────────────────────── */}
         <QuickActions dbTransactions={serializedTxns} />
+
+        {/* ─── Row 1.5: Accounts / Net-worth summary ───────────────────── */}
+        <AccountsSummary accounts={accountList} portfolio={portfolio} />
 
         {/* ─── Row 2: Main Dashboard Grid ──────────────────────────────── */}
         {/*
@@ -85,8 +103,8 @@ export default async function OverViewLayout({
           <div className='flex flex-col gap-4 lg:col-span-4'>
             {/* Recent Transactions (parallel route @sales) */}
             <div className='flex-1'>{sales}</div>
-            {/* Credit Cards (static) */}
-            <CreditCards />
+            {/* Credit Cards (real accounts) */}
+            <CreditCards cards={cardAccounts} />
           </div>
         </div>
       </div>

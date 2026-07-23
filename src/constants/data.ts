@@ -146,6 +146,14 @@ export const overviewNavItems: NavItem[] = [
 
 export const managementNavItems: NavItem[] = [
   {
+    title: 'Accounts',
+    url: '/dashboard/accounts',
+    icon: 'accounts',
+    isActive: false,
+    shortcut: ['a', 'a'],
+    items: []
+  },
+  {
     title: 'Transactions',
     url: '/dashboard/transactions',
     icon: 'transaction',
