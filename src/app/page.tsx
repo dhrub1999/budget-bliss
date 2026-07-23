@@ -79,14 +79,19 @@ export default async function Page() {
             </div>
           </ScrollReveal>
 
-          <ScrollReveal delay={0.35} direction='none'>
-            <div className='mx-auto mt-6 w-full max-w-6xl'>
+          <ScrollReveal
+            delay={0.35}
+            direction='none'
+            className='mt-8 w-full max-w-5xl md:max-w-6xl'
+          >
+            <div className='shadow-brand-500/20 relative mx-auto overflow-hidden rounded-2xl border border-white/10 bg-neutral-900/60 p-2 shadow-2xl backdrop-blur-sm md:rounded-3xl md:p-3'>
               <Image
                 src={'/images/hero-image.png'}
-                height={2160}
-                width={1440}
+                height={779}
+                width={1096}
                 alt='Product dashboard image'
-                className='w-full'
+                className='h-auto w-full rounded-xl object-cover md:rounded-2xl'
+                priority
               />
             </div>
           </ScrollReveal>
