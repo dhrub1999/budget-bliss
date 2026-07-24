@@ -1,7 +1,7 @@
 import { delay } from '@/constants/mock-api';
 import { SpendingCategories } from '@/features/overview/components/spending-categories';
 import { db } from '@/db';
-import { transactions } from '@/db/schema';
+import { transactions, budgets } from '@/db/schema';
 import { auth } from '@/lib/auth/server';
 import { eq } from 'drizzle-orm';
 
@@ -10,7 +10,7 @@ export default async function BarStats() {
 
   const { data: session } = await auth.getSession();
   if (!session?.user?.id) {
-    return <SpendingCategories dbTransactions={[]} />;
+    return <SpendingCategories dbTransactions={[]} dbBudgets={[]} />;
   }
 
   const dbTxns = await db
@@ -18,10 +18,29 @@ export default async function BarStats() {
     .from(transactions)
     .where(eq(transactions.userId, session.user.id));
 
+  const dbBudgets = await db
+    .select()
+    .from(budgets)
+    .where(eq(budgets.userId, session.user.id));
+
   const serializedTxns = dbTxns.map((t) => ({
     ...t,
     date: t.date.toISOString()
   }));
 
-  return <SpendingCategories dbTransactions={serializedTxns} />;
+  const serializedBudgets = dbBudgets.map((b) => ({
+    id: b.id,
+    category: b.category,
+    amount: b.amount,
+    period: b.period,
+    userId: b.userId,
+    createdAt: b.createdAt.toISOString()
+  }));
+
+  return (
+    <SpendingCategories
+      dbTransactions={serializedTxns}
+      dbBudgets={serializedBudgets}
+    />
+  );
 }
