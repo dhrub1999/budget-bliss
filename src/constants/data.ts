@@ -168,54 +168,16 @@ export const managementNavItems: NavItem[] = [
     isActive: false,
     shortcut: ['b', 'b'],
     items: []
-  },
-  {
-    title: 'Reports',
-    url: '/dashboard/reports',
-    icon: 'reports',
-    isActive: false,
-    shortcut: ['r', 'r'],
-    items: []
   }
+  // NOTE: Reports (/dashboard/reports) is hidden until the page is built.
 ];
 
-export const settingsNavItems: NavItem[] = [
-  {
-    title: 'Reminders',
-    url: '/dashboard/reminders',
-    icon: 'reminder',
-    isActive: false,
-    shortcut: ['r', 'r'],
-    items: []
-  },
-  {
-    title: 'Settings',
-    url: '/dashboard/settings',
-    icon: 'settings',
-    isActive: false,
-    shortcut: ['s', 's'],
-    items: []
-  }
-];
+// Hidden until built — Reminders and Settings pages don't exist yet.
+export const settingsNavItems: NavItem[] = [];
 
-export const supportNavItems: NavItem[] = [
-  {
-    title: 'Help',
-    url: '/dashboard/help',
-    icon: 'help',
-    isActive: false,
-    shortcut: ['h', 'h'],
-    items: []
-  },
-  {
-    title: 'Logout',
-    url: '/dashboard/logout',
-    icon: 'logout',
-    isActive: false,
-    shortcut: ['l', 'l'],
-    items: []
-  }
-];
+// Hidden until built — Help page doesn't exist; sign-out lives in the user
+// dropdown (see app-sidebar.tsx), so a nav "Logout" link isn't needed.
+export const supportNavItems: NavItem[] = [];
 
 export interface SaleUser {
   id: number;

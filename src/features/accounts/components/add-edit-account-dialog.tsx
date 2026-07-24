@@ -3,12 +3,20 @@
 import * as React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import Link from 'next/link';
 import {
   Landmark,
   CreditCard as CreditCardIcon,
   Wallet,
-  Banknote
+  Banknote,
+  Info
 } from 'lucide-react';
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger
+} from '@/components/ui/hover-card';
+import { DATA_DISCLAIMER, DATA_DISCLAIMER_TITLE } from '@/constants/legal';
 import {
   Dialog,
   DialogContent,
@@ -193,9 +201,38 @@ export function AddEditAccountDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className='max-h-[90vh] w-[94vw] max-w-[440px] overflow-y-auto rounded-2xl border-zinc-800 bg-[#121214] p-4 text-white sm:p-6 [&>button]:hidden'>
         <DialogHeader>
-          <DialogTitle className='text-lg font-semibold text-white'>
-            {isEditing ? 'Edit Account' : 'Add Account'}
-          </DialogTitle>
+          <div className='flex items-center gap-1.5'>
+            <DialogTitle className='text-lg font-semibold text-white'>
+              {isEditing ? 'Edit Account' : 'Add Account'}
+            </DialogTitle>
+            <HoverCard>
+              <HoverCardTrigger asChild>
+                <button
+                  type='button'
+                  aria-label='Data and privacy information'
+                  className='rounded-full text-zinc-400 transition-colors hover:text-zinc-200 focus:outline-none focus-visible:ring-1 focus-visible:ring-zinc-500'
+                >
+                  <Info className='h-4 w-4' />
+                </button>
+              </HoverCardTrigger>
+              <HoverCardContent
+                align='start'
+                className='w-72 border-zinc-800 bg-[#18181b] text-xs leading-relaxed text-zinc-300'
+              >
+                <p className='mb-1.5 font-semibold text-white'>
+                  {DATA_DISCLAIMER_TITLE}
+                </p>
+                <p>{DATA_DISCLAIMER}</p>
+                <Link
+                  href='/privacy'
+                  target='_blank'
+                  className='mt-2 inline-block font-medium text-emerald-400 hover:underline'
+                >
+                  Read more →
+                </Link>
+              </HoverCardContent>
+            </HoverCard>
+          </div>
           <DialogDescription className='text-xs text-zinc-400'>
             {isEditing
               ? 'Update the details of this account.'

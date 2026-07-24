@@ -22,7 +22,7 @@ export default async function AccountDetailPage({
   const { data: session } = await auth.getSession();
 
   if (!session?.user?.id) {
-    redirect('/auth/signin');
+    redirect('/auth/sign-in');
   }
 
   const userId = session.user.id;

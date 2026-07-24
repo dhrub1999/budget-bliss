@@ -47,6 +47,21 @@ export default function SignUpViewPage({ stars }: { stars: number }) {
     }
   };
 
+  const handleDemoSignIn = async () => {
+    setIsPending(true);
+    setErrorMsg('');
+    const { error } = await authClient.signIn.email({
+      email: 'test@abc.com',
+      password: 'Password123'
+    });
+    if (error) {
+      setErrorMsg(error.message || 'Could not open the demo. Try again.');
+      setIsPending(false);
+    } else {
+      router.push('/dashboard/overview');
+    }
+  };
+
   return (
     <div className='relative h-screen flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0'>
       <Link
@@ -297,6 +312,20 @@ export default function SignUpViewPage({ stars }: { stars: number }) {
                 {isPending ? 'Creating account...' : 'Create Account'}
               </button>
             </form>
+
+            <div className='flex flex-col gap-1.5'>
+              <button
+                type='button'
+                onClick={handleDemoSignIn}
+                disabled={isPending}
+                className='rounded-md border border-white/15 bg-white/5 py-2 font-semibold text-white transition hover:bg-white/10 disabled:opacity-50'
+              >
+                Continue with demo account
+              </button>
+              <p className='text-center text-xs text-gray-500'>
+                Explore instantly — no signup, uses shared sample data.
+              </p>
+            </div>
 
             <div className='relative my-4 flex items-center justify-center'>
               <div className='absolute inset-0 flex items-center'>
