@@ -15,7 +15,7 @@ export default async function BudgetingPage() {
   const { data: session } = await auth.getSession();
 
   if (!session?.user?.id) {
-    redirect('/auth/signin');
+    redirect('/auth/sign-in');
   }
 
   const userId = session.user.id;

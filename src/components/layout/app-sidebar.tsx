@@ -162,37 +162,41 @@ export default function AppSidebar() {
         </SidebarGroup>
 
         {/* Settings Group */}
-        <SidebarGroup>
-          <SidebarGroupLabel>Settings</SidebarGroupLabel>
-          <SidebarMenu>{renderNavItems(settingsNavItems)}</SidebarMenu>
-        </SidebarGroup>
+        {settingsNavItems.length > 0 && (
+          <SidebarGroup>
+            <SidebarGroupLabel>Settings</SidebarGroupLabel>
+            <SidebarMenu>{renderNavItems(settingsNavItems)}</SidebarMenu>
+          </SidebarGroup>
+        )}
       </SidebarContent>
 
       <SidebarFooter>
         {/* Support nav items */}
-        <SidebarGroup>
-          <SidebarGroupLabel>Support</SidebarGroupLabel>
-          <SidebarMenu>
-            {supportNavItems.map((item) => {
-              const Icon = item.icon ? Icons[item.icon] : Icons.budgetBliss;
-              const isActive = pathname === item.url;
-              return (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    asChild
-                    tooltip={item.title}
-                    isActive={isActive}
-                  >
-                    <Link href={item.url}>
-                      {item.icon && <Icon />}
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              );
-            })}
-          </SidebarMenu>
-        </SidebarGroup>
+        {supportNavItems.length > 0 && (
+          <SidebarGroup>
+            <SidebarGroupLabel>Support</SidebarGroupLabel>
+            <SidebarMenu>
+              {supportNavItems.map((item) => {
+                const Icon = item.icon ? Icons[item.icon] : Icons.budgetBliss;
+                const isActive = pathname === item.url;
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton
+                      asChild
+                      tooltip={item.title}
+                      isActive={isActive}
+                    >
+                      <Link href={item.url}>
+                        {item.icon && <Icon />}
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
+            </SidebarMenu>
+          </SidebarGroup>
+        )}
 
         {/* User menu dropdown */}
         <SidebarMenu>

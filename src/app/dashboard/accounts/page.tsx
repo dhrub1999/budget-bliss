@@ -15,7 +15,7 @@ export default async function AccountsPage() {
   const { data: session } = await auth.getSession();
 
   if (!session?.user?.id) {
-    redirect('/auth/signin');
+    redirect('/auth/sign-in');
   }
 
   const { accounts, portfolio } = await getAccountsWithBalances(

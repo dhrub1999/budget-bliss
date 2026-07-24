@@ -1,109 +1,143 @@
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://user-images.githubusercontent.com/9113740/201498864-2a900c64-d88f-4ed4-b5cf-770bcb57e1f5.png">
-  <source media="(prefers-color-scheme: light)" srcset="https://user-images.githubusercontent.com/9113740/201498152-b171abb8-9225-487a-821c-6ff49ee48579.png">
-</picture>
-
-<div align="center"><strong>Next.js Admin Dashboard Starter Template With Shadcn-ui</strong></div>
-<div align="center">Built with the Next.js 15 App Router</div>
-<br />
 <div align="center">
-<a href="https://dub.sh/shadcn-dashboard">View Demo</a>
-<span>
+  <h1>💸 Budget Bliss</h1>
+  <strong>A personal finance tracker for people who actually want to know where their money went.</strong>
+  <br />
+  <em>Built with Next.js 15, and a healthy distrust of "set it and forget it" budgeting.</em>
 </div>
 
 ## Overview
 
-This is a starter template using the following stack:
+Budget Bliss is a **manual** personal-finance tracker. Yes, _manual_ — on purpose. There's no bank scraping, no UPI hooks, no shadowy aggregator quietly reading your statements at 3 a.m. You enter your accounts, cards, wallets, and transactions yourself, because the fastest way to stop wondering where your money goes is to type it in and look it in the eye.
 
-- Framework - [Next.js 15](https://nextjs.org/13)
-- Language - [TypeScript](https://www.typescriptlang.org)
-- Styling - [Tailwind CSS v4](https://tailwindcss.com)
-- Components - [Shadcn-ui](https://ui.shadcn.com)
-- Schema Validations - [Zod](https://zod.dev)
-- State Management - [Zustand](https://zustand-demo.pmnd.rs)
-- Search params state manager - [Nuqs](https://nuqs.47ng.com/)
-- Auth - [Clerk](https://go.clerk.com/ILdYhn7)
-- Tables - [Tanstack Data Tables](https://ui.shadcn.com/docs/components/data-table) • [Dice UI](https://www.diceui.com/docs/components/data-table)
-- Forms - [React Hook Form](https://ui.shadcn.com/docs/components/form)
-- Command+k interface - [kbar](https://kbar.vercel.app/)
-- Linting - [ESLint](https://eslint.org)
-- Pre-commit Hooks - [Husky](https://typicode.github.io/husky/)
-- Formatting - [Prettier](https://prettier.io)
+The trade-off is honest: a little more effort from you, a lot less of your financial life handed to a third party. If you were hoping for "connect your bank and never think again," this is politely not that app.
 
-_If you are looking for a React admin dashboard starter, here is the [repo](https://github.com/Kiranism/react-shadcn-dashboard-starter)._
+Everything is derived, nothing is faked: balances are computed from your transactions rather than stored, so editing or deleting an entry just works — no reconciliation rituals required.
 
-## Pages
+## Features
 
-| Pages                                                                                 | Specifications                                                                                                                                                                                                                                                          |
-| :------------------------------------------------------------------------------------ | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Signup / Signin](https://next-shadcn-dashboard-starter.vercel.app/auth/sign-up)      | Authentication with **Clerk** provides secure authentication and user management with multiple sign-in options including passwordless authentication, social logins, and enterprise SSO - all designed to enhance security while delivering a seamless user experience. |
-| [Dashboard (Overview)](https://next-shadcn-dashboard-starter.vercel.app/dashboard)    | Cards with recharts graphs for analytics.Parallel routes in the overview sections with independent loading, error handling, and isolated component rendering .                                                                                                          |
-| [Product](https://next-shadcn-dashboard-starter.vercel.app/dashboard/product)         | Tanstack tables with server side searching, filter, pagination by Nuqs which is a Type-safe search params state manager in nextjs                                                                                                                                       |
-| [Product/new](https://next-shadcn-dashboard-starter.vercel.app/dashboard/product/new) | A Product Form with shadcn form (react-hook-form + zod).                                                                                                                                                                                                                |
-| [Profile](https://next-shadcn-dashboard-starter.vercel.app/dashboard/profile)         | Clerk's full-featured account management UI that allows users to manage their profile and security settings                                                                                                                                                             |
-| [Kanban Board](https://next-shadcn-dashboard-starter.vercel.app/dashboard/kanban)     | A Drag n Drop task management board with dnd-kit and zustand to persist state locally.                                                                                                                                                                                  |
-| [Not Found](https://next-shadcn-dashboard-starter.vercel.app/dashboard/notfound)      | Not Found Page Added in the root level                                                                                                                                                                                                                                  |
-| -                                                                                     | -                                                                                                                                                                                                                                                                       |
+- **Accounts** — Track Savings, Credit Cards, Wallets, and Cash in one unified model. A default Cash account is created for you the first time you show up, because everyone has cash they can't account for.
+- **Transactions** — Income and expenses, each tied to a real account. Supports **split transactions** (that dinner where you covered three friends who _swear_ they'll pay you back) and CSV import.
+- **Budgeting** — Set category budgets and watch the "Spending Categories" widget gently judge your life choices.
+- **Goals** — Earmark savings toward a goal and track progress.
+- **Overview dashboard** — Charts and stats via Recharts, with parallel-route loading so one slow widget doesn't hold the whole page hostage.
+- **Gentle, non-blocking warnings** — Credit utilization creeping past 40%, a wallet over its cap, savings below the minimum. It warns; it never nannies you into inaction.
+- **Privacy-conscious by design** — Only the **last 4 digits** of a card are ever collected. No full card numbers, no CVV, no PIN. A breach disclaimer is surfaced right on the account form and on the `/privacy` page, because storing financial data and pretending nothing could go wrong is not a personality we aspire to.
 
-## Feature based organization
+## Tech Stack
 
-```plaintext
-src/
-├── app/ # Next.js App Router directory
-│ ├── (auth)/ # Auth route group
-│ │ ├── (signin)/
-│ ├── (dashboard)/ # Dashboard route group
-│ │ ├── layout.tsx
-│ │ ├── loading.tsx
-│ │ └── page.tsx
-│ └── api/ # API routes
-│
-├── components/ # Shared components
-│ ├── ui/ # UI components (buttons, inputs, etc.)
-│ └── layout/ # Layout components (header, sidebar, etc.)
-│
-├── features/ # Feature-based modules
-│ ├── feature/
-│ │ ├── components/ # Feature-specific components
-│ │ ├── actions/ # Server actions
-│ │ ├── schemas/ # Form validation schemas
-│ │ └── utils/ # Feature-specific utilities
-│ │
-├── lib/ # Core utilities and configurations
-│ ├── auth/ # Auth configuration
-│ ├── db/ # Database utilities
-│ └── utils/ # Shared utilities
-│
-├── hooks/ # Custom hooks
-│ └── use-debounce.ts
-│
-├── stores/ # Zustand stores
-│ └── dashboard-store.ts
-│
-└── types/ # TypeScript types
-└── index.ts
-```
+| Concern            | Choice                                                        |
+| :----------------- | :------------------------------------------------------------ |
+| Framework          | [Next.js 15](https://nextjs.org) (App Router) + React 19      |
+| Language           | [TypeScript](https://www.typescriptlang.org)                  |
+| Styling            | [Tailwind CSS v4](https://tailwindcss.com)                    |
+| Components         | [shadcn/ui](https://ui.shadcn.com) + Radix                    |
+| Auth               | [better-auth](https://better-auth.com) via Neon Auth          |
+| Database           | Postgres ([Neon](https://neon.tech)) + [Drizzle ORM](https://orm.drizzle.team) |
+| Validation         | [Zod](https://zod.dev)                                        |
+| State              | [Zustand](https://zustand-demo.pmnd.rs)                       |
+| Search-param state | [Nuqs](https://nuqs.47ng.com/)                                |
+| Forms              | [React Hook Form](https://react-hook-form.com)                |
+| Charts             | [Recharts](https://recharts.org)                              |
+| Command palette    | [kbar](https://kbar.vercel.app/)                              |
+| Tables             | [TanStack Table](https://tanstack.com/table)                  |
+| Tooling            | ESLint · Prettier · Husky · lint-staged                       |
 
 ## Getting Started
 
-> [!NOTE]  
-> We are using **Next 15** with **React 19**, follow these steps:
+> [!NOTE]
+> We use **pnpm** (with `legacy-peer-deps=true` in `.npmrc`), **Next 15**, and **React 19**.
 
-Clone the repo:
+1. **Clone & install**
 
+   ```bash
+   git clone <your-repo-url>
+   cd budget-bliss
+   pnpm install
+   ```
+
+2. **Set up your environment** — create a `.env.local` with:
+
+   ```bash
+   DATABASE_URL=            # your Neon/Postgres connection string
+   NEON_AUTH_BASE_URL=      # Neon Auth base URL
+   NEON_AUTH_COOKIE_SECRET= # a long random string
+   ```
+
+   > [!WARNING]
+   > The committed `env.example.txt` still references Clerk from a past life. Ignore it — the variables above are the ones that actually matter.
+
+3. **Push the schema** to your database:
+
+   ```bash
+   pnpm db:push
+   ```
+
+   > We sync the schema with `db:push` rather than `db:migrate` — the generated migrations are stale. `pnpm db:studio` opens Drizzle Studio if you want to poke at the data.
+
+4. **Run it**
+
+   ```bash
+   pnpm dev
+   ```
+
+   Open [http://localhost:3000](http://localhost:3000).
+
+### Try the demo
+
+Don't feel like wiring up a database just to look around? Hit **"Continue with demo account"** on the sign-in or sign-up page, or log in manually:
+
+- **Email:** `test@abc.com`
+- **Password:** `Password123`
+
+(It's a demo account. Please don't put your real net worth in it.)
+
+## Project Structure
+
+```plaintext
+src/
+├── app/                # Next.js App Router (routes, API routes, landing page)
+│   ├── dashboard/      # accounts, transactions, budgeting, overview, profile
+│   ├── api/            # accounts, transactions, budgets, goals, auth
+│   ├── privacy/        # privacy + breach disclaimer
+│   └── terms/
+├── components/         # Shared + ui/ components
+├── features/           # Feature modules (accounts, transactions, budgeting, overview, ...)
+│   └── <feature>/      #   components / lib / schemas / types
+├── db/                 # Drizzle schema (accounts, transactions, budgets, goals)
+├── lib/
+│   ├── auth/           # better-auth client + server
+│   ├── accounts/       # balance derivation
+│   └── validations/    # Zod schemas (kept client-safe — no server/db imports)
+├── constants/          # shared copy, incl. legal.ts
+├── hooks/
+├── stores/             # Zustand stores
+└── types/
 ```
-git clone https://github.com/Kiranism/next-shadcn-dashboard-starter.git
-```
 
-- `pnpm install` ( we have legacy-peer-deps=true added in the .npmrc)
-- Create a `.env.local` file by copying the example environment file:
-  `cp env.example.txt .env.local`
-- Add the required environment variables to the `.env.local` file.
-- `pnpm run dev`
+## Scripts
 
-You should now be able to access the application at http://localhost:3000.
+| Script             | What it does                          |
+| :----------------- | :------------------------------------ |
+| `pnpm dev`         | Start the dev server (Turbopack)      |
+| `pnpm build`       | Production build                      |
+| `pnpm start`       | Serve the production build            |
+| `pnpm lint`        | Lint                                  |
+| `pnpm lint:fix`    | Lint + format                         |
+| `pnpm format`      | Prettier over everything              |
+| `pnpm db:push`     | Sync schema to the database           |
+| `pnpm db:studio`   | Open Drizzle Studio                   |
 
-> [!WARNING]
-> After cloning or forking the repository, be cautious when pulling or syncing with the latest changes, as this may result in breaking conflicts.
+## Contributing
+
+Contributions are welcome — bug fixes, features, or just fixing the typo you're about to notice.
+
+1. Branch off `main` with a descriptive name (`feat/…`, `fix/…`, `chore/…`).
+2. Keep it clean — Husky + lint-staged run Prettier on commit, so run `pnpm lint` before you push and save everyone the "fix lint" commit.
+3. **Keep `src/lib/validations/*` client-safe** — no imports that pull in `@/db` (Postgres needs net/tls/fs and will break the client build). Future you will thank present you.
+4. Balances are **derived, not stored** — don't add a running-balance column "for performance." It's a trap.
+5. Open a PR against `main` with a short description of the _what_ and the _why_.
+
+> [!NOTE]
+> Budget Bliss is intentionally manual. PRs proposing bank/UPI/aggregator auto-sync will be admired for their ambition and then respectfully declined — it's a design choice, not a missing feature.
 
 Cheers! 🥂
