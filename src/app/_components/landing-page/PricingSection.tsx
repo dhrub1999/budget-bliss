@@ -5,54 +5,69 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Star, SquareCheck, Users, Flame, PartyPopper } from 'lucide-react';
 
+/**
+ * Only the free plan is real.
+ *
+ * There is no payment processor in package.json and no billing tables in the
+ * schema, so Pro and Family are roadmap items. They stay on the page as a
+ * direction-of-travel signal but are badged `planned`, their CTAs route to the
+ * free signup rather than a checkout that doesn't exist, and the JSON-LD in
+ * src/lib/structured-data.ts advertises the free Offer only — an unbuyable
+ * Offer in structured data is a manual-action risk.
+ *
+ * Note "automation" was removed from the Pro description: no tier automates
+ * anything, and there is no plan to.
+ */
 const plans = [
   {
     id: 'free',
     name: 'Free Plan',
-    description: 'Perfect for individuals starting their financial journey.',
+    description: 'Everything that currently exists, at no cost.',
     monthlyPrice: 0,
     icon: Flame,
-    cta: 'Get Started with Free Plan',
-    sectionLabel: 'Starter Plan',
+    cta: 'Get Started Free',
+    sectionLabel: 'Available now',
+    planned: false,
     features: [
-      'Add unlimited income & expenses',
-      'Monthly budgeting tools',
-      'Spending category tracking',
-      'Access to goals & reports',
-      'Email updates'
-    ],
-    highlight: false
-  },
-  {
-    id: 'pro',
-    name: 'Pro Plan',
-    description:
-      'Ideal for users who want deeper financial insights and automation.',
-    monthlyPrice: 199,
-    icon: Star,
-    cta: 'Get Started with Pro Plan',
-    sectionLabel: 'Pro Plan',
-    features: [
-      'Everything in Free plan',
-      'Goal-based savings tracker',
-      'Smart reminders (bill, rent, EMI)',
-      'Export data (CSV, PDF)',
-      'Priority Support'
+      'Unlimited manual income & expense entries',
+      'Savings, credit card, wallet & cash accounts',
+      'Monthly per-category budgets',
+      'Savings goals with earmarked contributions',
+      'Split expenses & credit utilisation warnings'
     ],
     highlight: true
   },
   {
+    id: 'pro',
+    name: 'Pro Plan',
+    description: 'Deeper reporting and data export. Not yet available.',
+    monthlyPrice: 199,
+    icon: Star,
+    cta: 'Start free for now',
+    sectionLabel: 'Planned',
+    planned: true,
+    features: [
+      'Everything in Free',
+      'Bill, rent and EMI reminders',
+      'Export data (CSV, PDF)',
+      'Extended reporting history',
+      'Priority support'
+    ],
+    highlight: false
+  },
+  {
     id: 'family',
     name: 'Family Plan',
-    description: 'Designed for managing household or group finances together.',
+    description: 'Shared household budgeting. Not yet available.',
     monthlyPrice: 499,
     icon: Users,
-    cta: 'Get Started with Family Plan',
-    sectionLabel: 'Pro Plan',
+    cta: 'Start free for now',
+    sectionLabel: 'Planned',
+    planned: true,
     features: [
-      'Everything in Pro plan',
-      'Group-budgeting tools',
-      'Role based permission',
+      'Everything in Pro',
+      'Shared household budgets',
+      'Role-based permissions',
       'Activity history & audit logs',
       'Dedicated support channel'
     ],
@@ -98,15 +113,15 @@ export default function PricingSection() {
       {/* Heading */}
       <div className='mx-auto mb-8 max-w-3xl text-center md:mb-16'>
         <h2 className='font-nunito mb-6 text-3xl font-extrabold text-white sm:text-4xl md:text-5xl'>
-          Flexible Pricing That{' '}
+          How much does BudgetBliss{' '}
           <span className='from-brand-300 to-brand-500 bg-gradient-to-r bg-clip-text text-transparent'>
-            Grows
-          </span>{' '}
-          with You
+            cost?
+          </span>
         </h2>
         <p className='font-karla text-base text-neutral-400 md:text-lg'>
-          Choose a plan that suits your lifestyle - no hidden charges, no
-          stress.
+          Nothing, today. Everything that currently exists is on the free plan.
+          The Pro and Family tiers below are planned, not yet purchasable — the
+          prices show the intended direction.
         </p>
       </div>
 
@@ -197,9 +212,18 @@ export default function PricingSection() {
               </div>
 
               {/* Plan name & description */}
-              <h3 className='font-nunito mb-1 text-xl font-bold text-white'>
-                {plan.name}
-              </h3>
+              <div className='mb-1 flex items-center gap-2'>
+                <h3 className='font-nunito text-xl font-bold text-white'>
+                  {plan.name}
+                </h3>
+                {/* Unambiguous on the card itself — a reader should not have to
+                    infer purchasability from the CTA wording. */}
+                {plan.planned && (
+                  <span className='rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-bold tracking-wide text-amber-400 uppercase'>
+                    Planned
+                  </span>
+                )}
+              </div>
               <p className='mb-6 text-sm leading-relaxed text-neutral-500'>
                 {plan.description}
               </p>

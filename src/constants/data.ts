@@ -1,92 +1,5 @@
 import { NavItem } from '@/types';
 
-export type Testimonial = {
-  name: string;
-  role: string;
-  avatar: string;
-  quote: string;
-};
-
-export const testimonials: Testimonial[] = [
-  {
-    name: 'Arnab Ahmed',
-    role: 'Freelance Designer',
-    avatar: 'https://api.slingacademy.com/public/sample-users/6.png',
-    quote:
-      "Before I started using BudgetBliss, I was constantly stressed about money. I'd lose track of my expenses and panic at the end of the month. Now, I have full visibility into my spending, and I actually enjoy checking in on my finances. It's become a habit I look forward to."
-  },
-  {
-    name: 'Maya Rodriguez',
-    role: 'Graphic Designer',
-    avatar: 'https://api.slingacademy.com/public/sample-users/7.png',
-    quote:
-      'Using BudgetBliss has transformed my financial life. I used to feel overwhelmed with bills and payments, but now I have a clear roadmap for my expenditures. I can finally budget for fun things like vacations without guilt!'
-  },
-  {
-    name: 'James Lee',
-    role: 'UX/UI Designer',
-    avatar: 'https://api.slingacademy.com/public/sample-users/8.png',
-    quote:
-      "I was hesitant to track my finances, thinking it would be tedious, but BudgetBliss made it so easy. I can categorize my expenses effortlessly and see where I can save more. It's helped me plan for my future goals!"
-  },
-  {
-    name: 'Sofia Patel',
-    role: 'Product Manager',
-    avatar: 'https://api.slingacademy.com/public/sample-users/9.png',
-    quote:
-      "Managing projects was always chaotic for me. Deadlines would slip, and communication was a nightmare. Since integrating BudgetBliss into our workflow, I'm not only on top of my tasks, but my team feels more aligned and productive. It's transformed our approach to project management."
-  },
-  {
-    name: 'Jamal Thompson',
-    role: 'Content Strategist',
-    avatar: 'https://api.slingacademy.com/public/sample-users/10.png',
-    quote:
-      'Since I started using BudgetBliss, my approach to managing finances has completely shifted. I can easily track my spending habits and save for my goals. The insights are invaluable, making financial planning enjoyable!'
-  },
-  {
-    name: 'Maria Gonzalez',
-    role: 'Product Manager',
-    avatar: 'https://api.slingacademy.com/public/sample-users/11.png',
-    quote:
-      "Before using BudgetBliss, I struggled to maintain a clear overview of my project budgets. Now, I can analyze spending trends and adjust forecasts in real-time. It's a game-changer for my workflow!"
-  },
-  {
-    name: 'Liam Nguyen',
-    role: 'Marketing Specialist',
-    avatar: 'https://api.slingacademy.com/public/sample-users/12.png',
-    quote:
-      "Tracking my marketing budget used to be a daunting task. I often found myself overspending on campaigns without realizing it. Since I started using BudgetBliss, I can analyze my spending trends and reallocate funds smarter. It's empowering to see my ROI improve!"
-  },
-  {
-    name: 'Priya Singh',
-    role: 'Web Developer',
-    avatar: 'https://api.slingacademy.com/public/sample-users/13.png',
-    quote:
-      "BudgetBliss has made it possible for me to build my savings while still enjoying life. I love how it helps me prioritize my expenses and plan for future investments confidently. It's a game-changer!"
-  },
-  {
-    name: 'Daniel Kim',
-    role: 'Software Engineer',
-    avatar: 'https://api.slingacademy.com/public/sample-users/14.png',
-    quote:
-      'Tracking my subscriptions was always a hassle until I found BudgetBliss. The reminders and insights it provides help me stay on top of expenses I often forget about, making budgeting a breeze!'
-  },
-  {
-    name: 'Ethan Chen',
-    role: 'SEO Specialist',
-    avatar: 'https://api.slingacademy.com/public/sample-users/15.png',
-    quote:
-      "Using BudgetBliss has been a revelation. I no longer dread financial tasks; I actually look forward to reviewing my budget and seeing my progress. It's empowering to have control over my finances!"
-  },
-  {
-    name: 'Sophie Chen',
-    role: 'Graphic Designer',
-    avatar: 'https://api.slingacademy.com/public/sample-users/16.png',
-    quote:
-      "I never thought budgeting could actually be fun! BudgetBliss's visual charts and easy-to-use interface have transformed how I view my finances. It's empowering to see my savings grow!"
-  }
-];
-
 export type Product = {
   photo_url: string;
   name: string;
@@ -102,33 +15,54 @@ export type FeatureCardProps = {
   title: string;
   description: string;
   imageUrl: string;
+  /** Descriptive alt text. Falls back to title, but every card should set it. */
+  imageAlt?: string;
 };
 
-// Feature Cards Data
+/**
+ * Feature cards — each must describe something that actually ships today.
+ *
+ * Headings are noun phrases containing the search term people use, because
+ * "Track every account in one place" earns nothing while "Savings, cards,
+ * wallets and cash in one place" matches real queries. Descriptions lead with a
+ * concrete, quotable fact rather than an adjective, which is what makes a
+ * passage extractable by AI answer engines.
+ *
+ * Removed: "Bill & Subscription Reminders". Reminders are not built — the nav
+ * entry for them is commented out in this same file.
+ */
 export const featureCards: FeatureCardProps[] = [
   {
-    title: 'Effortless Expense Tracking',
+    title: 'Savings, credit cards, wallets and cash in one place',
     description:
-      'Track your daily spending with ease. Quickly log transactions, auto-categorize them, and view everything in one clean dashboard.',
-    imageUrl: '/images/feature-images/expense-tracking.png'
+      'Every transaction is tied to a real money source. Track four account types — savings accounts with a minimum-balance threshold, credit cards with a limit, digital wallets with a cap, and plain cash. Balances are calculated from your transaction history, so correcting a mistake never leaves a stale number behind.',
+    imageUrl: '/images/feature-images/expense-tracking.png',
+    imageAlt:
+      'BudgetBliss accounts screen listing a savings account, credit card, digital wallet and cash account with their current balances'
   },
   {
-    title: 'Smart Budget Planning',
+    title: 'Monthly budgets by category',
     description:
-      'Set monthly budgets by category and let BudgetBliss guide your spending with real-time insights and alerts before you overspend.',
-    imageUrl: '/images/feature-images/budget-planning.png'
+      'Set a spending limit per category for the month and watch the remaining balance fall as you log expenses. The spending-categories widget breaks down where the money actually went, so the gap between plan and reality is visible while you can still act on it.',
+    imageUrl: '/images/feature-images/budget-planning.png',
+    imageAlt:
+      'Monthly category budgets in BudgetBliss showing progress bars for each spending category'
   },
   {
-    title: 'Savings Goals & Progress Tracker',
+    title: 'Savings goals with earmarked money',
     description:
-      'Create financial goals and watch your progress grow with visual trackers and personalised saving tips.',
-    imageUrl: '/images/feature-images/savings-goals.png'
+      'Create a goal, then contribute to it from real income rather than a wish-list number. Contributions are earmarked against the goal and reversed automatically if you edit or delete the underlying transaction, so progress always reflects money you genuinely have.',
+    imageUrl: '/images/feature-images/savings-goals.png',
+    imageAlt:
+      'A savings goal in BudgetBliss with a progress bar showing the amount saved against the target'
   },
   {
-    title: 'Bill & Subscription Reminders',
+    title: 'Split expenses and credit utilisation warnings',
     description:
-      'Never miss a payment again. Get notified before due dates for rent, subscriptions, EMIs, and more.',
-    imageUrl: '/images/feature-images/bill-reminders.png'
+      'Divide one bill into several linked entries that still reconcile to a single payment — useful for a shared dinner or a mixed grocery run. Separately, when a card passes 40 percent of its limit the dashboard flags it, giving you room to pay down before the figure reaches a credit bureau.',
+    imageUrl: '/images/feature-images/bill-reminders.png',
+    imageAlt:
+      'A split expense in BudgetBliss divided across several categories, alongside a credit card utilisation warning'
   }
 ];
 

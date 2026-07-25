@@ -1,0 +1,6 @@
+{
+  "env": {
+    "CLAUDE_SEO_PYTHON": "/opt/homebrew/opt/python@3.13/bin/python3.13",
+    "CLAUDE_SEO_DATA_DIR": "/Users/tamal/Library/Application Support/claude-seo"
+  }
+}

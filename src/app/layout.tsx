@@ -3,6 +3,7 @@ import { Toaster } from '@/components/ui/sonner';
 import { fontVariables } from '@/lib/font';
 import ThemeProvider from '@/components/layout/ThemeToggle/theme-provider';
 import { cn } from '@/lib/utils';
+import { siteConfig, siteKeywords, siteUrl } from '@/config/site';
 import type { Metadata, Viewport } from 'next';
 import { cookies } from 'next/headers';
 import NextTopLoader from 'nextjs-toploader';
@@ -17,8 +18,64 @@ const META_THEME_COLORS = {
 };
 
 export const metadata: Metadata = {
-  title: 'Budget Bliss',
-  description: 'Basic dashboard with Next.js and Shadcn'
+  // metadataBase makes every relative OG/canonical URL below absolute. Without
+  // it Next emits relative og:image paths, which most crawlers reject.
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: siteConfig.title,
+    // Child routes set only their own title; the brand suffix is appended here.
+    template: `%s | ${siteConfig.name}`
+  },
+  description: siteConfig.description,
+  keywords: siteKeywords,
+  applicationName: siteConfig.name,
+  authors: [{ name: siteConfig.author.name }],
+  creator: siteConfig.author.name,
+  publisher: siteConfig.name,
+  alternates: {
+    canonical: '/'
+  },
+  openGraph: {
+    type: 'website',
+    locale: siteConfig.locale,
+    url: siteUrl,
+    siteName: siteConfig.name,
+    title: siteConfig.title,
+    description: siteConfig.description,
+    images: [
+      {
+        url: siteConfig.ogImage,
+        width: 1096,
+        height: 779,
+        alt: 'The BudgetBliss dashboard showing account balances, spending categories and budget progress'
+      }
+    ]
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: siteConfig.title,
+    description: siteConfig.description,
+    images: [siteConfig.ogImage]
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      // Uncapped snippet/image preview. These directives are also what governs
+      // eligibility for AI Overviews and AI Mode — capping them here would
+      // quietly suppress the product from AI answers.
+      'max-snippet': -1,
+      'max-image-preview': 'large',
+      'max-video-preview': -1
+    }
+  },
+  category: 'finance',
+  formatDetection: {
+    telephone: false,
+    address: false
+  }
 };
 
 export const viewport: Viewport = {

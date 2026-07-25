@@ -1,26 +1,31 @@
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import {
-  ArrowRight,
-  Sparkles,
-  Mail,
-  Globe,
-  Facebook,
-  Linkedin,
-  Instagram,
-  Heart
-} from 'lucide-react';
+import { ArrowRight, Sparkles, Mail, Heart } from 'lucide-react';
 import Image from 'next/image';
 import FeatureCard from './_components/landing-page/FeatureCard';
 import { featureCards } from '@/constants/data';
 import PricingSection from './_components/landing-page/PricingSection';
 import HowItWorks from './_components/landing-page/HowItWorks';
-import TestimonialsSection from './_components/landing-page/TestimonialsSection';
+import WhyManualSection from './_components/landing-page/WhyManualSection';
+import FaqSection from './_components/landing-page/FaqSection';
 import CTASection from './_components/landing-page/CTASection';
 import ScrollReveal, {
   StaggerContainer,
   StaggerItem
 } from './_components/landing-page/ScrollReveal';
+import { landingPageSchema } from '@/lib/structured-data';
+import { siteConfig } from '@/config/site';
+import type { Metadata } from 'next';
+
+/**
+ * Page-level metadata. Deliberately no `title` — omitting it inherits the root
+ * layout's `title.default`, which already ends in the brand. Setting one here
+ * would run the `%s | BudgetBliss` template and duplicate the suffix.
+ */
+export const metadata: Metadata = {
+  description: siteConfig.description,
+  alternates: { canonical: '/' }
+};
 
 export default async function Page() {
   return (
@@ -28,6 +33,17 @@ export default async function Page() {
       className='min-h-screen overflow-x-hidden overflow-y-auto bg-[#1e1e1e] text-white'
       style={{ scrollBehavior: 'smooth' }}
     >
+      {/*
+        Organization + WebSite + WebApplication + FAQPage as one @graph.
+        Emitted from a server component so it lands in the initial HTML: AI
+        crawlers don't run JavaScript, and Google's Dec 2025 JS SEO guidance
+        warns that client-injected structured data can be processed late.
+      */}
+      <script
+        type='application/ld+json'
+        // Schema content is our own static config, not user input.
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(landingPageSchema) }}
+      />
       {/* Radial glows for modern background aesthetics */}
       <div className='pointer-events-none absolute top-0 left-1/2 z-0 h-[600px] w-full max-w-7xl -translate-x-1/2 overflow-hidden opacity-30'>
         <div className='bg-brand-500 absolute -top-40 left-1/4 h-[500px] w-[500px] animate-pulse rounded-full blur-[150px] duration-4000' />
@@ -40,20 +56,34 @@ export default async function Page() {
           <ScrollReveal delay={0.05}>
             <div className='border-brand-500/20 bg-brand-500/5 text-brand-400 animate-fade-in mb-6 inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold md:text-sm'>
               <Sparkles className='text-brand-400 h-4 w-4' />
-              <span>Budgeting made blissful and automated</span>
+              {/* Was "Budgeting made blissful and automated" — nothing here is
+                  automated, and that claim contradicted the whole product. */}
+              <span>Manual by design — no bank linking, ever</span>
             </div>
           </ScrollReveal>
 
           <ScrollReveal delay={0.12}>
+            {/* One H1, leading with the primary keyword phrase rather than an
+                abstraction ("Your Finances, Organised & Optimised" matched no
+                query anyone types). */}
             <h1 className='font-nunito mb-6 max-w-4xl text-4xl leading-tight font-extrabold tracking-tight text-white sm:text-5xl md:text-7xl'>
-              Your Finances, Organised <span className=''>& Optimised.</span>
+              The personal finance tracker that{' '}
+              <span className='from-brand-300 to-brand-500 bg-gradient-to-r bg-clip-text text-transparent'>
+                never touches your bank
+              </span>
             </h1>
           </ScrollReveal>
 
           <ScrollReveal delay={0.2}>
-            <p className='font-karla mb-10 max-w-2xl text-2xl leading-relaxed text-neutral-400 md:text-xl'>
-              Gain complete visibility into your spending habits and make
-              informed financial decisions.
+            {/* Front-loaded answer block. Roughly 45 words, self-contained, and
+                naming the four account types — this is the passage most likely
+                to be lifted into an AI answer, so it has to stand alone. */}
+            <p className='font-karla mb-10 max-w-2xl text-xl leading-relaxed text-neutral-400 md:text-xl'>
+              BudgetBliss is a free budget planner where you log every
+              transaction yourself. Track savings accounts, credit cards,
+              digital wallets and cash in one dashboard, set monthly category
+              budgets, and save towards goals — without handing your bank
+              credentials to anyone.
             </p>
           </ScrollReveal>
 
@@ -89,39 +119,27 @@ export default async function Page() {
                 src={'/images/hero-image.png'}
                 height={779}
                 width={1096}
-                alt='Product dashboard image'
+                // Descriptive alt: "Product dashboard image" told a screen
+                // reader nothing and image search even less.
+                alt='The BudgetBliss dashboard showing account balances, a spending-category breakdown and monthly budget progress'
                 className='h-auto w-full rounded-xl object-cover md:rounded-2xl'
+                // Hero image is the LCP element — priority is correct here, and
+                // is the one place on the page it should be used.
                 priority
+                sizes='(max-width: 768px) 100vw, 1096px'
               />
             </div>
           </ScrollReveal>
         </div>
       </section>
 
-      {/* Trusted By Banner */}
-      <section className='border-y border-white/5 bg-neutral-900/40 py-12 text-center'>
-        <div className='mx-auto max-w-7xl px-6'>
-          <ScrollReveal>
-            <p className='mb-6 text-xs font-semibold tracking-widest text-neutral-500 uppercase'>
-              Loved by thousands of conscious spenders
-            </p>
-          </ScrollReveal>
-          <StaggerContainer className='flex flex-wrap items-center justify-center gap-8 opacity-40 md:gap-16'>
-            {[
-              'PRODUCT HUNT',
-              'FINTECH WEEKLY',
-              'VENTUREBEAT',
-              'SAAS CENTRAL'
-            ].map((name) => (
-              <StaggerItem key={name} direction='up'>
-                <span className='font-nunito text-xl font-extrabold tracking-tight'>
-                  {name}
-                </span>
-              </StaggerItem>
-            ))}
-          </StaggerContainer>
-        </div>
-      </section>
+      {/*
+        The "Trusted by" bar was removed. It read "Loved by thousands of
+        conscious spenders" above logos for Product Hunt, Fintech Weekly,
+        VentureBeat and SaaS Central — four real organisations that have not
+        covered this product, under a user count that does not exist.
+        WhyManualSection now occupies this slot with verifiable substance.
+      */}
 
       {/* Features Section */}
       <section
@@ -131,15 +149,16 @@ export default async function Page() {
         <ScrollReveal>
           <div className='mx-auto mb-16 max-w-3xl text-center md:mb-24'>
             <h2 className='font-nunito mb-6 text-3xl font-extrabold text-white sm:text-4xl md:text-5xl'>
-              Everything you Need to{' '}
+              What you can{' '}
               <span className='from-brand-300 to-brand-500 bg-gradient-to-r bg-clip-text text-transparent'>
-                Master your Money
+                actually do with it
               </span>
             </h2>
             <p className='text-base text-neutral-400 md:text-lg'>
-              Say goodbye to clunky spreadsheets and hidden bank fees. Budget
-              Bliss puts you back in the driver&apos;s seat of your financial
-              future.
+              Four things, built and shipped. Accounts across savings, cards,
+              wallets and cash; monthly category budgets; savings goals funded
+              from real income; and split expenses with credit-utilisation
+              warnings.
             </p>
           </div>
         </ScrollReveal>
@@ -151,20 +170,24 @@ export default async function Page() {
                 title={feature.title}
                 description={feature.description}
                 imageUrl={feature.imageUrl}
+                imageAlt={feature.imageAlt}
               />
             </StaggerItem>
           ))}
         </StaggerContainer>
       </section>
 
+      {/* Why manual + account-type table + explicit non-features */}
+      <WhyManualSection />
+
       {/* How It Works Section */}
       <HowItWorks />
 
-      {/* Testimonials Section */}
-      <TestimonialsSection />
-
       {/* Pricing Section — interactive client component */}
       <PricingSection />
+
+      {/* FAQ — server-rendered Q&A, shares its copy with the FAQPage JSON-LD */}
+      <FaqSection />
 
       {/* About Us & FAQ Section — temporarily commented out
       <section
@@ -246,9 +269,12 @@ export default async function Page() {
                 </h3>
                 <ul className='flex flex-col gap-3 text-sm text-neutral-400'>
                   {[
-                    { label: 'Home', href: '#' },
+                    { label: 'Features', href: '#features' },
+                    { label: 'Why manual', href: '#why-manual' },
+                    { label: 'How it works', href: '#how-it-works' },
                     { label: 'Pricing', href: '#pricing' },
-                    { label: 'Testimonials', href: '#testimonials' }
+                    // Replaces the '#testimonials' link — that section is gone.
+                    { label: 'FAQ', href: '#faq' }
                   ].map((item) => (
                     <li key={item.label}>
                       <Link
@@ -265,14 +291,15 @@ export default async function Page() {
               {/* Services */}
               <div>
                 <h3 className='mb-5 text-sm font-semibold tracking-wide text-white'>
-                  Services
+                  Features
                 </h3>
                 <ul className='flex flex-col gap-3 text-sm text-neutral-400'>
                   {[
-                    { label: 'Expense Management', href: '#features' },
-                    { label: 'Reminders', href: '#features' },
-                    { label: 'Goals', href: '#features' },
-                    { label: 'Budgeting', href: '#features' }
+                    // 'Reminders' removed — the feature does not exist.
+                    { label: 'Accounts & cards', href: '#features' },
+                    { label: 'Category budgets', href: '#features' },
+                    { label: 'Savings goals', href: '#features' },
+                    { label: 'Split expenses', href: '#features' }
                   ].map((item) => (
                     <li key={item.label}>
                       <Link
@@ -293,10 +320,16 @@ export default async function Page() {
                 </h3>
                 <ul className='flex flex-col gap-3 text-sm text-neutral-400'>
                   {[
-                    { label: 'Blog', href: '#' },
-                    { label: 'Help Center', href: '#' },
-                    { label: 'FAQs', href: '#about-us' },
-                    { label: 'Contact Us', href: '#' }
+                    // Blog and Help Center dropped — both pointed at '#'. A
+                    // link to nowhere is worse than no link, and a footer full
+                    // of them reads as an abandoned site to crawlers too.
+                    { label: 'FAQ', href: '#faq' },
+                    { label: 'Privacy Policy', href: '/privacy' },
+                    { label: 'Terms of Service', href: '/terms' },
+                    {
+                      label: 'Contact',
+                      href: `mailto:${siteConfig.email}`
+                    }
                   ].map((item) => (
                     <li key={item.label}>
                       <Link
@@ -317,15 +350,16 @@ export default async function Page() {
                 </h3>
                 <div className='flex flex-wrap gap-3'>
                   {[
+                    // Only the email is real. The Website/Facebook/LinkedIn/
+                    // Instagram icons all pointed at '#' — add each back when
+                    // the profile actually exists. (Worth doing: brand mentions
+                    // on real platforms correlate far more strongly with AI
+                    // search visibility than backlinks do.)
                     {
                       icon: Mail,
                       label: 'Email',
-                      href: 'mailto:hello@budgetbliss.app'
-                    },
-                    { icon: Globe, label: 'Website', href: '#' },
-                    { icon: Facebook, label: 'Facebook', href: '#' },
-                    { icon: Linkedin, label: 'LinkedIn', href: '#' },
-                    { icon: Instagram, label: 'Instagram', href: '#' }
+                      href: `mailto:${siteConfig.email}`
+                    }
                   ].map(({ icon: Icon, label, href }) => (
                     <a
                       key={label}

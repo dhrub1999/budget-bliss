@@ -1,0 +1,54 @@
+# BudgetBliss
+
+> A free, fully manual personal finance tracker. Users log every income and
+> expense themselves — there is no bank, UPI or card account linking, by design.
+> Amounts are in Indian rupees (INR).
+
+## What it is
+
+BudgetBliss is a free personal finance tracker where you enter every
+transaction yourself instead of linking a bank account. It tracks four account
+types — savings, credit card, digital wallet and cash — derives every balance
+from your transaction history, and supports category budgets, savings goals and
+split expenses.
+
+## Pages
+
+- [Home](/): Product overview, feature list, pricing and FAQ.
+- [Privacy Policy](/privacy): What data is stored, and the breach disclaimer.
+- [Terms of Service](/terms): Terms of use.
+
+## Features
+
+- Manual income and expense logging, one entry at a time
+- Four account types: savings (minimum-balance threshold), credit card (credit
+  limit and utilisation warnings), digital wallet (balance cap), cash
+- Balances derived from transaction history rather than stored as running totals
+- Monthly per-category budgets
+- Savings goals funded by earmarked contributions from real income
+- Split expenses: one bill divided into linked entries reconciling to one payment
+- Credit card utilisation warning at 40% of the limit
+- Spending-category breakdown, charts and a financial calendar
+- Demo account available without signup
+
+## What it deliberately does not do
+
+- No bank, UPI or card account linking — not planned
+- No automatic transaction import or categorisation
+- No selling or sharing of personal financial data
+- No collection of full card numbers, CVV or PIN — last four digits only
+
+## Pricing
+
+- Free plan: ₹0. Covers every feature that currently exists.
+- Pro (₹199/month) and Family (₹499/month): planned, not yet purchasable. There
+  is no payment processing integrated at this time.
+
+## Key facts
+
+- Fully manual by design; the friction of typing an amount is the intended
+  behaviour-change mechanism
+- Only the last four digits of a card are ever collected
+- A plain-language breach disclaimer is surfaced on the account form and the
+  privacy page
+- Built by Tamal Biswas as an independent side project

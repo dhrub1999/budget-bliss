@@ -68,8 +68,11 @@ const Header = () => {
 
   const navItems = [
     { label: 'Features', href: '#features', id: 'features' },
-    { label: 'Testimonials', href: '#testimonials', id: 'testimonials' },
-    { label: 'Pricing', href: '#pricing', id: 'pricing' }
+    // 'Testimonials' pointed at a section that has been removed. Internal
+    // anchors are crawled — a nav link to a non-existent target is a dead link.
+    { label: 'Why manual', href: '#why-manual', id: 'why-manual' },
+    { label: 'Pricing', href: '#pricing', id: 'pricing' },
+    { label: 'FAQ', href: '#faq', id: 'faq' }
   ];
 
   return (
