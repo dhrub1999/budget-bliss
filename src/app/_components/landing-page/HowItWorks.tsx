@@ -13,26 +13,34 @@ const steps = [
   {
     id: 'account',
     icon: UserPlus,
-    title: 'Create a free account.',
+    title: 'Add your accounts',
     description:
-      'Sign up in seconds — no credit card required. Get instant access to your personal finance dashboard and start your financial journey right away.',
-    image: '/images/feature-images/budget-planning.png'
+      'Sign up free — no card required — then add the accounts you actually use: a savings account, a credit card, a wallet, cash. Give each one its opening balance and BudgetBliss works out every balance from there.',
+    image: '/images/feature-images/budget-planning.png',
+    imageAlt:
+      'The add-account form in BudgetBliss with fields for account type and opening balance'
   },
   {
     id: 'track',
     icon: LayoutDashboard,
-    title: 'Stay top on your finances.',
+    // Was "Automatically track your expenses" — there is no automation here,
+    // and the claim contradicted the product's whole premise.
+    title: 'Log what you spend',
     description:
-      'Automatically track your expenses, set budgets, and manage savings effortlessly from one dashboard.',
-    image: '/images/feature-images/expense-tracking.png'
+      'Enter each transaction against the account it came from — a few seconds per entry, and the two-second review is the part that changes behaviour. Set monthly budgets per category and the dashboard shows what is left as you go.',
+    image: '/images/feature-images/expense-tracking.png',
+    imageAlt:
+      'Logging a transaction in BudgetBliss and assigning it to a spending category'
   },
   {
     id: 'goals',
     icon: Target,
-    title: 'Achieve your Goals.',
+    title: 'Fund your goals',
     description:
-      'Set meaningful financial goals, track your progress in real-time, and celebrate every milestone on your path to financial freedom.',
-    image: '/images/feature-images/savings-goals.png'
+      'Create a savings goal, then contribute to it from real income rather than an aspiration. Contributions are earmarked against the goal, so progress reflects money you genuinely set aside.',
+    image: '/images/feature-images/savings-goals.png',
+    imageAlt:
+      'A savings goal in BudgetBliss showing contributed amount against the target'
   }
 ];
 
@@ -92,12 +100,11 @@ export default function HowItWorks() {
       <ScrollReveal delay={0.08}>
         <div className='mx-auto mb-16 max-w-3xl text-center'>
           <h2 className='font-nunito mb-6 text-3xl font-extrabold text-white sm:text-4xl md:text-5xl'>
-            Plan. Track. Achieve.
+            How BudgetBliss works
           </h2>
           <p className='text-base leading-relaxed text-neutral-400 md:text-lg'>
-            Take control of your finances in just a few steps. BudgetBliss
-            guides you from setup to success —helping you plan better, track
-            smarter, and save more with ease.
+            Three steps, and none of them involve a bank login: add your
+            accounts, log what you spend, fund your goals.
           </p>
         </div>
       </ScrollReveal>
@@ -182,11 +189,14 @@ export default function HowItWorks() {
                 <Image
                   key={steps[activeIndex].id}
                   src={steps[activeIndex].image}
-                  alt={steps[activeIndex].title}
+                  alt={steps[activeIndex].imageAlt}
                   width={800}
                   height={500}
                   className='w-full object-cover'
-                  priority
+                  // No `priority`: this section is well below the fold, and
+                  // preloading it competed with the hero image for LCP.
+                  loading='lazy'
+                  sizes='(max-width: 768px) 100vw, 50vw'
                 />
               </div>
             </div>
