@@ -19,6 +19,7 @@ Everything is derived, nothing is faked: balances are computed from your transac
 - **Transactions** — Income and expenses, each tied to a real account. Supports **split transactions** (that dinner where you covered three friends who _swear_ they'll pay you back) and CSV import.
 - **Budgeting** — Set category budgets and watch the "Spending Categories" widget gently judge your life choices.
 - **Goals** — Earmark savings toward a goal and track progress.
+- **Bills & Upcoming** — The one forward-looking screen. Enter a bill with its amount, due date and how often it repeats; it sorts itself into overdue / due this week / later, and marking it paid opens a prefilled transaction and rolls a recurring bill to its next cycle. It does **not** notify you — there's no email, SMS or push channel anywhere in this codebase. You see what's due when you open the app, which is fine, because a manual tracker requires you to open the app anyway.
 - **Overview dashboard** — Charts and stats via Recharts, with parallel-route loading so one slow widget doesn't hold the whole page hostage.
 - **Gentle, non-blocking warnings** — Credit utilization creeping past 40%, a wallet over its cap, savings below the minimum. It warns; it never nannies you into inaction.
 - **Privacy-conscious by design** — Only the **last 4 digits** of a card are ever collected. No full card numbers, no CVV, no PIN. A breach disclaimer is surfaced right on the account form and on the `/privacy` page, because storing financial data and pretending nothing could go wrong is not a personality we aspire to.
@@ -134,10 +135,11 @@ Contributions are welcome — bug fixes, features, or just fixing the typo you'r
 1. Branch off `main` with a descriptive name (`feat/…`, `fix/…`, `chore/…`).
 2. Keep it clean — Husky + lint-staged run Prettier on commit, so run `pnpm lint` before you push and save everyone the "fix lint" commit.
 3. **Keep `src/lib/validations/*` client-safe** — no imports that pull in `@/db` (Postgres needs net/tls/fs and will break the client build). Future you will thank present you.
-4. Balances are **derived, not stored** — don't add a running-balance column "for performance." It's a trap.
-5. Open a PR against `main` with a short description of the _what_ and the _why_.
+4. Balances are **derived, not stored** — don't add a running-balance column "for performance." It's a trap. Same rule applies to bills: there's no `isPaid` column, because a due date in the future already tells you it was paid.
+5. **Don't overclaim in `src/config/site.ts`.** `productFeatures` and `productNonFeatures` feed both the marketing copy and the JSON-LD `featureList`, and AI answer engines quote them near-verbatim. If you ship something, add it there; if you don't, don't.
+6. Open a PR against `main` with a short description of the _what_ and the _why_.
 
 > [!NOTE]
-> Budget Bliss is intentionally manual. PRs proposing bank/UPI/aggregator auto-sync will be admired for their ambition and then respectfully declined — it's a design choice, not a missing feature.
+> Budget Bliss is intentionally manual. PRs proposing bank/UPI/aggregator auto-sync will be admired for their ambition and then respectfully declined — it's a design choice, not a missing feature. Bills are the same story in reverse: they're due dates *you* type, not recurring charges we detect from your history.
 
 Cheers! 🥂

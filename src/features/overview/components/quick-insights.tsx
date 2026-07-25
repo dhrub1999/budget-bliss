@@ -4,6 +4,14 @@ import * as React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Sparkles } from 'lucide-react';
 import { DynamicIcon } from '@/components/ui/dynamic-icon';
+import { formatINRFull } from './overview-data';
+import {
+  formatDueLabel,
+  daysUntilDue,
+  mostPressingBill
+} from '@/features/bills/lib/status';
+import type { BillRecord } from '@/features/bills/types';
+
 interface QuickInsightsProps {
   dbTransactions?: Array<{
     id: string;
@@ -25,12 +33,24 @@ interface QuickInsightsProps {
     userId: string;
     createdAt: string;
   }>;
+  dbBills?: BillRecord[];
+  /** Server's clock, ISO. Seeds `today` so SSR and first client paint agree. */
+  serverNow?: string;
 }
 
 export function QuickInsights({
   dbTransactions = [],
-  dbGoals = []
+  dbGoals = [],
+  dbBills = [],
+  serverNow
 }: QuickInsightsProps) {
+  const [today, setToday] = React.useState<Date>(() =>
+    serverNow ? new Date(serverNow) : new Date()
+  );
+  React.useEffect(() => {
+    setToday(new Date());
+  }, []);
+
   const insights = React.useMemo(() => {
     const list: Array<{
       id: string;
@@ -40,7 +60,24 @@ export function QuickInsights({
       text: string;
     }> = [];
 
-    // 1. Goal Insight
+    // 1. Bill Insight — the most pressing due date, first because it's the only
+    // insight that's actionable before the money moves.
+    const pressing = mostPressingBill(dbBills, today);
+    if (pressing) {
+      const overdue = daysUntilDue(pressing.dueDate, today) < 0;
+      const label = formatDueLabel(pressing.dueDate, today).toLowerCase();
+      list.push({
+        id: 'dyn-bill',
+        type: 'bill',
+        icon: overdue ? '⏰' : '📅',
+        color: overdue ? '#fb7185' : '#fbbf24',
+        text: `${pressing.name} (${formatINRFull(pressing.amount)}) is ${
+          overdue ? '' : 'due '
+        }${label}.`
+      });
+    }
+
+    // 2. Goal Insight
     if (dbGoals.length > 0) {
       let bestGoal = dbGoals[0];
       let maxPct = 0;
@@ -74,7 +111,7 @@ export function QuickInsights({
       }
     }
 
-    // 2. Transaction Summary
+    // 3. Transaction Summary
     if (dbTransactions.length > 0) {
       let totalIncome = 0;
       let totalExpense = 0;
@@ -109,7 +146,7 @@ export function QuickInsights({
     }
 
     return list;
-  }, [dbTransactions, dbGoals]);
+  }, [dbTransactions, dbGoals, dbBills, today]);
 
   return (
     <Card className='bg-card h-full'>

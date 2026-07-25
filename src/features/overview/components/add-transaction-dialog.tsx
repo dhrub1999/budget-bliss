@@ -14,13 +14,18 @@ interface AddTransactionDialogProps {
   defaultDate?: string;
   defaultType?: 'debit' | 'credit';
   defaultAccountId?: string;
+  defaultAmount?: number;
+  defaultCategory?: string;
+  defaultVendor?: string;
+  defaultNotes?: string;
   onSuccess?: () => void;
 }
 
 /**
  * Thin wrapper kept for existing overview entry points (quick actions, recent
- * transactions, financial calendar). Self-fetches accounts + goals on open so
- * those call sites don't need to thread the data through parallel routes.
+ * transactions, financial calendar, paying a bill). Self-fetches accounts +
+ * goals on open so those call sites don't need to thread the data through
+ * parallel routes.
  */
 export function AddTransactionDialog({
   open,
@@ -28,6 +33,10 @@ export function AddTransactionDialog({
   defaultDate,
   defaultType,
   defaultAccountId,
+  defaultAmount,
+  defaultCategory,
+  defaultVendor,
+  defaultNotes,
   onSuccess
 }: AddTransactionDialogProps) {
   const router = useRouter();
@@ -104,6 +113,10 @@ export function AddTransactionDialog({
       defaultType={defaultType}
       defaultDate={defaultDate}
       defaultAccountId={defaultAccountId}
+      defaultAmount={defaultAmount}
+      defaultCategory={defaultCategory}
+      defaultVendor={defaultVendor}
+      defaultNotes={defaultNotes}
       onSuccess={onSuccess ?? (() => router.refresh())}
     />
   );

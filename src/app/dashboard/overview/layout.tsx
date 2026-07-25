@@ -6,6 +6,9 @@ import { CreditCards } from '@/features/overview/components/credit-cards';
 import { AccountsSummary } from '@/features/overview/components/accounts-summary';
 import { getAccountsWithBalances } from '@/features/accounts/lib/get-accounts';
 import type { AccountOption, PortfolioTotals } from '@/features/accounts/types';
+import { UpcomingBillsCard } from '@/features/bills/components/upcoming-bills-card';
+import { getBills } from '@/features/bills/lib/get-bills';
+import type { BillRecord } from '@/features/bills/types';
 import { db } from '@/db';
 import { transactions, goals as dbGoalsTable } from '@/db/schema';
 import { auth } from '@/lib/auth/server';
@@ -27,6 +30,7 @@ export default async function OverViewLayout({
 
   let dbTxns: any[] = [];
   let dbGoals: any[] = [];
+  let dbBills: BillRecord[] = [];
   let accountList: AccountOption[] = [];
   let portfolio: PortfolioTotals = {
     totalAssets: 0,
@@ -48,7 +52,12 @@ export default async function OverViewLayout({
     const accountsData = await getAccountsWithBalances(userId);
     accountList = accountsData.accounts;
     portfolio = accountsData.portfolio;
+
+    // Already serialized to ISO strings by getBills.
+    dbBills = (await getBills(userId)).bills;
   }
+
+  const serverNow = new Date().toISOString();
 
   const cardAccounts = accountList.filter((a) => a.type === 'CREDIT_CARD');
 
@@ -75,7 +84,7 @@ export default async function OverViewLayout({
         {/* ─── Row 2: Main Dashboard Grid ──────────────────────────────── */}
         {/*
           Layout (3 columns on large screens):
-          Col 1 (narrow): Spending Categories + Quick Insights
+          Col 1 (narrow): Spending Categories + Quick Insights + Upcoming Bills
           Col 2 (mid):    Goals & Savings + Financial Calendar
           Col 3 (wide):   Recent Transactions + Credit Cards
         */}
@@ -88,7 +97,11 @@ export default async function OverViewLayout({
             <QuickInsights
               dbTransactions={serializedTxns}
               dbGoals={serializedGoals}
+              dbBills={dbBills}
+              serverNow={serverNow}
             />
+            {/* Upcoming Bills */}
+            <UpcomingBillsCard bills={dbBills} serverNow={serverNow} />
           </div>
 
           {/* ── Column 2 ── */}

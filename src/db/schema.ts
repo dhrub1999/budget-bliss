@@ -1,6 +1,8 @@
 import {
   boolean,
+  date,
   doublePrecision,
+  integer,
   pgTable,
   text,
   timestamp,
@@ -116,6 +118,58 @@ export const accounts = pgTable('accounts', {
   updatedAt: timestamp('updated_at').notNull().defaultNow()
 });
 
+// ─── Bills ──────────────────────────────────────────────────────────────────
+// userId references neon_auth.user.id — managed by Neon Auth, not Drizzle.
+//
+// A bill is a *future* expense the user told us about — rent, an EMI, a
+// subscription. Nothing here is detected or imported; the user types the name,
+// the amount and the date. The app only surfaces it.
+//
+// There is deliberately no `isPaid` column. Paid-ness is derived: marking a
+// recurring bill paid rolls `dueDate` to the next cycle, so a due date in the
+// future *is* the record of payment. The transaction it created is the receipt.
+
+export const bills = pgTable('bills', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => createId()),
+  /** Display name, e.g. "Rent", "Netflix", "Car EMI" */
+  name: text('name').notNull(),
+  amount: doublePrecision('amount').notNull(),
+  /** A member of expenseCategories, e.g. "Bills", "Subscriptions" */
+  category: text('category').notNull().default('Bills'),
+  /** "NONE" | "MONTHLY" | "QUARTERLY" | "YEARLY" */
+  recurrence: text('recurrence').notNull().default('MONTHLY'),
+  /**
+   * Next date money is expected to leave, as a calendar day ("2026-01-31").
+   * Rolled forward on mark-paid.
+   *
+   * Deliberately `date` and not `timestamp`: "due on the 31st" is a calendar
+   * fact, not an instant. Stored as a timestamp it would shift by a day
+   * whenever the server's zone and the viewer's disagree — a Vercel server runs
+   * in UTC while the audience is in IST, so an overdue check would flip a day
+   * early and the dueDay anchor below would come out as 30.
+   */
+  dueDate: date('due_date', { mode: 'string' }).notNull(),
+  /**
+   * Day-of-month anchor (1-31), captured when the bill is created. Rolling a
+   * bill due the 31st through February would otherwise clamp it to the 28th and
+   * leave it there permanently, so the roll re-anchors to this instead.
+   */
+  dueDay: integer('due_day'),
+  /** accounts.id (by convention, no DB FK). Account it's usually paid from. */
+  accountId: text('account_id'),
+  notes: text('notes'),
+  /** Last time this bill was settled. An event, not a derived aggregate. */
+  lastPaidAt: timestamp('last_paid_at'),
+  /** One-off bills archive on payment; recurring ones roll instead. */
+  isArchived: boolean('is_archived').notNull().default(false),
+  /** UUID of the authenticated user from neon_auth.user */
+  userId: uuid('user_id').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow()
+});
+
 // ─── Inferred types ───────────────────────────────────────────────────────────
 
 export type Transaction = typeof transactions.$inferSelect;
@@ -126,3 +180,5 @@ export type Budget = typeof budgets.$inferSelect;
 export type NewBudget = typeof budgets.$inferInsert;
 export type Account = typeof accounts.$inferSelect;
 export type NewAccount = typeof accounts.$inferInsert;
+export type Bill = typeof bills.$inferSelect;
+export type NewBill = typeof bills.$inferInsert;

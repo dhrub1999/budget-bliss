@@ -155,10 +155,10 @@ export default async function Page() {
               </span>
             </h2>
             <p className='text-base text-neutral-400 md:text-lg'>
-              Four things, built and shipped. Accounts across savings, cards,
+              Five things, built and shipped. Accounts across savings, cards,
               wallets and cash; monthly category budgets; savings goals funded
-              from real income; and split expenses with credit-utilisation
-              warnings.
+              from real income; split expenses with credit-utilisation warnings;
+              and bill, rent and EMI due dates you enter yourself.
             </p>
           </div>
         </ScrollReveal>
@@ -248,10 +248,15 @@ export default async function Page() {
                   priority
                 />
               </div>
+              {/*
+                Was "…insightful reports, and timely reminders". Nothing here
+                sends a reminder — there is no email, SMS or push channel. Bills
+                are due dates you enter and the app surfaces when you open it.
+              */}
               <p className='max-w-xs text-sm leading-relaxed text-neutral-400'>
                 BudgetBliss helps individuals take control of their personal
-                finances with smart budgeting tools, insightful reports, and
-                timely reminders—all in a clean, intuitive, and user-friendly
+                finances with category budgets, savings goals and bill due dates
+                you enter yourself—all in a clean, intuitive, and user-friendly
                 platform.
               </p>
             </div>
@@ -295,11 +300,11 @@ export default async function Page() {
                 </h3>
                 <ul className='flex flex-col gap-3 text-sm text-neutral-400'>
                   {[
-                    // 'Reminders' removed — the feature does not exist.
                     { label: 'Accounts & cards', href: '#features' },
                     { label: 'Category budgets', href: '#features' },
                     { label: 'Savings goals', href: '#features' },
-                    { label: 'Split expenses', href: '#features' }
+                    { label: 'Split expenses', href: '#features' },
+                    { label: 'Bills & upcoming', href: '#features' }
                   ].map((item) => (
                     <li key={item.label}>
                       <Link

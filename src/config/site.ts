@@ -48,7 +48,7 @@ export const siteConfig = {
     'A free, fully manual personal finance tracker. Log income and expenses yourself, track savings, credit cards, wallets and cash in one dashboard. No bank linking required.',
   /** 40–60 word self-contained answer block, front-loaded for AI citation. */
   answerSnippet:
-    'BudgetBliss is a free personal finance tracker where you enter every transaction yourself instead of linking a bank account. It tracks four account types — savings, credit card, digital wallet and cash — derives every balance from your transaction history, and supports category budgets, savings goals and split expenses.',
+    'BudgetBliss is a free personal finance tracker where you enter every transaction yourself instead of linking a bank account. It tracks four account types — savings, credit card, digital wallet and cash — derives every balance from your transaction history, and supports category budgets, savings goals, split expenses and bill due dates you enter by hand.',
   locale: 'en_IN',
   /** Amounts across the product are INR; stated explicitly for AI answers. */
   currency: 'INR',
@@ -66,7 +66,7 @@ export const siteConfig = {
    * Recency is a documented GEO ranking signal — content under three months
    * old is roughly 3x more likely to be cited. Bump on substantive edits.
    */
-  dateModified: '2026-07-25',
+  dateModified: '2026-07-26',
   ogImage: '/images/hero-image.png'
 } as const;
 
@@ -103,6 +103,7 @@ export const productFeatures = [
   'Credit card utilisation warnings',
   'Spending-category breakdown and charts',
   'Financial calendar',
+  'Bill, rent and EMI due dates entered by hand',
   'Demo account with no signup'
 ];
 
@@ -110,6 +111,9 @@ export const productFeatures = [
 export const productNonFeatures = [
   'No bank, UPI or card account linking',
   'No automatic transaction import or categorisation',
+  // Bills are the one forward-looking feature, so the absent channel has to be
+  // stated outright — "reminders" would otherwise be read as push.
+  'No email, SMS or push notifications — bills appear in the app when you open it',
   'No selling or sharing of personal financial data',
   'No full card numbers, CVV or PIN collected — last four digits only'
 ];

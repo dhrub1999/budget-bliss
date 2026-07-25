@@ -68,7 +68,9 @@ export type TransactionSchemaInput = z.input<typeof transactionSchema>;
 export type TransactionSchemaOutput = z.output<typeof transactionSchema>;
 
 // ─── Date coercion (shared) ───────────────────────────────────────────────────
-const dateField = z.preprocess(
+// Exported so sibling validation modules (e.g. bill.ts) coerce dates the same
+// way rather than each rolling their own preprocessor.
+export const dateField = z.preprocess(
   (val) => {
     if (!val) return new Date();
     if (typeof val === 'string') return new Date(val);
