@@ -28,8 +28,13 @@ export type FeatureCardProps = {
  * concrete, quotable fact rather than an adjective, which is what makes a
  * passage extractable by AI answer engines.
  *
- * Removed: "Bill & Subscription Reminders". Reminders are not built — the nav
- * entry for them is commented out in this same file.
+ * Bills & Upcoming ships as a *manual* due-date ledger: the user enters the
+ * bill and the date, and the app surfaces it in-app. It sends nothing — no
+ * email, SMS or push — so no card here may imply that it does.
+ *
+ * NOTE: bill-reminders.png now illustrates the bills card, which is what it
+ * actually depicts. The split-expenses card reuses expense-tracking.png until
+ * a dedicated asset exists — swap it when one does.
  */
 export const featureCards: FeatureCardProps[] = [
   {
@@ -60,9 +65,17 @@ export const featureCards: FeatureCardProps[] = [
     title: 'Split expenses and credit utilisation warnings',
     description:
       'Divide one bill into several linked entries that still reconcile to a single payment — useful for a shared dinner or a mixed grocery run. Separately, when a card passes 40 percent of its limit the dashboard flags it, giving you room to pay down before the figure reaches a credit bureau.',
-    imageUrl: '/images/feature-images/bill-reminders.png',
+    imageUrl: '/images/feature-images/expense-tracking.png',
     imageAlt:
       'A split expense in BudgetBliss divided across several categories, alongside a credit card utilisation warning'
+  },
+  {
+    title: 'Bill, rent and EMI due dates',
+    description:
+      'Enter a bill once with its amount and due date and it appears on the dashboard as the date approaches, sorted into overdue, due this week and later. Marking it paid logs a real transaction against the account you chose, then moves a recurring bill to its next cycle. BudgetBliss shows this when you open it — it sends no email, text or push notification.',
+    imageUrl: '/images/feature-images/bill-reminders.png',
+    imageAlt:
+      'The BudgetBliss bills screen listing rent, an EMI and a subscription with their amounts and due dates'
   }
 ];
 
@@ -102,11 +115,19 @@ export const managementNavItems: NavItem[] = [
     isActive: false,
     shortcut: ['b', 'b'],
     items: []
+  },
+  {
+    title: 'Bills & Upcoming',
+    url: '/dashboard/bills',
+    icon: 'reminder',
+    isActive: false,
+    shortcut: ['b', 'i'],
+    items: []
   }
   // NOTE: Reports (/dashboard/reports) is hidden until the page is built.
 ];
 
-// Hidden until built — Reminders and Settings pages don't exist yet.
+// Hidden until built — the Settings page doesn't exist yet.
 export const settingsNavItems: NavItem[] = [];
 
 // Hidden until built — Help page doesn't exist; sign-out lives in the user

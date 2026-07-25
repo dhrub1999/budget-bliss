@@ -131,6 +131,11 @@ export const faqs = [
       'Card balances are tracked as amount owed, computed from expenses minus repayments. When utilisation reaches 40 percent of the credit limit, the dashboard raises a non-blocking warning so you can pay down before the figure is reported to a bureau.'
   },
   {
+    question: 'Can BudgetBliss remind me about bills, rent and EMIs?',
+    answer:
+      'It tracks them but it does not contact you. Enter a bill once with its amount, due date and how often it repeats, and it appears on the Bills page and your dashboard as the date approaches, grouped into overdue, due this week and later. BudgetBliss sends no email, SMS or push notification — you see what is due when you open the app. Marking a bill paid logs a real transaction and moves a recurring bill to its next cycle.'
+  },
+  {
     question: 'Can I try BudgetBliss without signing up?',
     answer:
       'Yes. Both the sign-in and sign-up screens offer a "Continue with demo account" option that signs you straight into a shared demo workspace, so you can look around before creating your own account.'

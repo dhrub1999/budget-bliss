@@ -33,7 +33,10 @@ const plans = [
       'Savings, credit card, wallet & cash accounts',
       'Monthly per-category budgets',
       'Savings goals with earmarked contributions',
-      'Split expenses & credit utilisation warnings'
+      'Split expenses & credit utilisation warnings',
+      // Moved up from the planned Pro tier — this now ships. There is no
+      // billing table to gate it behind, and the demo account has to see it.
+      'Bill, rent & EMI due dates (in-app, no notifications)'
     ],
     highlight: true
   },
@@ -48,7 +51,6 @@ const plans = [
     planned: true,
     features: [
       'Everything in Free',
-      'Bill, rent and EMI reminders',
       'Export data (CSV, PDF)',
       'Extended reporting history',
       'Priority support'

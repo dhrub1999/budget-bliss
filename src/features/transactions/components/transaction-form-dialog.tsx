@@ -83,6 +83,16 @@ interface TransactionFormDialogProps {
   defaultType?: 'credit' | 'debit';
   defaultAccountId?: string;
   defaultDate?: string;
+  /**
+   * Prefills for entry points that already know the figures — e.g. paying a
+   * bill. `defaultVendor` only sticks if it's a member of the vendor enum for
+   * the given type; anything else is normalised to "Others" by the guard below,
+   * so pass a free-text label as `defaultNotes` instead.
+   */
+  defaultAmount?: number;
+  defaultCategory?: string;
+  defaultVendor?: string;
+  defaultNotes?: string;
   onSuccess?: () => void;
 }
 
@@ -114,6 +124,10 @@ export function TransactionFormDialog({
   defaultType = 'debit',
   defaultAccountId,
   defaultDate,
+  defaultAmount,
+  defaultCategory,
+  defaultVendor,
+  defaultNotes,
   onSuccess
 }: TransactionFormDialogProps) {
   const [submitting, setSubmitting] = React.useState(false);
@@ -162,11 +176,11 @@ export function TransactionFormDialog({
     }
     return {
       type: defaultType,
-      amount: '' as any,
-      category: 'Others',
-      vendor: 'Others',
+      amount: (defaultAmount ?? '') as any,
+      category: defaultCategory || 'Others',
+      vendor: defaultVendor || 'Others',
       date: defaultDate ? parseDate(defaultDate) : new Date(),
-      notes: '',
+      notes: defaultNotes || '',
       destinationAccountId:
         defaultType === 'credit' ? defaultAccountId : undefined,
       goalId: undefined,
@@ -175,7 +189,16 @@ export function TransactionFormDialog({
       allocations: [],
       override: false
     };
-  }, [transactionToEdit, defaultType, defaultAccountId, defaultDate]);
+  }, [
+    transactionToEdit,
+    defaultType,
+    defaultAccountId,
+    defaultDate,
+    defaultAmount,
+    defaultCategory,
+    defaultVendor,
+    defaultNotes
+  ]);
 
   const form = useForm<TransactionFormOutput>({
     resolver: zodResolver(transactionFormSchema),
