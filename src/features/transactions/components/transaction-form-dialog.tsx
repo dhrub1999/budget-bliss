@@ -1,11 +1,13 @@
 'use client';
 
 import * as React from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, type FieldErrors } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Dialog,
+  DialogBody,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog';
@@ -366,6 +368,15 @@ export function TransactionFormDialog({
     }
   }
 
+  /** Surface the first message so a validation error on a field this branch doesn't
+   *  render can't present as an inert submit button. */
+  function onInvalid(formErrors: FieldErrors<TransactionFormOutput>) {
+    const first = Object.values(formErrors).find((e) => e?.message);
+    toast.error(
+      (first?.message as string) || 'Please check the highlighted fields'
+    );
+  }
+
   function onValid(values: TransactionFormOutput) {
     const found = computeTransactionWarnings(
       currentWarningInput(values),
@@ -401,7 +412,7 @@ export function TransactionFormDialog({
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className='max-h-[90vh] w-[94vw] max-w-[440px] overflow-y-auto rounded-2xl border-zinc-800 bg-[#121214] p-4 text-white sm:p-6 [&>button]:hidden'>
+        <DialogContent className='w-[94vw] max-w-[440px] rounded-2xl border-zinc-800 bg-[#121214] p-4 text-white sm:p-6 [&>button]:hidden'>
           <DialogHeader className='flex-row items-center justify-between space-y-0 pb-2'>
             <DialogTitle className='text-xl font-semibold tracking-tight text-white'>
               {isEditing ? 'Edit Transaction' : 'Add New Record'}
@@ -447,7 +458,7 @@ export function TransactionFormDialog({
           </DialogHeader>
 
           {noAccounts && (
-            <div className='rounded-xl border border-zinc-800 bg-[#18181b] p-3 text-sm text-zinc-400'>
+            <div className='shrink-0 rounded-xl border border-zinc-800 bg-[#18181b] p-3 text-sm text-zinc-400'>
               You have no accounts yet.{' '}
               <Link
                 href='/dashboard/accounts'
@@ -461,329 +472,332 @@ export function TransactionFormDialog({
 
           <Form {...form}>
             <form
-              onSubmit={form.handleSubmit(onValid)}
-              className='space-y-4 pt-2'
+              onSubmit={form.handleSubmit(onValid, onInvalid)}
+              className='flex min-h-0 flex-1 flex-col gap-4'
             >
-              {/* Date */}
-              <FormField
-                control={form.control}
-                name='date'
-                render={({ field }) => (
-                  <FormItem className='space-y-1.5'>
-                    <FormLabel className='text-sm font-medium text-zinc-400'>
-                      Date
-                    </FormLabel>
-                    <Popover modal={true}>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant='outline'
-                            className='relative h-12 w-full cursor-pointer justify-between rounded-xl border border-zinc-800/80 bg-[#18181b] px-4 text-left font-normal text-white hover:bg-zinc-900 hover:text-white'
-                          >
-                            <span className='text-zinc-200'>
-                              {field.value
-                                ? new Date(field.value).toLocaleDateString(
-                                    'en-US',
-                                    {
-                                      month: 'short',
-                                      day: 'numeric',
-                                      year: 'numeric'
-                                    }
-                                  )
-                                : 'Select date'}
-                            </span>
-                            <CalendarIcon className='absolute right-4 h-5 w-5 text-zinc-400' />
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent
-                        className='w-auto border-zinc-800 bg-[#18181b] p-0 text-white'
-                        align='start'
-                      >
-                        <Calendar
-                          mode='single'
-                          selected={field.value as Date}
-                          onSelect={field.onChange}
-                          initialFocus
-                          className='rounded-xl border border-zinc-800 bg-[#18181b] text-white'
+              <DialogBody className='space-y-4 pt-2 pr-1'>
+                {/* Date */}
+                <FormField
+                  control={form.control}
+                  name='date'
+                  render={({ field }) => (
+                    <FormItem className='space-y-1.5'>
+                      <FormLabel className='text-sm font-medium text-zinc-400'>
+                        Date
+                      </FormLabel>
+                      <Popover modal={true}>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant='outline'
+                              className='relative h-12 w-full cursor-pointer justify-between rounded-xl border border-zinc-800/80 bg-[#18181b] px-4 text-left font-normal text-white hover:bg-zinc-900 hover:text-white'
+                            >
+                              <span className='text-zinc-200'>
+                                {field.value
+                                  ? new Date(field.value).toLocaleDateString(
+                                      'en-US',
+                                      {
+                                        month: 'short',
+                                        day: 'numeric',
+                                        year: 'numeric'
+                                      }
+                                    )
+                                  : 'Select date'}
+                              </span>
+                              <CalendarIcon className='absolute right-4 h-5 w-5 text-zinc-400' />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent
+                          className='w-auto border-zinc-800 bg-[#18181b] p-0 text-white'
+                          align='start'
+                        >
+                          <Calendar
+                            mode='single'
+                            selected={field.value as Date}
+                            onSelect={field.onChange}
+                            initialFocus
+                            className='rounded-xl border border-zinc-800 bg-[#18181b] text-white'
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Amount */}
+                <FormField
+                  control={form.control}
+                  name='amount'
+                  render={({ field }) => (
+                    <FormItem className='space-y-1.5'>
+                      <FormLabel className='text-sm font-medium text-zinc-400'>
+                        Amount (₹)
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type='number'
+                          placeholder='Enter amount'
+                          min='1'
+                          {...field}
+                          className='h-12 w-full rounded-xl border-zinc-800/80 bg-[#18181b] px-4 text-white placeholder:text-zinc-500 focus-visible:border-emerald-500 focus-visible:ring-1 focus-visible:ring-emerald-500 focus-visible:ring-offset-0'
                         />
-                      </PopoverContent>
-                    </Popover>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Amount */}
-              <FormField
-                control={form.control}
-                name='amount'
-                render={({ field }) => (
-                  <FormItem className='space-y-1.5'>
-                    <FormLabel className='text-sm font-medium text-zinc-400'>
-                      Amount (₹)
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        type='number'
-                        placeholder='Enter amount'
-                        min='1'
-                        {...field}
-                        className='h-12 w-full rounded-xl border-zinc-800/80 bg-[#18181b] px-4 text-white placeholder:text-zinc-500 focus-visible:border-emerald-500 focus-visible:ring-1 focus-visible:ring-emerald-500 focus-visible:ring-offset-0'
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Category + Vendor */}
-              <div className='grid grid-cols-2 gap-4'>
-                <FormField
-                  control={form.control}
-                  name='category'
-                  render={({ field }) => (
-                    <FormItem className='space-y-1.5'>
-                      <FormLabel className='text-sm font-medium text-zinc-400'>
-                        Category
-                      </FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value || 'Others'}
-                      >
-                        <FormControl>
-                          <SelectTrigger className='!h-12 w-full rounded-xl border-zinc-800/80 bg-[#18181b] px-4 text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500'>
-                            <SelectValue placeholder='Category' />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent className='border-zinc-800 bg-[#18181b] text-white'>
-                          {availableCategories.map((c) => (
-                            <SelectItem
-                              key={c}
-                              value={c}
-                              className='text-white hover:bg-zinc-800 focus:bg-zinc-800 focus:text-white'
-                            >
-                              {c}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
 
-                <FormField
-                  control={form.control}
-                  name='vendor'
-                  render={({ field }) => (
-                    <FormItem className='space-y-1.5'>
-                      <FormLabel className='text-sm font-medium text-zinc-400'>
-                        Vendor / Merchant
-                      </FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value || 'Others'}
-                      >
-                        <FormControl>
-                          <SelectTrigger className='!h-12 w-full rounded-xl border-zinc-800/80 bg-[#18181b] px-4 text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500'>
-                            <SelectValue placeholder='Vendor' />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent className='border-zinc-800 bg-[#18181b] text-white'>
-                          {availableVendors.map((v) => (
-                            <SelectItem
-                              key={v}
-                              value={v}
-                              className='text-white hover:bg-zinc-800 focus:bg-zinc-800 focus:text-white'
-                            >
-                              {v}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+                {/* Category + Vendor */}
+                <div className='grid grid-cols-2 gap-4'>
+                  <FormField
+                    control={form.control}
+                    name='category'
+                    render={({ field }) => (
+                      <FormItem className='space-y-1.5'>
+                        <FormLabel className='text-sm font-medium text-zinc-400'>
+                          Category
+                        </FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value || 'Others'}
+                        >
+                          <FormControl>
+                            <SelectTrigger className='!h-12 w-full rounded-xl border-zinc-800/80 bg-[#18181b] px-4 text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500'>
+                              <SelectValue placeholder='Category' />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent className='border-zinc-800 bg-[#18181b] text-white'>
+                            {availableCategories.map((c) => (
+                              <SelectItem
+                                key={c}
+                                value={c}
+                                className='text-white hover:bg-zinc-800 focus:bg-zinc-800 focus:text-white'
+                              >
+                                {c}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-              {/* Account section */}
-              {type === 'credit' ? (
-                <FormField
-                  control={form.control}
-                  name='destinationAccountId'
-                  render={() => (
-                    <FormItem className='space-y-1.5'>
-                      <FormLabel className='text-sm font-medium text-zinc-400'>
-                        Deposited to
-                      </FormLabel>
-                      <Select value={destValue} onValueChange={onDestChange}>
-                        <FormControl>
-                          <SelectTrigger className='!h-12 w-full rounded-xl border-zinc-800/80 bg-[#18181b] px-4 text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500'>
-                            <SelectValue placeholder='Where did it go?' />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent className='border-zinc-800 bg-[#18181b] text-white'>
-                          {savingsAccounts.length > 0 && (
-                            <SelectGroup>
-                              <SelectLabel className='text-zinc-500'>
-                                Savings
-                              </SelectLabel>
-                              {savingsAccounts.map((a) => (
-                                <SelectItem
-                                  key={a.id}
-                                  value={`acct:${a.id}`}
-                                  className='text-white focus:bg-zinc-800 focus:text-white'
-                                >
-                                  {a.name} — {formatINR(a.balance)}
-                                </SelectItem>
-                              ))}
-                            </SelectGroup>
-                          )}
-                          {walletAccounts.length > 0 && (
-                            <SelectGroup>
-                              <SelectLabel className='text-zinc-500'>
-                                Wallets
-                              </SelectLabel>
-                              {walletAccounts.map((a) => (
-                                <SelectItem
-                                  key={a.id}
-                                  value={`acct:${a.id}`}
-                                  className='text-white focus:bg-zinc-800 focus:text-white'
-                                >
-                                  {a.name} — {formatINR(a.balance)}
-                                </SelectItem>
-                              ))}
-                            </SelectGroup>
-                          )}
-                          {cashAccounts.length > 0 && (
-                            <SelectGroup>
-                              <SelectLabel className='text-zinc-500'>
-                                Cash
-                              </SelectLabel>
-                              {cashAccounts.map((a) => (
-                                <SelectItem
-                                  key={a.id}
-                                  value={`acct:${a.id}`}
-                                  className='text-white focus:bg-zinc-800 focus:text-white'
-                                >
-                                  {a.name} — {formatINR(a.balance)}
-                                </SelectItem>
-                              ))}
-                            </SelectGroup>
-                          )}
-                          {cardAccounts.length > 0 && (
-                            <SelectGroup>
-                              <SelectLabel className='text-zinc-500'>
-                                Repay a card
-                              </SelectLabel>
-                              {cardAccounts.map((a) => (
-                                <SelectItem
-                                  key={a.id}
-                                  value={`acct:${a.id}`}
-                                  className='text-white focus:bg-zinc-800 focus:text-white'
-                                >
-                                  Repay {a.name} — {formatINR(a.owed ?? 0)} owed
-                                </SelectItem>
-                              ))}
-                            </SelectGroup>
-                          )}
-                          {goals.length > 0 && (
-                            <SelectGroup>
-                              <SelectLabel className='text-zinc-500'>
-                                Goals
-                              </SelectLabel>
-                              {goals.map((g) => (
-                                <SelectItem
-                                  key={g.id}
-                                  value={`goal:${g.id}`}
-                                  className='text-white focus:bg-zinc-800 focus:text-white'
-                                >
-                                  {g.name}
-                                </SelectItem>
-                              ))}
-                            </SelectGroup>
-                          )}
-                        </SelectContent>
-                      </Select>
-                      {goalId && (
+                  <FormField
+                    control={form.control}
+                    name='vendor'
+                    render={({ field }) => (
+                      <FormItem className='space-y-1.5'>
+                        <FormLabel className='text-sm font-medium text-zinc-400'>
+                          Vendor / Merchant
+                        </FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value || 'Others'}
+                        >
+                          <FormControl>
+                            <SelectTrigger className='!h-12 w-full rounded-xl border-zinc-800/80 bg-[#18181b] px-4 text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500'>
+                              <SelectValue placeholder='Vendor' />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent className='border-zinc-800 bg-[#18181b] text-white'>
+                            {availableVendors.map((v) => (
+                              <SelectItem
+                                key={v}
+                                value={v}
+                                className='text-white hover:bg-zinc-800 focus:bg-zinc-800 focus:text-white'
+                              >
+                                {v}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {/* Account section */}
+                {type === 'credit' ? (
+                  <FormField
+                    control={form.control}
+                    name='destinationAccountId'
+                    render={() => (
+                      <FormItem className='space-y-1.5'>
+                        <FormLabel className='text-sm font-medium text-zinc-400'>
+                          Deposited to
+                        </FormLabel>
+                        <Select value={destValue} onValueChange={onDestChange}>
+                          <FormControl>
+                            <SelectTrigger className='!h-12 w-full rounded-xl border-zinc-800/80 bg-[#18181b] px-4 text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500'>
+                              <SelectValue placeholder='Where did it go?' />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent className='border-zinc-800 bg-[#18181b] text-white'>
+                            {savingsAccounts.length > 0 && (
+                              <SelectGroup>
+                                <SelectLabel className='text-zinc-500'>
+                                  Savings
+                                </SelectLabel>
+                                {savingsAccounts.map((a) => (
+                                  <SelectItem
+                                    key={a.id}
+                                    value={`acct:${a.id}`}
+                                    className='text-white focus:bg-zinc-800 focus:text-white'
+                                  >
+                                    {a.name} — {formatINR(a.balance)}
+                                  </SelectItem>
+                                ))}
+                              </SelectGroup>
+                            )}
+                            {walletAccounts.length > 0 && (
+                              <SelectGroup>
+                                <SelectLabel className='text-zinc-500'>
+                                  Wallets
+                                </SelectLabel>
+                                {walletAccounts.map((a) => (
+                                  <SelectItem
+                                    key={a.id}
+                                    value={`acct:${a.id}`}
+                                    className='text-white focus:bg-zinc-800 focus:text-white'
+                                  >
+                                    {a.name} — {formatINR(a.balance)}
+                                  </SelectItem>
+                                ))}
+                              </SelectGroup>
+                            )}
+                            {cashAccounts.length > 0 && (
+                              <SelectGroup>
+                                <SelectLabel className='text-zinc-500'>
+                                  Cash
+                                </SelectLabel>
+                                {cashAccounts.map((a) => (
+                                  <SelectItem
+                                    key={a.id}
+                                    value={`acct:${a.id}`}
+                                    className='text-white focus:bg-zinc-800 focus:text-white'
+                                  >
+                                    {a.name} — {formatINR(a.balance)}
+                                  </SelectItem>
+                                ))}
+                              </SelectGroup>
+                            )}
+                            {cardAccounts.length > 0 && (
+                              <SelectGroup>
+                                <SelectLabel className='text-zinc-500'>
+                                  Repay a card
+                                </SelectLabel>
+                                {cardAccounts.map((a) => (
+                                  <SelectItem
+                                    key={a.id}
+                                    value={`acct:${a.id}`}
+                                    className='text-white focus:bg-zinc-800 focus:text-white'
+                                  >
+                                    Repay {a.name} — {formatINR(a.owed ?? 0)}{' '}
+                                    owed
+                                  </SelectItem>
+                                ))}
+                              </SelectGroup>
+                            )}
+                            {goals.length > 0 && (
+                              <SelectGroup>
+                                <SelectLabel className='text-zinc-500'>
+                                  Goals
+                                </SelectLabel>
+                                {goals.map((g) => (
+                                  <SelectItem
+                                    key={g.id}
+                                    value={`goal:${g.id}`}
+                                    className='text-white focus:bg-zinc-800 focus:text-white'
+                                  >
+                                    {g.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectGroup>
+                            )}
+                          </SelectContent>
+                        </Select>
+                        {goalId && (
+                          <p className='text-xs text-zinc-500'>
+                            This reduces the card&apos;s outstanding, or funds a
+                            goal.
+                          </p>
+                        )}
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                ) : (
+                  <SplitAllocations form={form} accounts={activeAccounts} />
+                )}
+
+                {/* Backing account for a goal contribution */}
+                {type === 'credit' && goalId && (
+                  <FormField
+                    control={form.control}
+                    name='destinationAccountId'
+                    render={({ field }) => (
+                      <FormItem className='space-y-1.5'>
+                        <FormLabel className='text-sm font-medium text-zinc-400'>
+                          Held in which account?
+                        </FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value || ''}
+                        >
+                          <FormControl>
+                            <SelectTrigger className='!h-12 w-full rounded-xl border-zinc-800/80 bg-[#18181b] px-4 text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500'>
+                              <SelectValue placeholder='Choose the backing account' />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent className='border-zinc-800 bg-[#18181b] text-white'>
+                            {assetAccounts.map((a) => (
+                              <SelectItem
+                                key={a.id}
+                                value={a.id}
+                                className='text-white focus:bg-zinc-800 focus:text-white'
+                              >
+                                {a.name} — {formatINR(a.balance)}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                         <p className='text-xs text-zinc-500'>
-                          This reduces the card&apos;s outstanding, or funds a
-                          goal.
+                          Goal savings are tracked separately, but the money
+                          sits in this account.
                         </p>
-                      )}
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              ) : (
-                <SplitAllocations form={form} accounts={activeAccounts} />
-              )}
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
 
-              {/* Backing account for a goal contribution */}
-              {type === 'credit' && goalId && (
+                {/* Notes */}
                 <FormField
                   control={form.control}
-                  name='destinationAccountId'
+                  name='notes'
                   render={({ field }) => (
                     <FormItem className='space-y-1.5'>
                       <FormLabel className='text-sm font-medium text-zinc-400'>
-                        Held in which account?
+                        Notes (Optional)
                       </FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value || ''}
-                      >
-                        <FormControl>
-                          <SelectTrigger className='!h-12 w-full rounded-xl border-zinc-800/80 bg-[#18181b] px-4 text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500'>
-                            <SelectValue placeholder='Choose the backing account' />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent className='border-zinc-800 bg-[#18181b] text-white'>
-                          {assetAccounts.map((a) => (
-                            <SelectItem
-                              key={a.id}
-                              value={a.id}
-                              className='text-white focus:bg-zinc-800 focus:text-white'
-                            >
-                              {a.name} — {formatINR(a.balance)}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <p className='text-xs text-zinc-500'>
-                        Goal savings are tracked separately, but the money sits
-                        in this account.
-                      </p>
+                      <FormControl>
+                        <Textarea
+                          placeholder='Additional details...'
+                          {...field}
+                          className='min-h-[70px] w-full resize-none rounded-xl border-zinc-800/80 bg-[#18181b] p-4 text-white placeholder:text-zinc-500 focus-visible:border-emerald-500 focus-visible:ring-1 focus-visible:ring-emerald-500'
+                        />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-              )}
+              </DialogBody>
 
-              {/* Notes */}
-              <FormField
-                control={form.control}
-                name='notes'
-                render={({ field }) => (
-                  <FormItem className='space-y-1.5'>
-                    <FormLabel className='text-sm font-medium text-zinc-400'>
-                      Notes (Optional)
-                    </FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder='Additional details...'
-                        {...field}
-                        className='min-h-[70px] w-full resize-none rounded-xl border-zinc-800/80 bg-[#18181b] p-4 text-white placeholder:text-zinc-500 focus-visible:border-emerald-500 focus-visible:ring-1 focus-visible:ring-emerald-500'
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className='flex items-center gap-3 pt-2'>
+              <DialogFooter className='flex-row items-center gap-3 border-t border-zinc-800/60 pt-4 sm:justify-start'>
                 <Button
                   type='submit'
                   disabled={submitting}
@@ -810,7 +824,7 @@ export function TransactionFormDialog({
                 >
                   Cancel
                 </Button>
-              </div>
+              </DialogFooter>
             </form>
           </Form>
         </DialogContent>

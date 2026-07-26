@@ -3,7 +3,9 @@
 import * as React from 'react';
 import {
   Dialog,
+  DialogBody,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog';
@@ -200,7 +202,7 @@ export function ImportCsvModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='max-h-[90vh] w-[94vw] max-w-[620px] overflow-y-auto rounded-2xl border-zinc-800 bg-[#121214] p-4 text-white sm:p-6'>
+      <DialogContent className='w-[94vw] max-w-[620px] rounded-2xl border-zinc-800 bg-[#121214] p-4 text-white sm:p-6'>
         <DialogHeader>
           <DialogTitle className='flex items-center gap-2 text-xl font-semibold text-white'>
             <FileSpreadsheet className='h-5 w-5 text-emerald-400' />
@@ -208,109 +210,113 @@ export function ImportCsvModal({
           </DialogTitle>
         </DialogHeader>
 
-        {!file ? (
-          <div className='my-4 flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-zinc-800 bg-[#18181b] p-8 text-center transition-colors hover:border-zinc-700'>
-            <Upload className='mb-3 h-10 w-10 text-zinc-400' />
-            <p className='mb-1 text-sm font-medium text-white'>
-              Drag &amp; Drop Bank Statement CSV here
-            </p>
-            <p className='mb-4 text-xs text-zinc-400'>
-              Supports CSV files with Date, Description, Category, and Amount
-              columns.
-            </p>
-            <label className='cursor-pointer rounded-lg bg-emerald-500 px-4 py-2 text-sm font-semibold text-black transition-colors hover:bg-emerald-400'>
-              Browse CSV File
-              <input
-                type='file'
-                accept='.csv'
-                onChange={handleFileChange}
-                className='hidden'
-              />
-            </label>
-          </div>
-        ) : (
-          <div className='my-2 space-y-4'>
-            <div className='flex items-center justify-between rounded-xl border border-zinc-800 bg-[#18181b] p-3 px-4'>
-              <div className='flex items-center gap-3'>
-                <FileSpreadsheet className='h-5 w-5 text-emerald-400' />
-                <div>
-                  <p className='text-sm font-medium text-white'>{file.name}</p>
-                  <p className='text-xs text-zinc-400'>
-                    Parsed {parsedRows.length} rows
-                  </p>
-                </div>
-              </div>
-              <Button
-                variant='ghost'
-                size='sm'
-                onClick={() => {
-                  setFile(null);
-                  setParsedRows([]);
-                }}
-                className='text-xs text-zinc-400 hover:bg-zinc-800 hover:text-white'
-              >
-                Change File
-              </Button>
+        <DialogBody className='pr-1'>
+          {!file ? (
+            <div className='my-4 flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-zinc-800 bg-[#18181b] p-8 text-center transition-colors hover:border-zinc-700'>
+              <Upload className='mb-3 h-10 w-10 text-zinc-400' />
+              <p className='mb-1 text-sm font-medium text-white'>
+                Drag &amp; Drop Bank Statement CSV here
+              </p>
+              <p className='mb-4 text-xs text-zinc-400'>
+                Supports CSV files with Date, Description, Category, and Amount
+                columns.
+              </p>
+              <label className='cursor-pointer rounded-lg bg-emerald-500 px-4 py-2 text-sm font-semibold text-black transition-colors hover:bg-emerald-400'>
+                Browse CSV File
+                <input
+                  type='file'
+                  accept='.csv'
+                  onChange={handleFileChange}
+                  className='hidden'
+                />
+              </label>
             </div>
-
-            {errorMsg && (
-              <div className='flex items-center gap-2 rounded-lg border border-red-900/50 bg-red-950/20 p-3 text-xs text-red-400'>
-                <AlertCircle className='h-4 w-4 shrink-0' />
-                {errorMsg}
-              </div>
-            )}
-
-            {parsedRows.length > 0 && (
-              <div className='space-y-2'>
-                <p className='text-xs font-semibold tracking-wider text-zinc-400 uppercase'>
-                  Data Preview (First 5 Rows)
-                </p>
-                <div className='max-h-56 overflow-auto rounded-xl border border-zinc-800 bg-[#141416]'>
-                  <table className='w-full text-left text-xs text-zinc-300'>
-                    <thead className='sticky top-0 border-b border-zinc-800 bg-[#18181b] text-[10px] font-bold tracking-wider text-zinc-400 uppercase'>
-                      <tr>
-                        <th className='p-2.5 px-3'>Date</th>
-                        <th className='p-2.5 px-3'>Description</th>
-                        <th className='p-2.5 px-3'>Category</th>
-                        <th className='p-2.5 px-3'>Type</th>
-                        <th className='p-2.5 px-3 text-right'>Amount</th>
-                      </tr>
-                    </thead>
-                    <tbody className='divide-y divide-zinc-800/50'>
-                      {parsedRows.slice(0, 5).map((row, idx) => (
-                        <tr key={idx} className='hover:bg-zinc-900/50'>
-                          <td className='p-2.5 px-3 whitespace-nowrap'>
-                            {row.date}
-                          </td>
-                          <td className='max-w-[140px] truncate p-2.5 px-3'>
-                            {row.description}
-                          </td>
-                          <td className='p-2.5 px-3'>{row.category}</td>
-                          <td className='p-2.5 px-3'>
-                            <span
-                              className={`inline-block rounded px-1.5 py-0.5 text-[10px] font-semibold ${
-                                row.type === 'INCOME'
-                                  ? 'border border-emerald-800/40 bg-emerald-950/60 text-emerald-400'
-                                  : 'border border-rose-800/40 bg-rose-950/60 text-rose-400'
-                              }`}
-                            >
-                              {row.type}
-                            </span>
-                          </td>
-                          <td className='p-2.5 px-3 text-right font-medium text-white'>
-                            ₹{row.amount.toLocaleString('en-IN')}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+          ) : (
+            <div className='my-2 space-y-4'>
+              <div className='flex items-center justify-between rounded-xl border border-zinc-800 bg-[#18181b] p-3 px-4'>
+                <div className='flex items-center gap-3'>
+                  <FileSpreadsheet className='h-5 w-5 text-emerald-400' />
+                  <div>
+                    <p className='text-sm font-medium text-white'>
+                      {file.name}
+                    </p>
+                    <p className='text-xs text-zinc-400'>
+                      Parsed {parsedRows.length} rows
+                    </p>
+                  </div>
                 </div>
+                <Button
+                  variant='ghost'
+                  size='sm'
+                  onClick={() => {
+                    setFile(null);
+                    setParsedRows([]);
+                  }}
+                  className='text-xs text-zinc-400 hover:bg-zinc-800 hover:text-white'
+                >
+                  Change File
+                </Button>
               </div>
-            )}
-          </div>
-        )}
 
-        <div className='flex items-center justify-end gap-3 border-t border-zinc-800/60 pt-2'>
+              {errorMsg && (
+                <div className='flex items-center gap-2 rounded-lg border border-red-900/50 bg-red-950/20 p-3 text-xs text-red-400'>
+                  <AlertCircle className='h-4 w-4 shrink-0' />
+                  {errorMsg}
+                </div>
+              )}
+
+              {parsedRows.length > 0 && (
+                <div className='space-y-2'>
+                  <p className='text-xs font-semibold tracking-wider text-zinc-400 uppercase'>
+                    Data Preview (First 5 Rows)
+                  </p>
+                  <div className='max-h-56 overflow-auto rounded-xl border border-zinc-800 bg-[#141416]'>
+                    <table className='w-full text-left text-xs text-zinc-300'>
+                      <thead className='sticky top-0 border-b border-zinc-800 bg-[#18181b] text-[10px] font-bold tracking-wider text-zinc-400 uppercase'>
+                        <tr>
+                          <th className='p-2.5 px-3'>Date</th>
+                          <th className='p-2.5 px-3'>Description</th>
+                          <th className='p-2.5 px-3'>Category</th>
+                          <th className='p-2.5 px-3'>Type</th>
+                          <th className='p-2.5 px-3 text-right'>Amount</th>
+                        </tr>
+                      </thead>
+                      <tbody className='divide-y divide-zinc-800/50'>
+                        {parsedRows.slice(0, 5).map((row, idx) => (
+                          <tr key={idx} className='hover:bg-zinc-900/50'>
+                            <td className='p-2.5 px-3 whitespace-nowrap'>
+                              {row.date}
+                            </td>
+                            <td className='max-w-[140px] truncate p-2.5 px-3'>
+                              {row.description}
+                            </td>
+                            <td className='p-2.5 px-3'>{row.category}</td>
+                            <td className='p-2.5 px-3'>
+                              <span
+                                className={`inline-block rounded px-1.5 py-0.5 text-[10px] font-semibold ${
+                                  row.type === 'INCOME'
+                                    ? 'border border-emerald-800/40 bg-emerald-950/60 text-emerald-400'
+                                    : 'border border-rose-800/40 bg-rose-950/60 text-rose-400'
+                                }`}
+                              >
+                                {row.type}
+                              </span>
+                            </td>
+                            <td className='p-2.5 px-3 text-right font-medium text-white'>
+                              ₹{row.amount.toLocaleString('en-IN')}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </DialogBody>
+
+        <DialogFooter className='flex-row items-center gap-3 border-t border-zinc-800/60 pt-4'>
           <Button
             variant='outline'
             onClick={() => onOpenChange(false)}
@@ -332,7 +338,7 @@ export function ImportCsvModal({
               </>
             )}
           </Button>
-        </div>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
