@@ -1,0 +1,22 @@
+# Turning blank issues off is what makes the two forms the default path.
+# Anything that fits neither form needs a home in contact_links below, or
+# people will file it as a "bug" anyway.
+#
+# Two links are deliberately absent because they would 404 today:
+#   - Discussions — the feature is not enabled on this repo.
+#   - /security/advisories/new — requires private vulnerability reporting,
+#     which is off. Turn it on with
+#       gh api -X PUT repos/dhrub1999/budget-bliss/private-vulnerability-reporting
+#     and then add the entry here.
+blank_issues_enabled: false
+contact_links:
+  - name: Question about how BudgetBliss works
+    url: https://github.com/dhrub1999/budget-bliss#readme
+    about: >-
+      The README covers setup, the demo account, the tech stack and why the app
+      is manual by design. Start there.
+  - name: I want to contribute
+    url: https://github.com/dhrub1999/budget-bliss#contributing
+    about: >-
+      Branch naming, the client-safe validations rule, and the one class of PR
+      that gets declined.

@@ -52,7 +52,17 @@ export const siteConfig = {
   locale: 'en_IN',
   /** Amounts across the product are INR; stated explicitly for AI answers. */
   currency: 'INR',
-  email: 'hello@budgetbliss.app',
+  /**
+   * Must be an address that actually receives mail: it is published as
+   * Organization.email and as a customer-support contactPoint in the JSON-LD
+   * (see lib/structured-data.ts), and used as the footer mailto on the landing
+   * page. The previous value, hello@budgetbliss.app, had no MX record — the
+   * domain isn't even registered — so the structured data was advertising a
+   * support channel that silently swallowed every message, and leaving it
+   * there invited someone to register the domain and catch mail from our
+   * users. Change this again only alongside a mailbox that works.
+   */
+  email: 'contact.tamalbiswas@gmail.com',
   /**
    * Named author is a GEO authority signal (anonymous authorship is a scored
    * weak signal). Add `url` once there's a real profile to point at — the

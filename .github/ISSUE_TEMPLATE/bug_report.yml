@@ -1,0 +1,172 @@
+name: Bug report
+description: Something in BudgetBliss behaved differently from what you expected.
+title: '[Bug]: '
+labels: ['bug', 'needs-triage']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to file this.
+
+        **Please don't paste real financial data.** No full card numbers, no
+        CVV, no PINs, no netbanking credentials, no real account numbers.
+        Redact amounts in screenshots if you'd rather not share them — a bug is
+        almost always reproducible with made-up figures.
+
+  - type: checkboxes
+    id: preflight
+    attributes:
+      label: Before you file
+      options:
+        - label: I searched the open issues and this isn't a duplicate.
+          required: true
+        - label: >-
+            My screenshots and logs contain no card numbers, CVV, PINs or bank
+            credentials.
+          required: true
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: What went wrong?
+      description: One or two sentences. The detail goes in the fields below.
+      placeholder: >-
+        Marking a recurring bill as paid rolled it forward to the wrong next due
+        date.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Where did it happen?
+      description: The page or route you were on.
+      options:
+        - Overview dashboard (/dashboard/overview)
+        - Accounts list (/dashboard/accounts)
+        - Account detail (/dashboard/accounts/[id])
+        - Transactions (/dashboard/transactions)
+        - Budgeting (/dashboard/budgeting)
+        - Bills & Upcoming (/dashboard/bills)
+        - Profile (/dashboard/profile)
+        - Support (/dashboard/support)
+        - Sign in / sign up (/auth/*)
+        - Landing page, privacy or terms
+        - Somewhere else / not sure
+    validations:
+      required: true
+
+  - type: dropdown
+    id: account-type
+    attributes:
+      label: Which account type was involved?
+      description: >-
+        Balances are derived per account type, so this narrows most bugs down
+        quickly. Pick "Not account-specific" if it doesn't apply.
+      options:
+        - Savings
+        - Credit card
+        - Digital wallet
+        - Cash
+        - More than one
+        - Not account-specific
+    validations:
+      required: true
+
+  - type: dropdown
+    id: data-origin
+    attributes:
+      label: How did the data get there?
+      description: >-
+        BudgetBliss is fully manual, but there's more than one way in — and an
+        importer bug looks nothing like a form bug.
+      options:
+        - I typed it into the app
+        - CSV import
+        - It was already in the demo account
+        - Created automatically by the app (e.g. the default Cash account)
+        - Not sure
+    validations:
+      required: true
+
+  - type: dropdown
+    id: session
+    attributes:
+      label: Which account were you signed in as?
+      options:
+        - The shared demo account (test@abc.com)
+        - My own account
+        - Signed out
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Numbered, starting from a fresh page load.
+      value: |
+        1. Go to …
+        2. Click …
+        3. Enter …
+        4. See the problem
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected to happen
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: What actually happened
+      description: >-
+        Exact figures, dates and error text help. Screenshots too — redacted if
+        needed.
+    validations:
+      required: true
+
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and version
+      placeholder: Chrome 141 on macOS 15.2
+    validations:
+      required: true
+
+  - type: dropdown
+    id: viewport
+    attributes:
+      label: Screen size
+      description: >-
+        The dashboard has genuinely distinct mobile and desktop layouts, so
+        plenty of bugs only exist on one of them.
+      options:
+        - Desktop / laptop
+        - Tablet
+        - Phone
+    validations:
+      required: true
+
+  - type: textarea
+    id: console
+    attributes:
+      label: Browser console errors
+      description: >-
+        Optional. Open DevTools → Console, reproduce the problem, and paste
+        anything red. Formatted as code automatically — no backticks needed.
+      render: shell
+    validations:
+      required: false
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Anything else
+      description: A screen recording, or a hunch about the cause.
+    validations:
+      required: false
