@@ -26,22 +26,22 @@ Everything is derived, nothing is faked: balances are computed from your transac
 
 ## Tech Stack
 
-| Concern            | Choice                                                        |
-| :----------------- | :------------------------------------------------------------ |
-| Framework          | [Next.js 15](https://nextjs.org) (App Router) + React 19      |
-| Language           | [TypeScript](https://www.typescriptlang.org)                  |
-| Styling            | [Tailwind CSS v4](https://tailwindcss.com)                    |
-| Components         | [shadcn/ui](https://ui.shadcn.com) + Radix                    |
-| Auth               | [better-auth](https://better-auth.com) via Neon Auth          |
+| Concern            | Choice                                                                         |
+| :----------------- | :----------------------------------------------------------------------------- |
+| Framework          | [Next.js 15](https://nextjs.org) (App Router) + React 19                       |
+| Language           | [TypeScript](https://www.typescriptlang.org)                                   |
+| Styling            | [Tailwind CSS v4](https://tailwindcss.com)                                     |
+| Components         | [shadcn/ui](https://ui.shadcn.com) + Radix                                     |
+| Auth               | [better-auth](https://better-auth.com) via Neon Auth                           |
 | Database           | Postgres ([Neon](https://neon.tech)) + [Drizzle ORM](https://orm.drizzle.team) |
-| Validation         | [Zod](https://zod.dev)                                        |
-| State              | [Zustand](https://zustand-demo.pmnd.rs)                       |
-| Search-param state | [Nuqs](https://nuqs.47ng.com/)                                |
-| Forms              | [React Hook Form](https://react-hook-form.com)                |
-| Charts             | [Recharts](https://recharts.org)                              |
-| Command palette    | [kbar](https://kbar.vercel.app/)                              |
-| Tables             | [TanStack Table](https://tanstack.com/table)                  |
-| Tooling            | ESLint · Prettier · Husky · lint-staged                       |
+| Validation         | [Zod](https://zod.dev)                                                         |
+| State              | [Zustand](https://zustand-demo.pmnd.rs)                                        |
+| Search-param state | [Nuqs](https://nuqs.47ng.com/)                                                 |
+| Forms              | [React Hook Form](https://react-hook-form.com)                                 |
+| Charts             | [Recharts](https://recharts.org)                                               |
+| Command palette    | [kbar](https://kbar.vercel.app/)                                               |
+| Tables             | [TanStack Table](https://tanstack.com/table)                                   |
+| Tooling            | ESLint · Prettier · Husky · lint-staged                                        |
 
 ## Getting Started
 
@@ -64,8 +64,7 @@ Everything is derived, nothing is faked: balances are computed from your transac
    NEON_AUTH_COOKIE_SECRET= # a long random string
    ```
 
-   > [!WARNING]
-   > The committed `env.example.txt` still references Clerk from a past life. Ignore it — the variables above are the ones that actually matter.
+   > `env.example.txt` lists the same variables plus an optional `NEXT_PUBLIC_SITE_URL`, which only matters once the site has a custom domain.
 
 3. **Push the schema** to your database:
 
@@ -97,40 +96,42 @@ Don't feel like wiring up a database just to look around? Hit **"Continue with d
 ```plaintext
 src/
 ├── app/                # Next.js App Router (routes, API routes, landing page)
-│   ├── dashboard/      # accounts, transactions, budgeting, overview, profile
-│   ├── api/            # accounts, transactions, budgets, goals, auth
+│   ├── dashboard/      # accounts, transactions, budgeting, bills, overview, support, profile
+│   ├── api/            # accounts, transactions, budgets, goals, bills, auth
 │   ├── privacy/        # privacy + breach disclaimer
 │   └── terms/
 ├── components/         # Shared + ui/ components
-├── features/           # Feature modules (accounts, transactions, budgeting, overview, ...)
-│   └── <feature>/      #   components / lib / schemas / types
-├── db/                 # Drizzle schema (accounts, transactions, budgets, goals)
+├── features/           # Feature modules (accounts, transactions, budgeting, bills, overview, ...)
+│   └── <feature>/      #   components / lib / types / constants
+├── db/                 # Drizzle schema (accounts, transactions, budgets, goals, bills)
 ├── lib/
 │   ├── auth/           # better-auth client + server
 │   ├── accounts/       # balance derivation
 │   └── validations/    # Zod schemas (kept client-safe — no server/db imports)
-├── constants/          # shared copy, incl. legal.ts
+├── config/             # site.ts — SEO/GEO single source of truth
+├── constants/          # shared copy: data.ts (nav), legal.ts, support.ts
 ├── hooks/
-├── stores/             # Zustand stores
 └── types/
 ```
 
 ## Scripts
 
-| Script             | What it does                          |
-| :----------------- | :------------------------------------ |
-| `pnpm dev`         | Start the dev server (Turbopack)      |
-| `pnpm build`       | Production build                      |
-| `pnpm start`       | Serve the production build            |
-| `pnpm lint`        | Lint                                  |
-| `pnpm lint:fix`    | Lint + format                         |
-| `pnpm format`      | Prettier over everything              |
-| `pnpm db:push`     | Sync schema to the database           |
-| `pnpm db:studio`   | Open Drizzle Studio                   |
+| Script           | What it does                     |
+| :--------------- | :------------------------------- |
+| `pnpm dev`       | Start the dev server (Turbopack) |
+| `pnpm build`     | Production build                 |
+| `pnpm start`     | Serve the production build       |
+| `pnpm lint`      | Lint                             |
+| `pnpm lint:fix`  | Lint + format                    |
+| `pnpm format`    | Prettier over everything         |
+| `pnpm db:push`   | Sync schema to the database      |
+| `pnpm db:studio` | Open Drizzle Studio              |
 
 ## Contributing
 
 Contributions are welcome — bug fixes, features, or just fixing the typo you're about to notice.
+
+Start with a [bug report](https://github.com/dhrub1999/budget-bliss/issues/new?template=bug_report.yml) or a [feature request](https://github.com/dhrub1999/budget-bliss/issues/new?template=feature_request.yml). Both are also linked from the in-app **Support** page at `/dashboard/support`.
 
 1. Branch off `main` with a descriptive name (`feat/…`, `fix/…`, `chore/…`).
 2. Keep it clean — Husky + lint-staged run Prettier on commit, so run `pnpm lint` before you push and save everyone the "fix lint" commit.
@@ -140,6 +141,6 @@ Contributions are welcome — bug fixes, features, or just fixing the typo you'r
 6. Open a PR against `main` with a short description of the _what_ and the _why_.
 
 > [!NOTE]
-> Budget Bliss is intentionally manual. PRs proposing bank/UPI/aggregator auto-sync will be admired for their ambition and then respectfully declined — it's a design choice, not a missing feature. Bills are the same story in reverse: they're due dates *you* type, not recurring charges we detect from your history.
+> Budget Bliss is intentionally manual. PRs proposing bank/UPI/aggregator auto-sync will be admired for their ambition and then respectfully declined — it's a design choice, not a missing feature. Bills are the same story in reverse: they're due dates _you_ type, not recurring charges we detect from your history.
 
 Cheers! 🥂

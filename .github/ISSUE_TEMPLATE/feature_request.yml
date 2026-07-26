@@ -1,0 +1,85 @@
+name: Feature request
+description: Suggest something BudgetBliss should do that it doesn't do yet.
+title: '[Feature]: '
+labels: ['enhancement', 'needs-triage']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        One thing worth knowing before you write this up: **BudgetBliss is
+        deliberately manual.** There is no bank, UPI or card-aggregator sync,
+        and there is no email, SMS or push channel anywhere in the codebase.
+        Both are design choices rather than gaps, so requests to add either will
+        be closed with thanks. Everything else is fair game.
+
+  - type: checkboxes
+    id: preflight
+    attributes:
+      label: Before you file
+      options:
+        - label: I searched the open issues and this isn't already requested.
+          required: true
+        - label: >-
+            This isn't a request for bank / UPI / aggregator auto-sync, or for
+            email / SMS / push notifications.
+          required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem are you trying to solve?
+      description: >-
+        Describe the situation, not the solution. "I can't tell which of my
+        cards is closest to its limit" is more useful than "add a card
+        dashboard", because it leaves room for a better answer than the one you
+        had in mind.
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: What would you like to happen?
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Which part of the app?
+      multiple: true
+      options:
+        - Accounts
+        - Transactions (including splits and CSV import)
+        - Budgeting
+        - Savings goals
+        - Bills & Upcoming
+        - Overview dashboard and charts
+        - Reports
+        - Sign in / sign up
+        - Landing page and docs
+        - Something new that doesn't exist yet
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: What are you doing instead today?
+      description: >-
+        A workaround, another app, a spreadsheet. Knowing this is often what
+        decides the priority.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: contribution
+    attributes:
+      label: Would you be up for building it?
+      description: No wrong answer — this just helps with planning.
+      options:
+        - Yes, I'd like to open a PR
+        - Maybe, with some pointers on where to start
+        - No, I'm just suggesting it
+    validations:
+      required: true

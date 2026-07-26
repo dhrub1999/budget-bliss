@@ -130,9 +130,22 @@ export const managementNavItems: NavItem[] = [
 // Hidden until built — the Settings page doesn't exist yet.
 export const settingsNavItems: NavItem[] = [];
 
-// Hidden until built — Help page doesn't exist; sign-out lives in the user
-// dropdown (see app-sidebar.tsx), so a nav "Logout" link isn't needed.
-export const supportNavItems: NavItem[] = [];
+// Rendered in the sidebar footer (see app-sidebar.tsx) and as the "Support"
+// section of the ⌘K palette. Sign-out lives in the user dropdown, so there's
+// no nav "Logout" link here.
+export const supportNavItems: NavItem[] = [
+  {
+    title: 'Support',
+    url: '/dashboard/support',
+    icon: 'help',
+    isActive: false,
+    // First claim on 's'. Following the convention above, a later Settings page
+    // disambiguates with ['s', 'e'] the way Bills took ['b', 'i'] after
+    // Budgeting had already claimed ['b', 'b'].
+    shortcut: ['s', 's'],
+    items: []
+  }
+];
 
 export interface SaleUser {
   id: number;
