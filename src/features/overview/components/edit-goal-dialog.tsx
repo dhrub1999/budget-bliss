@@ -3,7 +3,10 @@
 import * as React from 'react';
 import {
   Dialog,
+  DialogBody,
   DialogContent,
+  DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog';
@@ -13,6 +16,10 @@ import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { goalIcons } from '@/lib/validations/goal';
 import { DynamicIcon } from '@/components/ui/dynamic-icon';
+
+const inputClass =
+  'h-12 w-full rounded-xl border-zinc-800/80 bg-[#18181b] px-4 text-white placeholder:text-zinc-500 focus-visible:border-emerald-500 focus-visible:ring-1 focus-visible:ring-emerald-500';
+const labelClass = 'text-sm font-medium text-zinc-400';
 
 export interface GoalItem {
   id: string;
@@ -99,109 +106,122 @@ export function EditGoalDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='rounded-2xl border-zinc-800 bg-[#121214] p-6 text-white sm:max-w-[440px]'>
+      <DialogContent className='w-[94vw] max-w-[440px] rounded-2xl border-zinc-800 bg-[#121214] p-4 text-white sm:p-6 [&>button]:hidden'>
         <DialogHeader>
-          <DialogTitle className='text-xl font-semibold tracking-tight text-white'>
+          <DialogTitle className='text-lg font-semibold text-white'>
             Edit Goal
           </DialogTitle>
+          <DialogDescription className='text-xs text-zinc-400'>
+            Update what you&apos;re saving towards or how much you&apos;ve put
+            aside.
+          </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className='space-y-4 pt-2'>
-          {/* Goal Name */}
-          <div className='space-y-1.5'>
-            <Label className='text-sm font-medium text-zinc-400'>
-              Goal Name
-            </Label>
-            <Input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder='e.g. New Laptop'
-              required
-              className='h-11 rounded-xl border-zinc-800 bg-[#18181b] text-white focus-visible:ring-emerald-500'
-            />
-          </div>
-
-          {/* Target & Saved grid */}
-          <div className='grid grid-cols-2 gap-3'>
+        <form
+          onSubmit={handleSubmit}
+          className='flex min-h-0 flex-1 flex-col gap-4'
+        >
+          <DialogBody className='space-y-4 pt-2 pr-1'>
+            {/* Goal Name */}
             <div className='space-y-1.5'>
-              <Label className='text-sm font-medium text-zinc-400'>
-                Target Amount (₹)
+              <Label htmlFor='edit-goal-name' className={labelClass}>
+                Goal Name
               </Label>
               <Input
-                type='number'
-                min='1'
-                value={target}
-                onChange={(e) => setTarget(e.target.value)}
+                id='edit-goal-name'
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder='e.g. New Laptop'
                 required
-                className='h-11 rounded-xl border-zinc-800 bg-[#18181b] text-white focus-visible:ring-emerald-500'
+                className={inputClass}
               />
             </div>
+
+            {/* Target & Saved grid */}
+            <div className='grid grid-cols-2 gap-3'>
+              <div className='space-y-1.5'>
+                <Label htmlFor='edit-goal-target' className={labelClass}>
+                  Target Amount (₹)
+                </Label>
+                <Input
+                  id='edit-goal-target'
+                  type='number'
+                  min='1'
+                  value={target}
+                  onChange={(e) => setTarget(e.target.value)}
+                  required
+                  className={inputClass}
+                />
+              </div>
+              <div className='space-y-1.5'>
+                <Label htmlFor='edit-goal-saved' className={labelClass}>
+                  Already Saved (₹)
+                </Label>
+                <Input
+                  id='edit-goal-saved'
+                  type='number'
+                  min='0'
+                  value={saved}
+                  onChange={(e) => setSaved(e.target.value)}
+                  className={inputClass}
+                />
+              </div>
+            </div>
+
+            {/* Icon Picker */}
             <div className='space-y-1.5'>
-              <Label className='text-sm font-medium text-zinc-400'>
-                Already Saved (₹)
+              <Label className={labelClass}>Icon</Label>
+              <div className='flex flex-wrap gap-2 pt-1'>
+                {goalIcons.map((ic) => (
+                  <button
+                    key={ic}
+                    type='button'
+                    onClick={() => setIcon(ic)}
+                    className={`flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl border transition-all ${
+                      icon === ic
+                        ? 'scale-105 border-emerald-500 bg-emerald-500/20 text-emerald-400'
+                        : 'border-zinc-800 bg-[#18181b] text-zinc-400 hover:border-zinc-700'
+                    }`}
+                  >
+                    <DynamicIcon emoji={ic} className='h-5 w-5' />
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Deadline */}
+            <div className='space-y-1.5'>
+              <Label htmlFor='edit-goal-deadline' className={labelClass}>
+                Target Deadline
               </Label>
               <Input
-                type='number'
-                min='0'
-                value={saved}
-                onChange={(e) => setSaved(e.target.value)}
-                className='h-11 rounded-xl border-zinc-800 bg-[#18181b] text-white focus-visible:ring-emerald-500'
+                id='edit-goal-deadline'
+                type='date'
+                value={deadline}
+                onChange={(e) => setDeadline(e.target.value)}
+                required
+                className={inputClass}
               />
             </div>
-          </div>
+          </DialogBody>
 
-          {/* Icon Picker */}
-          <div className='space-y-1.5'>
-            <Label className='text-sm font-medium text-zinc-400'>Icon</Label>
-            <div className='flex flex-wrap gap-2 pt-1'>
-              {goalIcons.map((ic) => (
-                <button
-                  key={ic}
-                  type='button'
-                  onClick={() => setIcon(ic)}
-                  className={`flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl border transition-all ${
-                    icon === ic
-                      ? 'scale-105 border-emerald-500 bg-emerald-500/20 text-emerald-400'
-                      : 'border-zinc-800 bg-[#18181b] text-zinc-400 hover:border-zinc-700'
-                  }`}
-                >
-                  <DynamicIcon emoji={ic} className='h-5 w-5' />
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Deadline */}
-          <div className='space-y-1.5'>
-            <Label className='text-sm font-medium text-zinc-400'>
-              Target Deadline
-            </Label>
-            <Input
-              type='date'
-              value={deadline}
-              onChange={(e) => setDeadline(e.target.value)}
-              required
-              className='h-11 rounded-xl border-zinc-800 bg-[#18181b] text-white focus-visible:ring-emerald-500'
-            />
-          </div>
-
-          <div className='flex items-center justify-end gap-3 pt-4'>
+          <DialogFooter className='flex-row gap-2 border-t border-zinc-800/60 pt-4 sm:justify-end'>
             <Button
               type='button'
               variant='outline'
               onClick={() => onOpenChange(false)}
-              className='h-11 border-zinc-800 bg-transparent text-zinc-400 hover:bg-zinc-800 hover:text-white'
+              className='h-10 border-zinc-800 bg-[#18181b] text-white hover:bg-zinc-800'
             >
               Cancel
             </Button>
             <Button
               type='submit'
               disabled={submitting}
-              className='h-11 bg-[#4ade80] font-semibold text-black hover:bg-[#22c55e]'
+              className='h-10 bg-[#4ade80] font-semibold text-black hover:bg-[#22c55e]'
             >
-              {submitting ? 'Saving...' : 'Save Changes'}
+              {submitting ? 'Saving...' : 'Save changes'}
             </Button>
-          </div>
+          </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>

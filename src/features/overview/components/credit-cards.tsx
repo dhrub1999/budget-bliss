@@ -19,6 +19,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogHeader,
   DialogTitle,
@@ -638,190 +639,197 @@ export function CreditCards({ cards = [] }: { cards?: AccountOption[] }) {
             </DialogDescription>
           </DialogHeader>
 
-          <form onSubmit={handleAddCardSubmit} className='space-y-4 pt-2'>
-            {/* Card name */}
-            <div className='space-y-1.5'>
-              <Label
-                htmlFor='card-name'
-                className='text-[11px] font-semibold tracking-wider text-zinc-400 uppercase'
-              >
-                Card Name
-              </Label>
-              <Input
-                id='card-name'
-                type='text'
-                placeholder='e.g. HDFC Regalia'
-                value={cardName}
-                onChange={(e) => setCardName(e.target.value)}
-                className='rounded-xl border border-zinc-800 bg-zinc-950/80 px-3 py-2 text-sm text-white placeholder:text-zinc-600 focus:ring-1 focus:ring-purple-500'
-              />
-              {formErrors.cardName && (
-                <p className='text-[10px] text-red-400'>
-                  {formErrors.cardName}
-                </p>
-              )}
-            </div>
-
-            {/* Credit limit + outstanding */}
-            <div className='grid grid-cols-2 gap-3'>
+          <form
+            onSubmit={handleAddCardSubmit}
+            className='flex min-h-0 flex-1 flex-col gap-4'
+          >
+            <DialogBody className='space-y-4 pt-2 pr-1'>
+              {/* Card name */}
               <div className='space-y-1.5'>
                 <Label
-                  htmlFor='credit-limit'
+                  htmlFor='card-name'
                   className='text-[11px] font-semibold tracking-wider text-zinc-400 uppercase'
                 >
-                  Credit Limit (₹)
+                  Card Name
                 </Label>
                 <Input
-                  id='credit-limit'
-                  type='number'
-                  min='1'
-                  placeholder='200000'
-                  value={creditLimitInput}
-                  onChange={(e) => setCreditLimitInput(e.target.value)}
+                  id='card-name'
+                  type='text'
+                  placeholder='e.g. HDFC Regalia'
+                  value={cardName}
+                  onChange={(e) => setCardName(e.target.value)}
                   className='rounded-xl border border-zinc-800 bg-zinc-950/80 px-3 py-2 text-sm text-white placeholder:text-zinc-600 focus:ring-1 focus:ring-purple-500'
                 />
-                {formErrors.creditLimit && (
+                {formErrors.cardName && (
                   <p className='text-[10px] text-red-400'>
-                    {formErrors.creditLimit}
+                    {formErrors.cardName}
                   </p>
                 )}
               </div>
+
+              {/* Credit limit + outstanding */}
+              <div className='grid grid-cols-2 gap-3'>
+                <div className='space-y-1.5'>
+                  <Label
+                    htmlFor='credit-limit'
+                    className='text-[11px] font-semibold tracking-wider text-zinc-400 uppercase'
+                  >
+                    Credit Limit (₹)
+                  </Label>
+                  <Input
+                    id='credit-limit'
+                    type='number'
+                    min='1'
+                    placeholder='200000'
+                    value={creditLimitInput}
+                    onChange={(e) => setCreditLimitInput(e.target.value)}
+                    className='rounded-xl border border-zinc-800 bg-zinc-950/80 px-3 py-2 text-sm text-white placeholder:text-zinc-600 focus:ring-1 focus:ring-purple-500'
+                  />
+                  {formErrors.creditLimit && (
+                    <p className='text-[10px] text-red-400'>
+                      {formErrors.creditLimit}
+                    </p>
+                  )}
+                </div>
+                <div className='space-y-1.5'>
+                  <Label
+                    htmlFor='outstanding'
+                    className='text-[11px] font-semibold tracking-wider text-zinc-400 uppercase'
+                  >
+                    Outstanding (₹)
+                  </Label>
+                  <Input
+                    id='outstanding'
+                    type='number'
+                    min='0'
+                    placeholder='0'
+                    value={outstandingInput}
+                    onChange={(e) => setOutstandingInput(e.target.value)}
+                    className='rounded-xl border border-zinc-800 bg-zinc-950/80 px-3 py-2 text-sm text-white placeholder:text-zinc-600 focus:ring-1 focus:ring-purple-500'
+                  />
+                  {formErrors.outstanding && (
+                    <p className='text-[10px] text-red-400'>
+                      {formErrors.outstanding}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {/* Brand select */}
+              <div className='space-y-1.5'>
+                <Label className='text-[11px] font-semibold tracking-wider text-zinc-400 uppercase'>
+                  Card Brand
+                </Label>
+                <Select
+                  value={brandInput}
+                  onValueChange={(val: CreditCard['brand']) =>
+                    setBrandInput(val)
+                  }
+                >
+                  <SelectTrigger className='rounded-xl border border-zinc-800 bg-zinc-950/80 px-3 py-2 text-sm text-white focus:ring-1 focus:ring-purple-500'>
+                    <SelectValue placeholder='Select card brand' />
+                  </SelectTrigger>
+                  <SelectContent className='border-zinc-850 rounded-xl bg-zinc-950 text-white'>
+                    <SelectItem
+                      value='mastercard'
+                      className='rounded-lg focus:bg-zinc-800'
+                    >
+                      Mastercard
+                    </SelectItem>
+                    <SelectItem
+                      value='visa'
+                      className='rounded-lg focus:bg-zinc-800'
+                    >
+                      Visa
+                    </SelectItem>
+                    <SelectItem
+                      value='rupay'
+                      className='rounded-lg focus:bg-zinc-800'
+                    >
+                      RuPay
+                    </SelectItem>
+                    <SelectItem
+                      value='amex'
+                      className='rounded-lg focus:bg-zinc-800'
+                    >
+                      American Express
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Cardholder name */}
               <div className='space-y-1.5'>
                 <Label
-                  htmlFor='outstanding'
+                  htmlFor='cardholder-name'
                   className='text-[11px] font-semibold tracking-wider text-zinc-400 uppercase'
                 >
-                  Outstanding (₹)
+                  Cardholder Name
                 </Label>
                 <Input
-                  id='outstanding'
-                  type='number'
-                  min='0'
-                  placeholder='0'
-                  value={outstandingInput}
-                  onChange={(e) => setOutstandingInput(e.target.value)}
+                  id='cardholder-name'
+                  type='text'
+                  placeholder='e.g. Tamal Biswas'
+                  value={cardHolder}
+                  onChange={(e) => setCardHolder(e.target.value)}
                   className='rounded-xl border border-zinc-800 bg-zinc-950/80 px-3 py-2 text-sm text-white placeholder:text-zinc-600 focus:ring-1 focus:ring-purple-500'
                 />
-                {formErrors.outstanding && (
+                {formErrors.cardHolder && (
                   <p className='text-[10px] text-red-400'>
-                    {formErrors.outstanding}
+                    {formErrors.cardHolder}
                   </p>
                 )}
               </div>
-            </div>
 
-            {/* Brand select */}
-            <div className='space-y-1.5'>
-              <Label className='text-[11px] font-semibold tracking-wider text-zinc-400 uppercase'>
-                Card Brand
-              </Label>
-              <Select
-                value={brandInput}
-                onValueChange={(val: CreditCard['brand']) => setBrandInput(val)}
-              >
-                <SelectTrigger className='rounded-xl border border-zinc-800 bg-zinc-950/80 px-3 py-2 text-sm text-white focus:ring-1 focus:ring-purple-500'>
-                  <SelectValue placeholder='Select card brand' />
-                </SelectTrigger>
-                <SelectContent className='border-zinc-850 rounded-xl bg-zinc-950 text-white'>
-                  <SelectItem
-                    value='mastercard'
-                    className='rounded-lg focus:bg-zinc-800'
-                  >
-                    Mastercard
-                  </SelectItem>
-                  <SelectItem
-                    value='visa'
-                    className='rounded-lg focus:bg-zinc-800'
-                  >
-                    Visa
-                  </SelectItem>
-                  <SelectItem
-                    value='rupay'
-                    className='rounded-lg focus:bg-zinc-800'
-                  >
-                    RuPay
-                  </SelectItem>
-                  <SelectItem
-                    value='amex'
-                    className='rounded-lg focus:bg-zinc-800'
-                  >
-                    American Express
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+              {/* Card number */}
+              <div className='space-y-1.5'>
+                <Label
+                  htmlFor='card-number'
+                  className='text-[11px] font-semibold tracking-wider text-zinc-400 uppercase'
+                >
+                  Card Number
+                </Label>
+                <Input
+                  id='card-number'
+                  type='text'
+                  placeholder='0000 0000 0000 0000'
+                  value={cardNumberInput}
+                  onChange={handleCardNumberChange}
+                  className='rounded-xl border border-zinc-800 bg-zinc-950/80 px-3 py-2 font-mono text-sm text-white placeholder:text-zinc-600 focus:ring-1 focus:ring-purple-500'
+                />
+                {formErrors.cardNumber && (
+                  <p className='text-[10px] text-red-400'>
+                    {formErrors.cardNumber}
+                  </p>
+                )}
+              </div>
 
-            {/* Cardholder name */}
-            <div className='space-y-1.5'>
-              <Label
-                htmlFor='cardholder-name'
-                className='text-[11px] font-semibold tracking-wider text-zinc-400 uppercase'
-              >
-                Cardholder Name
-              </Label>
-              <Input
-                id='cardholder-name'
-                type='text'
-                placeholder='e.g. Tamal Biswas'
-                value={cardHolder}
-                onChange={(e) => setCardHolder(e.target.value)}
-                className='rounded-xl border border-zinc-800 bg-zinc-950/80 px-3 py-2 text-sm text-white placeholder:text-zinc-600 focus:ring-1 focus:ring-purple-500'
-              />
-              {formErrors.cardHolder && (
-                <p className='text-[10px] text-red-400'>
-                  {formErrors.cardHolder}
-                </p>
-              )}
-            </div>
-
-            {/* Card number */}
-            <div className='space-y-1.5'>
-              <Label
-                htmlFor='card-number'
-                className='text-[11px] font-semibold tracking-wider text-zinc-400 uppercase'
-              >
-                Card Number
-              </Label>
-              <Input
-                id='card-number'
-                type='text'
-                placeholder='0000 0000 0000 0000'
-                value={cardNumberInput}
-                onChange={handleCardNumberChange}
-                className='rounded-xl border border-zinc-800 bg-zinc-950/80 px-3 py-2 font-mono text-sm text-white placeholder:text-zinc-600 focus:ring-1 focus:ring-purple-500'
-              />
-              {formErrors.cardNumber && (
-                <p className='text-[10px] text-red-400'>
-                  {formErrors.cardNumber}
-                </p>
-              )}
-            </div>
-
-            {/* Expiry MM/YY */}
-            <div className='space-y-1.5'>
-              <Label
-                htmlFor='expiry-date'
-                className='text-[11px] font-semibold tracking-wider text-zinc-400 uppercase'
-              >
-                Expiration Date
-              </Label>
-              <Input
-                id='expiry-date'
-                type='text'
-                placeholder='MM/YY'
-                value={validThruInput}
-                onChange={handleExpiryChange}
-                className='rounded-xl border border-zinc-800 bg-zinc-950/80 px-3 py-2 font-mono text-sm text-white placeholder:text-zinc-600 focus:ring-1 focus:ring-purple-500'
-              />
-              {formErrors.validThru && (
-                <p className='text-[10px] text-red-400'>
-                  {formErrors.validThru}
-                </p>
-              )}
-            </div>
+              {/* Expiry MM/YY */}
+              <div className='space-y-1.5'>
+                <Label
+                  htmlFor='expiry-date'
+                  className='text-[11px] font-semibold tracking-wider text-zinc-400 uppercase'
+                >
+                  Expiration Date
+                </Label>
+                <Input
+                  id='expiry-date'
+                  type='text'
+                  placeholder='MM/YY'
+                  value={validThruInput}
+                  onChange={handleExpiryChange}
+                  className='rounded-xl border border-zinc-800 bg-zinc-950/80 px-3 py-2 font-mono text-sm text-white placeholder:text-zinc-600 focus:ring-1 focus:ring-purple-500'
+                />
+                {formErrors.validThru && (
+                  <p className='text-[10px] text-red-400'>
+                    {formErrors.validThru}
+                  </p>
+                )}
+              </div>
+            </DialogBody>
 
             {/* Footer action buttons */}
-            <DialogFooter className='flex-row gap-2 pt-2 sm:justify-end'>
+            <DialogFooter className='flex-row gap-2 border-t border-zinc-800/60 pt-4 sm:justify-end'>
               <Button
                 type='button'
                 variant='ghost'

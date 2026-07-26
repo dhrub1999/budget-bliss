@@ -3,7 +3,9 @@
 import * as React from 'react';
 import {
   Dialog,
+  DialogBody,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog';
@@ -101,95 +103,100 @@ export function AddBudgetDialog({
           </DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className='space-y-4 pt-2'>
-          {/* Period Selection (Monthly vs Yearly) */}
-          <div className='space-y-1.5'>
-            <Label className='text-sm font-medium text-zinc-400'>
-              Budget Frequency
-            </Label>
-            <div className='grid grid-cols-2 gap-2 rounded-xl border border-zinc-800 bg-[#18181b] p-1'>
-              <button
-                type='button'
-                onClick={() => setPeriod('MONTHLY')}
-                className={`cursor-pointer rounded-lg py-2 text-xs font-semibold transition-all ${
-                  period === 'MONTHLY'
-                    ? 'bg-emerald-500 text-black shadow-md'
-                    : 'text-zinc-400 hover:text-white'
-                }`}
-              >
-                Monthly Budget
-              </button>
-              <button
-                type='button'
-                onClick={() => setPeriod('YEARLY')}
-                className={`cursor-pointer rounded-lg py-2 text-xs font-semibold transition-all ${
-                  period === 'YEARLY'
-                    ? 'bg-emerald-500 text-black shadow-md'
-                    : 'text-zinc-400 hover:text-white'
-                }`}
-              >
-                Yearly Budget
-              </button>
+        <form
+          onSubmit={handleSubmit}
+          className='flex min-h-0 flex-1 flex-col gap-4'
+        >
+          <DialogBody className='space-y-4 pt-2 pr-1'>
+            {/* Period Selection (Monthly vs Yearly) */}
+            <div className='space-y-1.5'>
+              <Label className='text-sm font-medium text-zinc-400'>
+                Budget Frequency
+              </Label>
+              <div className='grid grid-cols-2 gap-2 rounded-xl border border-zinc-800 bg-[#18181b] p-1'>
+                <button
+                  type='button'
+                  onClick={() => setPeriod('MONTHLY')}
+                  className={`cursor-pointer rounded-lg py-2 text-xs font-semibold transition-all ${
+                    period === 'MONTHLY'
+                      ? 'bg-emerald-500 text-black shadow-md'
+                      : 'text-zinc-400 hover:text-white'
+                  }`}
+                >
+                  Monthly Budget
+                </button>
+                <button
+                  type='button'
+                  onClick={() => setPeriod('YEARLY')}
+                  className={`cursor-pointer rounded-lg py-2 text-xs font-semibold transition-all ${
+                    period === 'YEARLY'
+                      ? 'bg-emerald-500 text-black shadow-md'
+                      : 'text-zinc-400 hover:text-white'
+                  }`}
+                >
+                  Yearly Budget
+                </button>
+              </div>
             </div>
-          </div>
 
-          {/* Category Dropdown */}
-          <div className='space-y-1.5'>
-            <Label className='text-sm font-medium text-zinc-400'>
-              Category
-            </Label>
-            <Select value={category} onValueChange={setCategory}>
-              <SelectTrigger className='!h-11 w-full rounded-xl border-zinc-800 bg-[#18181b] text-white focus:ring-emerald-500'>
-                <SelectValue placeholder='Select category' />
-              </SelectTrigger>
-              <SelectContent className='border-zinc-800 bg-[#18181b] text-white'>
-                {categoriesList.map((cat) => (
-                  <SelectItem
-                    key={cat}
-                    value={cat}
-                    className='hover:bg-zinc-800 focus:bg-zinc-800'
-                  >
-                    {cat === 'TOTAL' ? '🎯 Overall Total Budget' : cat}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+            {/* Category Dropdown */}
+            <div className='space-y-1.5'>
+              <Label className='text-sm font-medium text-zinc-400'>
+                Category
+              </Label>
+              <Select value={category} onValueChange={setCategory}>
+                <SelectTrigger className='!h-11 w-full rounded-xl border-zinc-800 bg-[#18181b] text-white focus:ring-emerald-500'>
+                  <SelectValue placeholder='Select category' />
+                </SelectTrigger>
+                <SelectContent className='border-zinc-800 bg-[#18181b] text-white'>
+                  {categoriesList.map((cat) => (
+                    <SelectItem
+                      key={cat}
+                      value={cat}
+                      className='hover:bg-zinc-800 focus:bg-zinc-800'
+                    >
+                      {cat === 'TOTAL' ? '🎯 Overall Total Budget' : cat}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-          {/* Amount Input */}
-          <div className='space-y-1.5'>
-            <Label className='text-sm font-medium text-zinc-400'>
-              Budget Limit Amount (₹)
-            </Label>
-            <Input
-              type='number'
-              min='1'
-              step='any'
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              placeholder='e.g. 15000'
-              required
-              className='h-11 rounded-xl border-zinc-800 bg-[#18181b] text-white placeholder:text-zinc-600 focus-visible:ring-emerald-500'
-            />
-          </div>
+            {/* Amount Input */}
+            <div className='space-y-1.5'>
+              <Label className='text-sm font-medium text-zinc-400'>
+                Budget Limit Amount (₹)
+              </Label>
+              <Input
+                type='number'
+                min='1'
+                step='any'
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                placeholder='e.g. 15000'
+                required
+                className='h-11 rounded-xl border-zinc-800 bg-[#18181b] text-white placeholder:text-zinc-600 focus-visible:ring-emerald-500'
+              />
+            </div>
+          </DialogBody>
 
-          <div className='flex items-center justify-end gap-3 pt-4'>
+          <DialogFooter className='flex-row gap-2 border-t border-zinc-800/60 pt-4 sm:justify-end'>
             <Button
               type='button'
               variant='outline'
               onClick={() => onOpenChange(false)}
-              className='h-11 border-zinc-800 bg-transparent text-zinc-400 hover:bg-zinc-800 hover:text-white'
+              className='h-10 border-zinc-800 bg-[#18181b] text-white hover:bg-zinc-800'
             >
               Cancel
             </Button>
             <Button
               type='submit'
               disabled={submitting}
-              className='h-11 bg-[#4ade80] font-semibold text-black hover:bg-[#22c55e]'
+              className='h-10 bg-[#4ade80] font-semibold text-black hover:bg-[#22c55e]'
             >
-              {submitting ? 'Saving...' : 'Set Budget'}
+              {submitting ? 'Saving...' : 'Set budget'}
             </Button>
-          </div>
+          </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>

@@ -1,11 +1,12 @@
 'use client';
 
 import * as React from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, type FieldErrors } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Calendar as CalendarIcon, Info } from 'lucide-react';
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogHeader,
   DialogTitle,
@@ -107,6 +108,15 @@ export function AddEditBillDialog({
   const category = watch('category');
   const accountId = watch('accountId');
 
+  /** Surface the first message so a validation error on a field this branch doesn't
+   *  render can't present as an inert submit button. */
+  function onInvalid(formErrors: FieldErrors<BillSchemaInput>) {
+    const first = Object.values(formErrors).find((e) => e?.message);
+    toast.error(
+      (first?.message as string) || 'Please check the highlighted fields'
+    );
+  }
+
   async function onSubmit(values: BillSchemaOutput) {
     setSubmitting(true);
     try {
@@ -153,7 +163,7 @@ export function AddEditBillDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='max-h-[90vh] w-[94vw] max-w-[440px] overflow-y-auto rounded-2xl border-zinc-800 bg-[#121214] p-4 text-white sm:p-6 [&>button]:hidden'>
+      <DialogContent className='w-[94vw] max-w-[440px] rounded-2xl border-zinc-800 bg-[#121214] p-4 text-white sm:p-6 [&>button]:hidden'>
         <DialogHeader>
           <div className='flex items-center gap-1.5'>
             <DialogTitle className='text-lg font-semibold text-white'>
@@ -188,185 +198,187 @@ export function AddEditBillDialog({
         </DialogHeader>
 
         <form
-          onSubmit={handleSubmit(onSubmit as any)}
-          className='space-y-4 pt-2'
+          onSubmit={handleSubmit(onSubmit as any, onInvalid)}
+          className='flex min-h-0 flex-1 flex-col gap-4'
         >
-          {/* Name */}
-          <div className='space-y-1.5'>
-            <Label htmlFor='bill-name' className='text-sm text-zinc-400'>
-              Name
-            </Label>
-            <Input
-              id='bill-name'
-              placeholder='Rent, Netflix, Car EMI…'
-              className='h-12 rounded-xl border-zinc-800/80 bg-[#18181b] px-4 text-white'
-              {...register('name')}
-            />
-            {errors.name && (
-              <p className='text-xs text-rose-400'>{errors.name.message}</p>
-            )}
-          </div>
+          <DialogBody className='space-y-4 pt-2 pr-1'>
+            {/* Name */}
+            <div className='space-y-1.5'>
+              <Label htmlFor='bill-name' className='text-sm text-zinc-400'>
+                Name
+              </Label>
+              <Input
+                id='bill-name'
+                placeholder='Rent, Netflix, Car EMI…'
+                className='h-12 rounded-xl border-zinc-800/80 bg-[#18181b] px-4 text-white'
+                {...register('name')}
+              />
+              {errors.name && (
+                <p className='text-xs text-rose-400'>{errors.name.message}</p>
+              )}
+            </div>
 
-          {/* Amount */}
-          <div className='space-y-1.5'>
-            <Label htmlFor='bill-amount' className='text-sm text-zinc-400'>
-              Amount (₹)
-            </Label>
-            <Input
-              id='bill-amount'
-              type='number'
-              step='0.01'
-              min='0'
-              placeholder='0.00'
-              className='h-12 rounded-xl border-zinc-800/80 bg-[#18181b] px-4 text-white'
-              {...register('amount')}
-            />
-            {errors.amount && (
-              <p className='text-xs text-rose-400'>{errors.amount.message}</p>
-            )}
-          </div>
+            {/* Amount */}
+            <div className='space-y-1.5'>
+              <Label htmlFor='bill-amount' className='text-sm text-zinc-400'>
+                Amount (₹)
+              </Label>
+              <Input
+                id='bill-amount'
+                type='number'
+                step='0.01'
+                min='0'
+                placeholder='0.00'
+                className='h-12 rounded-xl border-zinc-800/80 bg-[#18181b] px-4 text-white'
+                {...register('amount')}
+              />
+              {errors.amount && (
+                <p className='text-xs text-rose-400'>{errors.amount.message}</p>
+              )}
+            </div>
 
-          {/* Due date */}
-          <div className='space-y-1.5'>
-            <Label className='text-sm text-zinc-400'>Next due date</Label>
-            <Popover modal={true}>
-              <PopoverTrigger asChild>
-                <Button
-                  type='button'
-                  variant='outline'
-                  className='relative h-12 w-full cursor-pointer justify-between rounded-xl border border-zinc-800/80 bg-[#18181b] px-4 text-left font-normal text-white hover:bg-zinc-900 hover:text-white'
+            {/* Due date */}
+            <div className='space-y-1.5'>
+              <Label className='text-sm text-zinc-400'>Next due date</Label>
+              <Popover modal={true}>
+                <PopoverTrigger asChild>
+                  <Button
+                    type='button'
+                    variant='outline'
+                    className='relative h-12 w-full cursor-pointer justify-between rounded-xl border border-zinc-800/80 bg-[#18181b] px-4 text-left font-normal text-white hover:bg-zinc-900 hover:text-white'
+                  >
+                    <span className='text-zinc-200'>
+                      {parsedDueDate
+                        ? parsedDueDate.toLocaleDateString('en-US', {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric'
+                          })
+                        : 'Select date'}
+                    </span>
+                    <CalendarIcon className='absolute right-4 h-5 w-5 text-zinc-400' />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent
+                  className='w-auto border-zinc-800 bg-[#18181b] p-0 text-white'
+                  align='start'
                 >
-                  <span className='text-zinc-200'>
-                    {parsedDueDate
-                      ? parsedDueDate.toLocaleDateString('en-US', {
-                          month: 'short',
-                          day: 'numeric',
-                          year: 'numeric'
-                        })
-                      : 'Select date'}
-                  </span>
-                  <CalendarIcon className='absolute right-4 h-5 w-5 text-zinc-400' />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent
-                className='w-auto border-zinc-800 bg-[#18181b] p-0 text-white'
-                align='start'
+                  <Calendar
+                    mode='single'
+                    selected={parsedDueDate}
+                    onSelect={(d) =>
+                      d &&
+                      setValue('dueDate', toDueDateString(d), {
+                        shouldValidate: true
+                      })
+                    }
+                    initialFocus
+                    className='rounded-xl border border-zinc-800 bg-[#18181b] text-white'
+                  />
+                </PopoverContent>
+              </Popover>
+              {errors.dueDate && (
+                <p className='text-xs text-rose-400'>
+                  {errors.dueDate.message as string}
+                </p>
+              )}
+            </div>
+
+            {/* Recurrence */}
+            <div className='space-y-1.5'>
+              <Label className='text-sm text-zinc-400'>Repeats</Label>
+              <Select
+                value={recurrence ?? 'MONTHLY'}
+                onValueChange={(v) =>
+                  setValue('recurrence', v as any, { shouldValidate: true })
+                }
               >
-                <Calendar
-                  mode='single'
-                  selected={parsedDueDate}
-                  onSelect={(d) =>
-                    d &&
-                    setValue('dueDate', toDueDateString(d), {
-                      shouldValidate: true
-                    })
-                  }
-                  initialFocus
-                  className='rounded-xl border border-zinc-800 bg-[#18181b] text-white'
-                />
-              </PopoverContent>
-            </Popover>
-            {errors.dueDate && (
-              <p className='text-xs text-rose-400'>
-                {errors.dueDate.message as string}
+                <SelectTrigger className='h-12 w-full rounded-xl border-zinc-800/80 bg-[#18181b] px-4 text-white'>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className='border-zinc-800 bg-[#18181b] text-white'>
+                  {recurrenceOptions.map((r) => (
+                    <SelectItem key={r} value={r}>
+                      {RECURRENCE_LABELS[r]}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className='text-[11px] text-zinc-500'>
+                {recurrence === 'NONE'
+                  ? 'Archived once you mark it paid.'
+                  : 'The due date moves to the next cycle when you mark it paid.'}
               </p>
-            )}
-          </div>
+            </div>
 
-          {/* Recurrence */}
-          <div className='space-y-1.5'>
-            <Label className='text-sm text-zinc-400'>Repeats</Label>
-            <Select
-              value={recurrence ?? 'MONTHLY'}
-              onValueChange={(v) =>
-                setValue('recurrence', v as any, { shouldValidate: true })
-              }
-            >
-              <SelectTrigger className='h-12 w-full rounded-xl border-zinc-800/80 bg-[#18181b] px-4 text-white'>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className='border-zinc-800 bg-[#18181b] text-white'>
-                {recurrenceOptions.map((r) => (
-                  <SelectItem key={r} value={r}>
-                    {RECURRENCE_LABELS[r]}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <p className='text-[11px] text-zinc-500'>
-              {recurrence === 'NONE'
-                ? 'Archived once you mark it paid.'
-                : 'The due date moves to the next cycle when you mark it paid.'}
-            </p>
-          </div>
+            {/* Category */}
+            <div className='space-y-1.5'>
+              <Label className='text-sm text-zinc-400'>Category</Label>
+              <Select
+                value={category ?? 'Bills'}
+                onValueChange={(v) =>
+                  setValue('category', v, { shouldValidate: true })
+                }
+              >
+                <SelectTrigger className='h-12 w-full rounded-xl border-zinc-800/80 bg-[#18181b] px-4 text-white'>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className='border-zinc-800 bg-[#18181b] text-white'>
+                  {expenseCategories.map((c) => (
+                    <SelectItem key={c} value={c}>
+                      {c}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-          {/* Category */}
-          <div className='space-y-1.5'>
-            <Label className='text-sm text-zinc-400'>Category</Label>
-            <Select
-              value={category ?? 'Bills'}
-              onValueChange={(v) =>
-                setValue('category', v, { shouldValidate: true })
-              }
-            >
-              <SelectTrigger className='h-12 w-full rounded-xl border-zinc-800/80 bg-[#18181b] px-4 text-white'>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className='border-zinc-800 bg-[#18181b] text-white'>
-                {expenseCategories.map((c) => (
-                  <SelectItem key={c} value={c}>
-                    {c}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+            {/* Paid from */}
+            <div className='space-y-1.5'>
+              <Label className='text-sm text-zinc-400'>
+                Usually paid from{' '}
+                <span className='text-zinc-600'>(optional)</span>
+              </Label>
+              <Select
+                value={accountId || NO_ACCOUNT}
+                onValueChange={(v) =>
+                  setValue('accountId', v === NO_ACCOUNT ? undefined : v, {
+                    shouldValidate: true
+                  })
+                }
+              >
+                <SelectTrigger className='h-12 w-full rounded-xl border-zinc-800/80 bg-[#18181b] px-4 text-white'>
+                  <SelectValue placeholder='Choose later' />
+                </SelectTrigger>
+                <SelectContent className='border-zinc-800 bg-[#18181b] text-white'>
+                  <SelectItem value={NO_ACCOUNT}>Choose later</SelectItem>
+                  {activeAccounts.map((a) => (
+                    <SelectItem key={a.id} value={a.id}>
+                      {a.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className='text-[11px] text-zinc-500'>
+                Prefills the account when you mark this bill paid.
+              </p>
+            </div>
 
-          {/* Paid from */}
-          <div className='space-y-1.5'>
-            <Label className='text-sm text-zinc-400'>
-              Usually paid from{' '}
-              <span className='text-zinc-600'>(optional)</span>
-            </Label>
-            <Select
-              value={accountId || NO_ACCOUNT}
-              onValueChange={(v) =>
-                setValue('accountId', v === NO_ACCOUNT ? undefined : v, {
-                  shouldValidate: true
-                })
-              }
-            >
-              <SelectTrigger className='h-12 w-full rounded-xl border-zinc-800/80 bg-[#18181b] px-4 text-white'>
-                <SelectValue placeholder='Choose later' />
-              </SelectTrigger>
-              <SelectContent className='border-zinc-800 bg-[#18181b] text-white'>
-                <SelectItem value={NO_ACCOUNT}>Choose later</SelectItem>
-                {activeAccounts.map((a) => (
-                  <SelectItem key={a.id} value={a.id}>
-                    {a.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <p className='text-[11px] text-zinc-500'>
-              Prefills the account when you mark this bill paid.
-            </p>
-          </div>
+            {/* Notes */}
+            <div className='space-y-1.5'>
+              <Label htmlFor='bill-notes' className='text-sm text-zinc-400'>
+                Notes <span className='text-zinc-600'>(optional)</span>
+              </Label>
+              <Input
+                id='bill-notes'
+                placeholder='Landlord, policy number…'
+                className='h-12 rounded-xl border-zinc-800/80 bg-[#18181b] px-4 text-white'
+                {...register('notes')}
+              />
+            </div>
+          </DialogBody>
 
-          {/* Notes */}
-          <div className='space-y-1.5'>
-            <Label htmlFor='bill-notes' className='text-sm text-zinc-400'>
-              Notes <span className='text-zinc-600'>(optional)</span>
-            </Label>
-            <Input
-              id='bill-notes'
-              placeholder='Landlord, policy number…'
-              className='h-12 rounded-xl border-zinc-800/80 bg-[#18181b] px-4 text-white'
-              {...register('notes')}
-            />
-          </div>
-
-          <DialogFooter className='gap-2 pt-2 sm:gap-2'>
+          <DialogFooter className='gap-2 border-t border-zinc-800/60 pt-4 sm:gap-2'>
             <Button
               type='button'
               variant='outline'

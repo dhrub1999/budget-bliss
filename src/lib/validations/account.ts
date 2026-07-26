@@ -20,32 +20,52 @@ export const walletProviders = [
 
 export const cardBrands = ['mastercard', 'visa', 'rupay', 'amex'] as const;
 
+/**
+ * An emptied `<input type="number">` submits `''`, which `z.coerce.number()` turns into
+ * `0` — tripping `.positive()` on fields the user never touched. Since the form keeps
+ * every type's fields in one flat object, a blank credit limit would otherwise fail
+ * validation even when a Savings account is being created. Treat blank as absent.
+ *
+ * Only `''` is remapped — `null` stays meaningful, since PATCH payloads send it
+ * explicitly to clear a column.
+ */
+const blankToUndefined = <T extends z.ZodTypeAny>(schema: T) =>
+  z.preprocess((v) => (v === '' ? undefined : v), schema);
+
 export const accountSchema = z
   .object({
     name: z.string().min(1, { message: 'Name is required' }),
     type: z.enum(accountTypes),
     provider: z.string().optional(),
-    openingBalance: z.coerce
-      .number({ invalid_type_error: 'Balance must be a number' })
-      .nonnegative({ message: 'Balance cannot be negative' })
-      .optional(),
+    openingBalance: blankToUndefined(
+      z.coerce
+        .number({ invalid_type_error: 'Balance must be a number' })
+        .nonnegative({ message: 'Balance cannot be negative' })
+        .optional()
+    ),
 
     // SAVINGS
-    minimumBalance: z.coerce
-      .number({ invalid_type_error: 'Minimum balance must be a number' })
-      .nonnegative({ message: 'Minimum balance cannot be negative' })
-      .optional(),
+    minimumBalance: blankToUndefined(
+      z.coerce
+        .number({ invalid_type_error: 'Minimum balance must be a number' })
+        .nonnegative({ message: 'Minimum balance cannot be negative' })
+        .optional()
+    ),
 
     // CREDIT_CARD
-    creditLimit: z.coerce
-      .number({ invalid_type_error: 'Credit limit must be a number' })
-      .positive({ message: 'Credit limit must be positive' })
-      .optional(),
+    creditLimit: blankToUndefined(
+      z.coerce
+        .number({ invalid_type_error: 'Credit limit must be a number' })
+        .positive({ message: 'Credit limit must be positive' })
+        .optional()
+    ),
     /** Existing outstanding balance when adding a card (seeds owed via an opening EXPENSE). */
-    currentOutstanding: z.coerce
-      .number({ invalid_type_error: 'Outstanding must be a number' })
-      .nonnegative({ message: 'Outstanding cannot be negative' })
-      .optional(),
+    currentOutstanding: blankToUndefined(
+      z.coerce
+        .number({ invalid_type_error: 'Outstanding must be a number' })
+        .nonnegative({ message: 'Outstanding cannot be negative' })
+        .optional()
+    ),
     last4: z.string().optional(),
     cardHolder: z.string().optional(),
     validThru: z.string().optional(),
@@ -53,7 +73,7 @@ export const accountSchema = z
     gradient: z.string().optional(),
 
     // WALLET
-    maxBalance: z.coerce.number().positive().optional(),
+    maxBalance: blankToUndefined(z.coerce.number().positive().optional()),
 
     isDefault: z.boolean().optional()
   })
@@ -87,15 +107,21 @@ export const updateAccountSchema = z
   .object({
     name: z.string().min(1).optional(),
     provider: z.string().nullable().optional(),
-    openingBalance: z.coerce.number().optional(),
-    minimumBalance: z.coerce.number().nonnegative().nullable().optional(),
-    creditLimit: z.coerce.number().positive().nullable().optional(),
+    openingBalance: blankToUndefined(z.coerce.number().optional()),
+    minimumBalance: blankToUndefined(
+      z.coerce.number().nonnegative().nullable().optional()
+    ),
+    creditLimit: blankToUndefined(
+      z.coerce.number().positive().nullable().optional()
+    ),
     last4: z.string().nullable().optional(),
     cardHolder: z.string().nullable().optional(),
     validThru: z.string().nullable().optional(),
     brand: z.enum(cardBrands).nullable().optional(),
     gradient: z.string().nullable().optional(),
-    maxBalance: z.coerce.number().positive().nullable().optional(),
+    maxBalance: blankToUndefined(
+      z.coerce.number().positive().nullable().optional()
+    ),
     isDefault: z.boolean().optional(),
     isArchived: z.boolean().optional()
   })
