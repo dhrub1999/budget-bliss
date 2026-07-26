@@ -12,11 +12,17 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = await params;
-    const rawData = await request.json();
-    console.log(`PATCH /api/transactions/${id} called with:`, rawData);
+    const { data: session } = await auth.getSession();
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+    const userId = session.user.id;
 
-    const parsed = updateTransactionSchema.safeParse(rawData);
+    const { id } = await params;
+    const parsed = updateTransactionSchema.safeParse(await request.json());
     if (!parsed.success) {
       return NextResponse.json(
         {
@@ -28,14 +34,6 @@ export async function PATCH(
     }
 
     const data = parsed.data;
-    const { data: session } = await auth.getSession();
-    if (!session?.user?.id) {
-      return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-    const userId = session.user.id;
 
     // Load the existing row so we can reverse any prior goal earmark.
     const [existing] = await db
@@ -115,12 +113,12 @@ export async function PATCH(
     revalidatePath('/dashboard/accounts');
 
     return NextResponse.json({ success: true, transaction: updated });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error updating transaction:', error);
     return NextResponse.json(
       {
         success: false,
-        error: error.message || 'Failed to update transaction'
+        error: 'Failed to update transaction'
       },
       { status: 500 }
     );
@@ -175,12 +173,12 @@ export async function DELETE(
     revalidatePath('/dashboard/accounts');
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error deleting transaction:', error);
     return NextResponse.json(
       {
         success: false,
-        error: error.message || 'Failed to delete transaction'
+        error: 'Failed to delete transaction'
       },
       { status: 500 }
     );

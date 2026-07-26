@@ -23,10 +23,10 @@ export async function GET() {
       accounts: snapshot.accounts,
       totals: snapshot.totals
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error fetching accounts:', error);
     return NextResponse.json(
-      { success: false, error: error.message || 'Failed to fetch accounts' },
+      { success: false, error: 'Failed to fetch accounts' },
       { status: 500 }
     );
   }
@@ -34,8 +34,18 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const rawData = await request.json();
-    const parsed = accountSchema.safeParse(rawData);
+    // Auth first: returning the 400 before the 401 let an unauthenticated caller
+    // map the whole validation schema from the error messages.
+    const { data: session } = await auth.getSession();
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+    const userId = session.user.id;
+
+    const parsed = accountSchema.safeParse(await request.json());
     if (!parsed.success) {
       return NextResponse.json(
         {
@@ -47,14 +57,6 @@ export async function POST(request: NextRequest) {
     }
 
     const data = parsed.data;
-    const { data: session } = await auth.getSession();
-    if (!session?.user?.id) {
-      return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-    const userId = session.user.id;
 
     // For a credit card, openingBalance carries the initial outstanding (owed);
     // wallets default to the RBI cap unless overridden.
@@ -96,10 +98,10 @@ export async function POST(request: NextRequest) {
     revalidatePath('/dashboard/overview');
     revalidatePath('/dashboard/accounts');
     return NextResponse.json({ success: true });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error creating account:', error);
     return NextResponse.json(
-      { success: false, error: error.message || 'Failed to save account' },
+      { success: false, error: 'Failed to save account' },
       { status: 500 }
     );
   }

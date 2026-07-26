@@ -27,6 +27,7 @@ import { EditGoalDialog } from './edit-goal-dialog';
 import { ContributeGoalDialog } from './contribute-goal-dialog';
 import { DynamicIcon } from '@/components/ui/dynamic-icon';
 import { toast } from 'sonner';
+import { getErrorMessage } from '@/lib/utils';
 
 const chartConfig = {
   value: {
@@ -106,8 +107,8 @@ export function GoalsSavings({ dbGoals = [] }: GoalsSavingsProps) {
       } else {
         toast.error(data.error || 'Failed to delete goal');
       }
-    } catch (err: any) {
-      toast.error(err.message || 'Failed to delete goal');
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err, 'Failed to delete goal'));
     }
   }
 
@@ -130,8 +131,8 @@ export function GoalsSavings({ dbGoals = [] }: GoalsSavingsProps) {
       } else {
         toast.error(data.error || 'Failed to update goal');
       }
-    } catch (err: any) {
-      toast.error(err.message || 'Failed to update goal');
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err, 'Failed to update goal'));
     }
   }
 

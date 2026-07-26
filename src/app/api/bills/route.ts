@@ -26,10 +26,10 @@ export async function GET() {
       .orderBy(asc(bills.dueDate));
 
     return NextResponse.json({ success: true, bills: userBills });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error fetching bills:', error);
     return NextResponse.json(
-      { success: false, error: error.message || 'Failed to fetch bills' },
+      { success: false, error: 'Failed to fetch bills' },
       { status: 500 }
     );
   }
@@ -37,7 +37,6 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const rawData = await request.json();
     const { data: session } = await auth.getSession();
     if (!session?.user?.id) {
       return NextResponse.json(
@@ -47,7 +46,7 @@ export async function POST(request: NextRequest) {
     }
     const userId = session.user.id;
 
-    const parsed = billSchema.safeParse(rawData);
+    const parsed = billSchema.safeParse(await request.json());
     if (!parsed.success) {
       return NextResponse.json(
         {
@@ -95,10 +94,10 @@ export async function POST(request: NextRequest) {
     revalidatePath('/dashboard/bills');
     revalidatePath('/dashboard/overview');
     return NextResponse.json({ success: true, bill: created });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error creating bill:', error);
     return NextResponse.json(
-      { success: false, error: error.message || 'Failed to create bill' },
+      { success: false, error: 'Failed to create bill' },
       { status: 500 }
     );
   }

@@ -16,6 +16,7 @@ import { formatINRFull } from '@/features/overview/components/overview-data';
 import { ACCOUNT_TYPE_SINGULAR } from '@/features/accounts/constants';
 import type { AccountOption } from '@/features/accounts/types';
 import { toast } from 'sonner';
+import { getErrorMessage } from '@/lib/utils';
 
 interface AccountDetailViewProps {
   account: AccountOption;
@@ -62,8 +63,8 @@ export function AccountDetailView({
       } else {
         toast.error(data?.error || 'Failed to delete transaction');
       }
-    } catch (err: any) {
-      toast.error(err?.message || 'Error deleting transaction');
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err, 'Error deleting transaction'));
     }
   };
 

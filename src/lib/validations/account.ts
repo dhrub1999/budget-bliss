@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { money } from './transaction';
 
 /** Digital-wallet regulatory cap (RBI): ₹2,00,000. Defined here to keep this
  *  client-importable module free of any server (DB) imports. */
@@ -38,31 +39,27 @@ export const accountSchema = z
     type: z.enum(accountTypes),
     provider: z.string().optional(),
     openingBalance: blankToUndefined(
-      z.coerce
-        .number({ invalid_type_error: 'Balance must be a number' })
+      money({ invalid_type_error: 'Balance must be a number' })
         .nonnegative({ message: 'Balance cannot be negative' })
         .optional()
     ),
 
     // SAVINGS
     minimumBalance: blankToUndefined(
-      z.coerce
-        .number({ invalid_type_error: 'Minimum balance must be a number' })
+      money({ invalid_type_error: 'Minimum balance must be a number' })
         .nonnegative({ message: 'Minimum balance cannot be negative' })
         .optional()
     ),
 
     // CREDIT_CARD
     creditLimit: blankToUndefined(
-      z.coerce
-        .number({ invalid_type_error: 'Credit limit must be a number' })
+      money({ invalid_type_error: 'Credit limit must be a number' })
         .positive({ message: 'Credit limit must be positive' })
         .optional()
     ),
     /** Existing outstanding balance when adding a card (seeds owed via an opening EXPENSE). */
     currentOutstanding: blankToUndefined(
-      z.coerce
-        .number({ invalid_type_error: 'Outstanding must be a number' })
+      money({ invalid_type_error: 'Outstanding must be a number' })
         .nonnegative({ message: 'Outstanding cannot be negative' })
         .optional()
     ),
@@ -73,7 +70,7 @@ export const accountSchema = z
     gradient: z.string().optional(),
 
     // WALLET
-    maxBalance: blankToUndefined(z.coerce.number().positive().optional()),
+    maxBalance: blankToUndefined(money().positive().optional()),
 
     isDefault: z.boolean().optional()
   })
@@ -107,21 +104,24 @@ export const updateAccountSchema = z
   .object({
     name: z.string().min(1).optional(),
     provider: z.string().nullable().optional(),
-    openingBalance: blankToUndefined(z.coerce.number().optional()),
+    // `.nonnegative()` is not optional polish here: the create path above refuses
+    // a negative opening balance, and without the same rule a PATCH could set one
+    // and drive net worth arbitrarily negative.
+    openingBalance: blankToUndefined(
+      money({ invalid_type_error: 'Balance must be a number' })
+        .nonnegative({ message: 'Balance cannot be negative' })
+        .optional()
+    ),
     minimumBalance: blankToUndefined(
-      z.coerce.number().nonnegative().nullable().optional()
+      money().nonnegative().nullable().optional()
     ),
-    creditLimit: blankToUndefined(
-      z.coerce.number().positive().nullable().optional()
-    ),
+    creditLimit: blankToUndefined(money().positive().nullable().optional()),
     last4: z.string().nullable().optional(),
     cardHolder: z.string().nullable().optional(),
     validThru: z.string().nullable().optional(),
     brand: z.enum(cardBrands).nullable().optional(),
     gradient: z.string().nullable().optional(),
-    maxBalance: blankToUndefined(
-      z.coerce.number().positive().nullable().optional()
-    ),
+    maxBalance: blankToUndefined(money().positive().nullable().optional()),
     isDefault: z.boolean().optional(),
     isArchived: z.boolean().optional()
   })

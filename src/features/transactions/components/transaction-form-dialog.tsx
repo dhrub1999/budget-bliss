@@ -40,7 +40,7 @@ import {
 import { CalendarIcon, Download, Upload } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
-import { cn } from '@/lib/utils';
+import { cn, getErrorMessage } from '@/lib/utils';
 import {
   transactionFormSchema,
   type TransactionFormOutput,
@@ -362,9 +362,9 @@ export function TransactionFormDialog({
       } else {
         toast.error(result?.error || 'Failed to save transaction');
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       setSubmitting(false);
-      toast.error(err?.message || 'An error occurred while saving');
+      toast.error(getErrorMessage(err, 'An error occurred while saving'));
     }
   }
 

@@ -4,7 +4,7 @@ import { budgets } from '@/db/schema';
 import { auth } from '@/lib/auth/server';
 import { revalidatePath } from 'next/cache';
 import { eq, and, desc } from 'drizzle-orm';
-import { budgetSchema } from '@/lib/validations/budget';
+import { budgetSchema, budgetPeriodEnum } from '@/lib/validations/budget';
 
 export async function GET(request: NextRequest) {
   try {
@@ -16,8 +16,12 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Parameterised, so junk was never injectable — it just silently returned an
+    // empty list instead of saying the period was invalid.
     const { searchParams } = new URL(request.url);
-    const period = searchParams.get('period') || 'MONTHLY';
+    const period = budgetPeriodEnum
+      .catch('MONTHLY')
+      .parse(searchParams.get('period') ?? 'MONTHLY');
 
     const userBudgets = await db
       .select()
@@ -28,10 +32,10 @@ export async function GET(request: NextRequest) {
       .orderBy(desc(budgets.createdAt));
 
     return NextResponse.json({ success: true, budgets: userBudgets });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error fetching budgets:', error);
     return NextResponse.json(
-      { success: false, error: error.message || 'Failed to fetch budgets' },
+      { success: false, error: 'Failed to fetch budgets' },
       { status: 500 }
     );
   }
@@ -39,7 +43,6 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const rawData = await request.json();
     const { data: session } = await auth.getSession();
 
     if (!session?.user?.id) {
@@ -49,7 +52,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const parsed = budgetSchema.safeParse(rawData);
+    const parsed = budgetSchema.safeParse(await request.json());
     if (!parsed.success) {
       return NextResponse.json(
         {
@@ -82,7 +85,15 @@ export async function POST(request: NextRequest) {
           amount,
           updatedAt: new Date()
         })
-        .where(eq(budgets.id, existing[0].id));
+        // userId re-asserted even though `existing` came from a userId-scoped
+        // select: this was the one bare-id `where` in the codebase, and the
+        // convention is what makes the absence of foreign keys survivable.
+        .where(
+          and(
+            eq(budgets.id, existing[0].id),
+            eq(budgets.userId, session.user.id)
+          )
+        );
     } else {
       // Create new budget
       await db.insert(budgets).values({
@@ -96,10 +107,10 @@ export async function POST(request: NextRequest) {
     revalidatePath('/dashboard/overview');
     revalidatePath('/dashboard/budgeting');
     return NextResponse.json({ success: true });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error setting budget:', error);
     return NextResponse.json(
-      { success: false, error: error.message || 'Failed to set budget' },
+      { success: false, error: 'Failed to set budget' },
       { status: 500 }
     );
   }

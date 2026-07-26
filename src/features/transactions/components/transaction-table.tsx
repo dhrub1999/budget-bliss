@@ -57,6 +57,7 @@ import {
 } from '@/lib/validations/transaction';
 import { formatINRFull } from '@/features/overview/components/overview-data';
 import { toast } from 'sonner';
+import { getErrorMessage } from '@/lib/utils';
 
 interface TransactionTableProps {
   data: TransactionRecord[];
@@ -139,9 +140,9 @@ export function TransactionTable({
       } else {
         toast.error(result?.error || 'Failed to bulk delete');
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       setBulkDeleting(false);
-      toast.error(err?.message || 'Error executing bulk delete');
+      toast.error(getErrorMessage(err, 'Error executing bulk delete'));
     }
   };
 

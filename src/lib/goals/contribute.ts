@@ -11,6 +11,21 @@ export interface GoalContributionResult {
 }
 
 /**
+ * Thrown when the goal is missing or not owned by the caller.
+ *
+ * A named class rather than a bare `Error`, because callers need to turn this
+ * into a 404 while letting real failures bubble to a 500. They used to do that by
+ * comparing `err.message` to a literal, so renaming the message silently
+ * downgraded a "not found" into a leaked 500.
+ */
+export class GoalNotFoundError extends Error {
+  constructor() {
+    super('Goal not found');
+    this.name = 'GoalNotFoundError';
+  }
+}
+
+/**
  * Applies a delta to a goal's savedAmount and recomputes completion state.
  * Positive delta = contribution; negative delta = reversal (on edit/delete of
  * an earmarked transaction). savedAmount is clamped at ≥ 0.
@@ -30,7 +45,7 @@ export async function applyGoalContribution(
     .where(and(eq(goals.id, goalId), eq(goals.userId, userId)));
 
   if (!existingGoal) {
-    throw new Error('Goal not found');
+    throw new GoalNotFoundError();
   }
 
   const savedAmount = Math.max(0, existingGoal.savedAmount + delta);

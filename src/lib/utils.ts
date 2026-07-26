@@ -5,6 +5,24 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+/**
+ * Narrow a caught value to a displayable string.
+ *
+ * `strict: true` enables `useUnknownInCatchVariables`, so a caught value is
+ * `unknown` and `error.message` doesn't compile — which is why this codebase was
+ * full of `catch (error: any)`. Use `catch (error: unknown)` plus this helper.
+ *
+ * **Client-side and server-log use only.** Never pass the result to an API
+ * response: a `postgres.js` error message carries column names, constraint names
+ * and sometimes the offending row values. Route handlers return a fixed fallback
+ * string instead and keep the real error in `console.error`.
+ */
+export function getErrorMessage(error: unknown, fallback: string): string {
+  if (error instanceof Error && error.message) return error.message;
+  if (typeof error === 'string' && error) return error;
+  return fallback;
+}
+
 export function formatBytes(
   bytes: number,
   opts: {

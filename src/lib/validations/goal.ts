@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { money } from './transaction';
 
 export const goalIcons = [
   'target',
@@ -44,12 +45,11 @@ export const goalSchema = z.object({
     .min(1, { message: 'Goal name is required' })
     .max(100, { message: 'Goal name must be 100 characters or less' }),
 
-  targetAmount: z.coerce
-    .number({ invalid_type_error: 'Target amount must be a number' })
-    .positive({ message: 'Target amount must be a positive number' }),
+  targetAmount: money({
+    invalid_type_error: 'Target amount must be a number'
+  }).positive({ message: 'Target amount must be a positive number' }),
 
-  savedAmount: z.coerce
-    .number({ invalid_type_error: 'Saved amount must be a number' })
+  savedAmount: money({ invalid_type_error: 'Saved amount must be a number' })
     .min(0, { message: 'Saved amount cannot be negative' })
     .default(0),
 
@@ -87,9 +87,7 @@ export const updateGoalSchema = goalSchema.partial().extend({
 });
 
 export const contributeGoalSchema = z.object({
-  amount: z.coerce
-    .number({ invalid_type_error: 'Amount must be a number' })
-    .positive({ message: 'Amount must be greater than zero' }),
+  amount: money().positive({ message: 'Amount must be greater than zero' }),
   note: z.string().optional()
 });
 

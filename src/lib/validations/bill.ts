@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { expenseCategories } from './transaction';
+import { expenseCategories, money } from './transaction';
 
 /**
  * Bill validation. Client-safe by contract — this module is imported by the
@@ -59,9 +59,7 @@ const dueDateField = z.preprocess(
 
 export const billSchema = z.object({
   name: z.string().trim().min(1, { message: 'Give the bill a name' }),
-  amount: z.coerce
-    .number({ invalid_type_error: 'Amount must be a number' })
-    .positive({ message: 'Amount must be a positive number' }),
+  amount: money().positive({ message: 'Amount must be a positive number' }),
   category: z
     .string()
     .min(1, { message: 'Category is required' })

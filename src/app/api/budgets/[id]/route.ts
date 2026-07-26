@@ -27,10 +27,10 @@ export async function DELETE(
     revalidatePath('/dashboard/overview');
     revalidatePath('/dashboard/budgeting');
     return NextResponse.json({ success: true });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error deleting budget:', error);
     return NextResponse.json(
-      { success: false, error: error.message || 'Failed to delete budget' },
+      { success: false, error: 'Failed to delete budget' },
       { status: 500 }
     );
   }

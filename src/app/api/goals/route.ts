@@ -24,10 +24,10 @@ export async function GET() {
       .orderBy(desc(goals.createdAt));
 
     return NextResponse.json({ success: true, goals: userGoals });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error fetching goals:', error);
     return NextResponse.json(
-      { success: false, error: error.message || 'Failed to fetch goals' },
+      { success: false, error: 'Failed to fetch goals' },
       { status: 500 }
     );
   }
@@ -35,10 +35,15 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const rawData = await request.json();
-    console.log('POST /api/goals called with:', rawData);
+    const { data: session } = await auth.getSession();
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
 
-    const parsed = goalSchema.safeParse(rawData);
+    const parsed = goalSchema.safeParse(await request.json());
     if (!parsed.success) {
       return NextResponse.json(
         {
@@ -50,14 +55,6 @@ export async function POST(request: NextRequest) {
     }
 
     const data = parsed.data;
-    const { data: session } = await auth.getSession();
-
-    if (!session?.user?.id) {
-      return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
 
     // Auto-assign a pastel color based on the selected icon
     const color = iconColorMap[data.icon] || '#BAE1FF';
@@ -78,10 +75,10 @@ export async function POST(request: NextRequest) {
     revalidatePath('/dashboard/overview');
     revalidatePath('/dashboard/budgeting');
     return NextResponse.json({ success: true });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error creating goal:', error);
     return NextResponse.json(
-      { success: false, error: error.message || 'Failed to save goal' },
+      { success: false, error: 'Failed to save goal' },
       { status: 500 }
     );
   }

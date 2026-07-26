@@ -17,6 +17,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { getErrorMessage } from '@/lib/utils';
 
 interface ImportCsvModalProps {
   open: boolean;
@@ -135,6 +136,10 @@ export function ImportCsvModal({
             ? columns[amtIdx].replace(/[^0-9.-]/g, '')
             : '0';
           const numericAmt = parseFloat(rawAmtStr) || 0;
+          // Unparseable or zero amounts used to be imported as ₹0 rows; the API
+          // now rejects them, so drop them here instead of failing the whole
+          // upload on a summary/balance line. The preview reflects the drop.
+          if (numericAmt === 0) continue;
 
           let rawType: 'INCOME' | 'EXPENSE' = 'EXPENSE';
           if (typeIdx !== -1 && columns[typeIdx]) {
@@ -166,8 +171,10 @@ export function ImportCsvModal({
         } else {
           setParsedRows(rows);
         }
-      } catch (err: any) {
-        setErrorMsg('Failed to parse CSV file: ' + err.message);
+      } catch (err: unknown) {
+        setErrorMsg(
+          'Failed to parse CSV file: ' + getErrorMessage(err, 'Unknown error')
+        );
       }
     };
 
@@ -194,9 +201,9 @@ export function ImportCsvModal({
       } else {
         toast.error(data?.error || 'Failed to import transactions');
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       setLoading(false);
-      toast.error(err?.message || 'Error importing CSV');
+      toast.error(getErrorMessage(err, 'Error importing CSV'));
     }
   };
 

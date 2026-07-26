@@ -22,6 +22,7 @@ import { groupBillsByStatus, summariseBills } from '../lib/status';
 import type { BillRecord } from '../types';
 import { AddEditBillDialog } from './add-edit-bill-dialog';
 import { BillCard } from './bill-card';
+import { getErrorMessage } from '@/lib/utils';
 
 interface BillsViewProps {
   bills: BillRecord[];
@@ -123,8 +124,8 @@ export function BillsView({ bills, accounts, serverNow }: BillsViewProps) {
       } else {
         toast.error(data?.error || 'Failed to delete bill');
       }
-    } catch (err: any) {
-      toast.error(err?.message || 'Error deleting bill');
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err, 'Error deleting bill'));
     } finally {
       setDeleting(false);
     }

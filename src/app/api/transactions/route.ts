@@ -11,10 +11,16 @@ import { applyGoalContribution } from '@/lib/goals/contribute';
 
 export async function POST(request: NextRequest) {
   try {
-    const rawData = await request.json();
-    console.log('POST /api/transactions called with:', rawData);
+    const { data: session } = await auth.getSession();
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+    const userId = session.user.id;
 
-    const parsed = createTransactionSchema.safeParse(rawData);
+    const parsed = createTransactionSchema.safeParse(await request.json());
     if (!parsed.success) {
       return NextResponse.json(
         {
@@ -26,15 +32,6 @@ export async function POST(request: NextRequest) {
     }
 
     const data = parsed.data;
-
-    const { data: session } = await auth.getSession();
-    if (!session?.user?.id) {
-      return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-    const userId = session.user.id;
 
     const formattedDate = new Date(data.date);
     const vendor = data.vendor?.trim() || '';
@@ -235,10 +232,10 @@ export async function POST(request: NextRequest) {
       transactions: inserted,
       budgetAlert
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error creating transaction:', error);
     return NextResponse.json(
-      { success: false, error: error.message || 'Failed to save transaction' },
+      { success: false, error: 'Failed to save transaction' },
       { status: 500 }
     );
   }

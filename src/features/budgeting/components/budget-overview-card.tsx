@@ -18,6 +18,7 @@ import {
   formatINR
 } from '@/features/overview/components/overview-data';
 import { toast } from 'sonner';
+import { getErrorMessage } from '@/lib/utils';
 
 export interface Budget {
   id: string;
@@ -83,8 +84,8 @@ export function BudgetOverviewCard({
       } else {
         toast.error(data.error || 'Failed to remove budget');
       }
-    } catch (err: any) {
-      toast.error(err.message || 'An error occurred');
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err, 'An error occurred'));
     }
   }
 
