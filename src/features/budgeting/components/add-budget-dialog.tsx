@@ -21,6 +21,7 @@ import {
 } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { expenseCategories } from '@/lib/validations/transaction';
+import { getErrorMessage } from '@/lib/utils';
 
 interface AddBudgetDialogProps {
   open: boolean;
@@ -88,9 +89,9 @@ export function AddBudgetDialog({
       } else {
         toast.error(data.error || 'Failed to save budget');
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       setSubmitting(false);
-      toast.error(err.message || 'An error occurred while saving');
+      toast.error(getErrorMessage(err, 'An error occurred while saving'));
     }
   }
 

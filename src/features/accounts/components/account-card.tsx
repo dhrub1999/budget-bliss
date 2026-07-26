@@ -23,7 +23,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { cn } from '@/lib/utils';
+import { cn, getErrorMessage } from '@/lib/utils';
 import { toast } from 'sonner';
 import {
   formatINR,
@@ -92,9 +92,9 @@ export function AccountCard({ account }: AccountCardProps) {
       } else {
         toast.error(data?.error || 'Failed to delete account');
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       setDeleting(false);
-      toast.error(err?.message || 'Error deleting account');
+      toast.error(getErrorMessage(err, 'Error deleting account'));
     }
   };
 

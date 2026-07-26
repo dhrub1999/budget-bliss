@@ -47,7 +47,7 @@ import {
 import { WALLET_CAP } from '@/features/accounts/constants';
 import type { AccountOption } from '@/features/accounts/types';
 import type { AccountType } from '@/lib/accounts/balances';
-import { cn } from '@/lib/utils';
+import { cn, getErrorMessage } from '@/lib/utils';
 import { toast } from 'sonner';
 
 interface AddEditAccountDialogProps {
@@ -204,9 +204,9 @@ export function AddEditAccountDialog({
       } else {
         toast.error(data?.error || 'Failed to save account');
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       setSubmitting(false);
-      toast.error(err?.message || 'Error saving account');
+      toast.error(getErrorMessage(err, 'Error saving account'));
     }
   }
 

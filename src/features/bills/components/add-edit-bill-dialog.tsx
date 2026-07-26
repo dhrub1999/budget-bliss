@@ -46,6 +46,7 @@ import { RECURRENCE_LABELS } from '../constants';
 import { parseDueDate, toDueDateString, todayDueDateString } from '../lib/date';
 import type { BillRecord } from '../types';
 import { toast } from 'sonner';
+import { getErrorMessage } from '@/lib/utils';
 
 interface AddEditBillDialogProps {
   open: boolean;
@@ -152,9 +153,9 @@ export function AddEditBillDialog({
       } else {
         toast.error(data?.error || 'Failed to save bill');
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       setSubmitting(false);
-      toast.error(err?.message || 'Error saving bill');
+      toast.error(getErrorMessage(err, 'Error saving bill'));
     }
   }
 

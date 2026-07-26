@@ -3,7 +3,7 @@ import { db } from '@/db';
 import { accounts, transactions } from '@/db/schema';
 import { auth } from '@/lib/auth/server';
 import { revalidatePath } from 'next/cache';
-import { eq, and, or, isNull, desc } from 'drizzle-orm';
+import { eq, and, or, ne, isNull, desc } from 'drizzle-orm';
 import { updateAccountSchema } from '@/lib/validations/account';
 import { getAccountBalance } from '@/lib/accounts/balances';
 
@@ -54,10 +54,10 @@ export async function GET(
       balance,
       transactions: accountTxns
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error fetching account:', error);
     return NextResponse.json(
-      { success: false, error: error.message || 'Failed to fetch account' },
+      { success: false, error: 'Failed to fetch account' },
       { status: 500 }
     );
   }
@@ -68,9 +68,19 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // Auth first: returning the 400 before the 401 let an unauthenticated caller
+    // map the whole validation schema from the error messages.
+    const { data: session } = await auth.getSession();
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+    const userId = session.user.id;
+
     const { id } = await params;
-    const rawData = await request.json();
-    const parsed = updateAccountSchema.safeParse(rawData);
+    const parsed = updateAccountSchema.safeParse(await request.json());
     if (!parsed.success) {
       return NextResponse.json(
         {
@@ -80,15 +90,6 @@ export async function PATCH(
         { status: 400 }
       );
     }
-
-    const { data: session } = await auth.getSession();
-    if (!session?.user?.id) {
-      return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-    const userId = session.user.id;
 
     const [existing] = await db
       .select()
@@ -111,6 +112,10 @@ export async function PATCH(
           .set({ isDefault: false })
           .where(eq(accounts.userId, userId));
       }
+      // Spreading the parsed payload is safe *only* because Zod strips unknown
+      // keys and `updateAccountSchema` declares no `userId`/`id`/`createdAt`.
+      // Adding any of those to that schema would turn this line into a
+      // userId-overwrite — i.e. handing one user's account to another.
       await tx
         .update(accounts)
         .set({ ...data, updatedAt: new Date() })
@@ -120,10 +125,10 @@ export async function PATCH(
     revalidatePath('/dashboard/overview');
     revalidatePath('/dashboard/accounts');
     return NextResponse.json({ success: true });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error updating account:', error);
     return NextResponse.json(
-      { success: false, error: error.message || 'Failed to update account' },
+      { success: false, error: 'Failed to update account' },
       { status: 500 }
     );
   }
@@ -156,14 +161,6 @@ export async function DELETE(
       );
     }
 
-    // Never delete/archive the default Cash account — legacy transactions rely on it.
-    if (existing.isDefault && existing.type === 'CASH') {
-      return NextResponse.json(
-        { success: false, error: 'Cannot delete the default Cash account' },
-        { status: 409 }
-      );
-    }
-
     const linked = await db
       .select({ id: transactions.id })
       .from(transactions)
@@ -173,13 +170,52 @@ export async function DELETE(
 
     let archived = false;
     if (linked.length > 0) {
-      // Soft-archive to preserve transaction history / debt.
+      // Soft-archive to preserve transaction history / debt. Safe even for the
+      // last Cash account: the null-accountId fallback in
+      // computeAccountsSnapshot does not filter archived rows.
       await db
         .update(accounts)
         .set({ isArchived: true, updatedAt: new Date() })
         .where(and(eq(accounts.id, id), eq(accounts.userId, userId)));
       archived = true;
     } else {
+      // Hard delete. The invariant to protect is that *a* Cash row survives —
+      // not that the `isDefault` flag is set on one.
+      // `computeAccountsSnapshot` attributes every transaction with a null
+      // accountId to `CASH && isDefault` or, failing that, to any CASH row
+      // (lib/accounts/balances.ts:51-54); with no CASH row at all it hits
+      // `if (!key) continue` and those rows vanish from every balance and total
+      // while still existing in the table.
+      //
+      // Guarding on `isDefault` was bypassable in two calls: PATCH
+      // {"isDefault":true} on any other account cleared the flag from Cash, and
+      // this delete then went through. Note `linked` only counts transactions
+      // pointing *at* this id, so the rows most at risk — the legacy
+      // null-accountId ones — never showed up here at all.
+      if (existing.type === 'CASH') {
+        const [otherCash] = await db
+          .select({ id: accounts.id })
+          .from(accounts)
+          .where(
+            and(
+              eq(accounts.userId, userId),
+              eq(accounts.type, 'CASH'),
+              ne(accounts.id, id)
+            )
+          )
+          .limit(1);
+
+        if (!otherCash) {
+          return NextResponse.json(
+            {
+              success: false,
+              error: 'Cannot delete your only Cash account'
+            },
+            { status: 409 }
+          );
+        }
+      }
+
       await db
         .delete(accounts)
         .where(and(eq(accounts.id, id), eq(accounts.userId, userId)));
@@ -188,10 +224,10 @@ export async function DELETE(
     revalidatePath('/dashboard/overview');
     revalidatePath('/dashboard/accounts');
     return NextResponse.json({ success: true, archived });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error deleting account:', error);
     return NextResponse.json(
-      { success: false, error: error.message || 'Failed to delete account' },
+      { success: false, error: 'Failed to delete account' },
       { status: 500 }
     );
   }

@@ -16,6 +16,7 @@ import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { goalIcons } from '@/lib/validations/goal';
 import { DynamicIcon } from '@/components/ui/dynamic-icon';
+import { getErrorMessage } from '@/lib/utils';
 
 const inputClass =
   'h-12 w-full rounded-xl border-zinc-800/80 bg-[#18181b] px-4 text-white placeholder:text-zinc-500 focus-visible:border-emerald-500 focus-visible:ring-1 focus-visible:ring-emerald-500';
@@ -98,9 +99,9 @@ export function EditGoalDialog({
       } else {
         toast.error(data.error || 'Failed to update goal');
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       setSubmitting(false);
-      toast.error(err.message || 'An error occurred');
+      toast.error(getErrorMessage(err, 'An error occurred'));
     }
   }
 

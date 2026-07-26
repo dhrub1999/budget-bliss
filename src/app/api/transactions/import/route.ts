@@ -1,14 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
-import { transactions } from '@/db/schema';
+import { transactions, type NewTransaction } from '@/db/schema';
 import { auth } from '@/lib/auth/server';
 import { revalidatePath } from 'next/cache';
 
+import { importTransactionsSchema } from '@/lib/validations/transaction';
+
 export async function POST(request: NextRequest) {
   try {
-    const { items } = await request.json();
+    // Auth before body parsing — otherwise an unauthenticated caller gets the
+    // server to buffer and validate an arbitrarily large payload for free.
     const { data: session } = await auth.getSession();
-
     if (!session?.user?.id) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized' },
@@ -16,19 +18,30 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!items || !Array.isArray(items) || items.length === 0) {
+    const parsed = importTransactionsSchema.safeParse(await request.json());
+    if (!parsed.success) {
+      const issue = parsed.error.errors[0];
+      // Row index is the first path segment — without it "Invalid date" is
+      // useless feedback on a 500-row CSV.
+      const row = typeof issue?.path[1] === 'number' ? issue.path[1] : null;
       return NextResponse.json(
-        { success: false, error: 'No transaction rows provided' },
+        {
+          success: false,
+          error:
+            row !== null
+              ? `Row ${row + 1}: ${issue?.message ?? 'Invalid row'}`
+              : (issue?.message ?? 'Validation failed')
+        },
         { status: 400 }
       );
     }
 
-    const rowsToInsert = items.map((item: any) => ({
-      amount: Math.abs(Number(item.amount) || 0),
-      type: item.type === 'INCOME' ? 'INCOME' : 'EXPENSE',
-      category: String(item.category || 'Others'),
-      description: String(item.description || 'Imported Transaction'),
-      date: new Date(item.date),
+    const rowsToInsert: NewTransaction[] = parsed.data.items.map((item) => ({
+      amount: item.amount,
+      type: item.type,
+      category: item.category,
+      description: item.description,
+      date: item.date,
       userId: session.user.id
     }));
 
@@ -39,13 +52,10 @@ export async function POST(request: NextRequest) {
     revalidatePath('/dashboard/budgeting');
 
     return NextResponse.json({ success: true, count: rowsToInsert.length });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error importing CSV transactions:', error);
     return NextResponse.json(
-      {
-        success: false,
-        error: error.message || 'Failed to import transactions'
-      },
+      { success: false, error: 'Failed to import transactions' },
       { status: 500 }
     );
   }

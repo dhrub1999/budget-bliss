@@ -6,7 +6,10 @@ import { revalidatePath } from 'next/cache';
 import { and, eq } from 'drizzle-orm';
 import type { Recurrence } from '@/lib/validations/bill';
 import { rollForwardPast } from '@/features/bills/lib/recurrence';
-import { todayDueDateString } from '@/features/bills/lib/date';
+import {
+  calendarDaysBetween,
+  todayDueDateString
+} from '@/features/bills/lib/date';
 
 /**
  * Settles a bill.
@@ -47,6 +50,29 @@ export async function POST(
     }
 
     const now = new Date();
+    const today = todayDueDateString(now);
+
+    // Not replayable. `rollForwardPast` calls `rollForward` unconditionally, so
+    // it always advances at least one cycle — twelve rapid POSTs pushed a monthly
+    // bill a year out and it dropped off every overdue view. There is no isPaid
+    // column by design; a due date in the future *is* the paid signal, so that is
+    // what we check.
+    if (bill.isArchived) {
+      return NextResponse.json(
+        { success: false, error: 'This bill is already settled' },
+        { status: 409 }
+      );
+    }
+    if (calendarDaysBetween(today, bill.dueDate) > 0) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'This bill is already paid for the current cycle'
+        },
+        { status: 409 }
+      );
+    }
+
     const recurrence = bill.recurrence as Recurrence;
 
     // Skip past any cycles that were never marked paid, so a bill ignored since
@@ -78,10 +104,10 @@ export async function POST(
       /** Calendar day, `yyyy-MM-dd`. */
       nextDueDate: nextDue
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error marking bill paid:', error);
     return NextResponse.json(
-      { success: false, error: error.message || 'Failed to mark bill paid' },
+      { success: false, error: 'Failed to mark bill paid' },
       { status: 500 }
     );
   }

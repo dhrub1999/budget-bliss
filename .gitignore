@@ -25,7 +25,10 @@ yarn-debug.log*
 yarn-error.log*
 
 # local env files
-.env*.local
+# Broad on purpose: a bare `.env` was tracked for months because this pattern
+# used to be `.env*.local`, which also missed a typo'd `.env.loacal`.
+.env*
+!env.example.txt
 
 # vercel
 .vercel
@@ -39,3 +42,6 @@ next-env.d.ts
 /.clerk/
 
 /generated/prisma
+
+# security remediation working notes — enumerates unfixed weaknesses, never publish
+SECURITY-TODO.md

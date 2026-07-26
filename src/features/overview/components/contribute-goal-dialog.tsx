@@ -15,6 +15,7 @@ import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { DynamicIcon } from '@/components/ui/dynamic-icon';
 import { formatINR } from './overview-data';
+import { getErrorMessage } from '@/lib/utils';
 
 export interface GoalItem {
   id: string;
@@ -89,9 +90,9 @@ export function ContributeGoalDialog({
       } else {
         toast.error(data.error || 'Failed to contribute to goal');
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       setSubmitting(false);
-      toast.error(err.message || 'An error occurred');
+      toast.error(getErrorMessage(err, 'An error occurred'));
     }
   }
 

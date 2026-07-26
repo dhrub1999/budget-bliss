@@ -11,7 +11,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { cn } from '@/lib/utils';
+import { cn, getErrorMessage } from '@/lib/utils';
 import { type CreditCard, formatINRFull } from './overview-data';
 import type { AccountOption } from '@/features/accounts/types';
 import { UTIL_AMBER, UTIL_ROSE } from '@/features/accounts/constants';
@@ -456,9 +456,9 @@ export function CreditCards({ cards = [] }: { cards?: AccountOption[] }) {
       } else {
         toast.error(data?.error || 'Failed to add credit card');
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       setSubmitting(false);
-      toast.error(err?.message || 'Failed to add credit card');
+      toast.error(getErrorMessage(err, 'Failed to add credit card'));
     }
   };
 

@@ -34,10 +34,10 @@ export async function GET(
     }
 
     return NextResponse.json({ success: true, bill });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error fetching bill:', error);
     return NextResponse.json(
-      { success: false, error: error.message || 'Failed to fetch bill' },
+      { success: false, error: 'Failed to fetch bill' },
       { status: 500 }
     );
   }
@@ -48,9 +48,17 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { data: session } = await auth.getSession();
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+    const userId = session.user.id;
+
     const { id } = await params;
-    const rawData = await request.json();
-    const parsed = updateBillSchema.safeParse(rawData);
+    const parsed = updateBillSchema.safeParse(await request.json());
     if (!parsed.success) {
       return NextResponse.json(
         {
@@ -60,15 +68,6 @@ export async function PATCH(
         { status: 400 }
       );
     }
-
-    const { data: session } = await auth.getSession();
-    if (!session?.user?.id) {
-      return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-    const userId = session.user.id;
 
     const [existing] = await db
       .select()
@@ -99,6 +98,9 @@ export async function PATCH(
       }
     }
 
+    // Spreading the parsed payload is safe *only* because Zod strips unknown
+    // keys and `updateBillSchema` declares no `userId`/`id`/`createdAt`. Adding
+    // any of those to that schema would turn this into a userId-overwrite.
     await db
       .update(bills)
       .set({
@@ -116,10 +118,10 @@ export async function PATCH(
     revalidatePath('/dashboard/bills');
     revalidatePath('/dashboard/overview');
     return NextResponse.json({ success: true });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error updating bill:', error);
     return NextResponse.json(
-      { success: false, error: error.message || 'Failed to update bill' },
+      { success: false, error: 'Failed to update bill' },
       { status: 500 }
     );
   }
@@ -161,10 +163,10 @@ export async function DELETE(
     revalidatePath('/dashboard/bills');
     revalidatePath('/dashboard/overview');
     return NextResponse.json({ success: true });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error deleting bill:', error);
     return NextResponse.json(
-      { success: false, error: error.message || 'Failed to delete bill' },
+      { success: false, error: 'Failed to delete bill' },
       { status: 500 }
     );
   }

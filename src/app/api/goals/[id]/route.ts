@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
-import { goals } from '@/db/schema';
+import { goals, transactions } from '@/db/schema';
 import { auth } from '@/lib/auth/server';
 import { revalidatePath } from 'next/cache';
 import { eq, and } from 'drizzle-orm';
@@ -11,8 +11,6 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = await params;
-    const rawData = await request.json();
     const { data: session } = await auth.getSession();
 
     if (!session?.user?.id) {
@@ -22,7 +20,8 @@ export async function PUT(
       );
     }
 
-    const parsed = updateGoalSchema.safeParse(rawData);
+    const { id } = await params;
+    const parsed = updateGoalSchema.safeParse(await request.json());
     if (!parsed.success) {
       return NextResponse.json(
         {
@@ -92,10 +91,10 @@ export async function PUT(
     revalidatePath('/dashboard/overview');
     revalidatePath('/dashboard/budgeting');
     return NextResponse.json({ success: true });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error updating goal:', error);
     return NextResponse.json(
-      { success: false, error: error.message || 'Failed to update goal' },
+      { success: false, error: 'Failed to update goal' },
       { status: 500 }
     );
   }
@@ -116,17 +115,42 @@ export async function DELETE(
       );
     }
 
-    await db
-      .delete(goals)
-      .where(and(eq(goals.id, id), eq(goals.userId, session.user.id)));
+    const userId = session.user.id;
+
+    // There are no foreign keys anywhere in this schema, so nothing cascades.
+    // Leaving transactions pointing at a deleted goal is not cosmetic: every
+    // later edit/delete of one of those rows tries to reverse an earmark against
+    // a goal that no longer exists, and the reversal is swallowed by a bare
+    // `catch {}` in transactions/[id], so the failure is permanently silent.
+    // Clear the reference in the same transaction as the delete.
+    const [deleted] = await db.transaction(async (tx) => {
+      await tx
+        .update(transactions)
+        .set({ goalId: null })
+        .where(
+          and(eq(transactions.goalId, id), eq(transactions.userId, userId))
+        );
+
+      return tx
+        .delete(goals)
+        .where(and(eq(goals.id, id), eq(goals.userId, userId)))
+        .returning({ id: goals.id });
+    });
+
+    if (!deleted) {
+      return NextResponse.json(
+        { success: false, error: 'Goal not found' },
+        { status: 404 }
+      );
+    }
 
     revalidatePath('/dashboard/overview');
     revalidatePath('/dashboard/budgeting');
     return NextResponse.json({ success: true });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error deleting goal:', error);
     return NextResponse.json(
-      { success: false, error: error.message || 'Failed to delete goal' },
+      { success: false, error: 'Failed to delete goal' },
       { status: 500 }
     );
   }

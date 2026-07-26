@@ -24,6 +24,7 @@ import { TransactionTable } from './transaction-table';
 import { formatINRFull } from '@/features/overview/components/overview-data';
 import type { AccountOption } from '@/features/accounts/types';
 import { toast } from 'sonner';
+import { getErrorMessage } from '@/lib/utils';
 
 interface TransactionsViewProps {
   initialTransactions: TransactionRecord[];
@@ -66,8 +67,8 @@ export function TransactionsView({
       } else {
         toast.error(data?.error || 'Failed to delete transaction');
       }
-    } catch (err: any) {
-      toast.error(err?.message || 'Error deleting transaction');
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err, 'Error deleting transaction'));
     }
   };
 

@@ -3,15 +3,16 @@ import { db } from '@/db';
 import { auth } from '@/lib/auth/server';
 import { revalidatePath } from 'next/cache';
 import { contributeGoalSchema } from '@/lib/validations/goal';
-import { applyGoalContribution } from '@/lib/goals/contribute';
+import {
+  applyGoalContribution,
+  GoalNotFoundError
+} from '@/lib/goals/contribute';
 
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = await params;
-    const rawData = await request.json();
     const { data: session } = await auth.getSession();
 
     if (!session?.user?.id) {
@@ -21,7 +22,8 @@ export async function POST(
       );
     }
 
-    const parsed = contributeGoalSchema.safeParse(rawData);
+    const { id } = await params;
+    const parsed = contributeGoalSchema.safeParse(await request.json());
     if (!parsed.success) {
       return NextResponse.json(
         {
@@ -39,8 +41,8 @@ export async function POST(
       result = await db.transaction((tx) =>
         applyGoalContribution(tx, session.user.id, id, amount)
       );
-    } catch (err: any) {
-      if (err?.message === 'Goal not found') {
+    } catch (err: unknown) {
+      if (err instanceof GoalNotFoundError) {
         return NextResponse.json(
           { success: false, error: 'Goal not found' },
           { status: 404 }
@@ -56,12 +58,12 @@ export async function POST(
       savedAmount: result.savedAmount,
       isCompleted: result.isCompleted
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error contributing to goal:', error);
     return NextResponse.json(
       {
         success: false,
-        error: error.message || 'Failed to contribute to goal'
+        error: 'Failed to contribute to goal'
       },
       { status: 500 }
     );
