@@ -6,6 +6,8 @@ const FeatureCard = ({
   title,
   description,
   imageUrl,
+  imageWidth,
+  imageHeight,
   imageAlt
 }: FeatureCardProps) => {
   return (
@@ -18,8 +20,10 @@ const FeatureCard = ({
           // sits under — repeating the visible <h3> adds nothing for a screen
           // reader and nothing for image search.
           alt={imageAlt ?? title}
-          width={1440}
-          height={640}
+          // Per-card, because these are screenshots cropped to their content
+          // rather than one fixed art size.
+          width={imageWidth}
+          height={imageHeight}
           className='h-auto w-full rounded-lg'
           // Below the fold: let the browser defer these rather than competing
           // with the hero image for bandwidth (LCP).

@@ -16,9 +16,11 @@ const steps = [
     title: 'Add your accounts',
     description:
       'Sign up free — no card required — then add the accounts you actually use: a savings account, a credit card, a wallet, cash. Give each one its opening balance and BudgetBliss works out every balance from there.',
-    image: '/images/feature-images/budget-planning.png',
+    // Was budget-planning.png, which showed the budgets screen — the wrong
+    // subject entirely for a step about adding accounts.
+    image: '/images/feature-images/add-account.webp',
     imageAlt:
-      'The add-account form in BudgetBliss with fields for account type and opening balance'
+      'The add-account form in BudgetBliss offering savings, credit card, wallet and cash types, with name, bank and opening-balance fields'
   },
   {
     id: 'track',
@@ -28,9 +30,9 @@ const steps = [
     title: 'Log what you spend',
     description:
       'Enter each transaction against the account it came from — a few seconds per entry, and the two-second review is the part that changes behaviour. Set monthly budgets per category and the dashboard shows what is left as you go.',
-    image: '/images/feature-images/expense-tracking.png',
+    image: '/images/feature-images/log-transaction.webp',
     imageAlt:
-      'Logging a transaction in BudgetBliss and assigning it to a spending category'
+      'Logging a ₹1,450 Blinkit expense in BudgetBliss against the Groceries category, paid from a savings account'
   },
   {
     id: 'goals',
@@ -38,9 +40,9 @@ const steps = [
     title: 'Fund your goals',
     description:
       'Create a savings goal, then contribute to it from real income rather than an aspiration. Contributions are earmarked against the goal, so progress reflects money you genuinely set aside.',
-    image: '/images/feature-images/savings-goals.png',
+    image: '/images/feature-images/fund-goal.webp',
     imageAlt:
-      'A savings goal in BudgetBliss showing contributed amount against the target'
+      'Topping up a Foreign Trip savings goal in BudgetBliss with ₹5,000, showing ₹62,000 saved of a ₹1.2 lakh target'
   }
 ];
 
@@ -190,8 +192,11 @@ export default function HowItWorks() {
                   key={steps[activeIndex].id}
                   src={steps[activeIndex].image}
                   alt={steps[activeIndex].imageAlt}
-                  width={800}
-                  height={500}
+                  // All three step screenshots are cropped to the same size on
+                  // purpose: they cycle inside this one box, and a differing
+                  // aspect ratio would make it jump on every advance.
+                  width={1256}
+                  height={656}
                   className='w-full object-cover'
                   // No `priority`: this section is well below the fold, and
                   // preloading it competed with the hero image for LCP.

@@ -116,12 +116,12 @@ export default async function Page() {
           >
             <div className='shadow-brand-500/20 relative mx-auto overflow-hidden rounded-2xl border border-white/10 bg-neutral-900/60 p-2 shadow-2xl backdrop-blur-sm md:rounded-3xl md:p-3'>
               <Image
-                src={'/images/hero-image.png'}
-                height={779}
-                width={1096}
+                src={'/images/hero-dashboard.webp'}
+                height={794}
+                width={1512}
                 // Descriptive alt: "Product dashboard image" told a screen
                 // reader nothing and image search even less.
-                alt='The BudgetBliss dashboard showing account balances, a spending-category breakdown and monthly budget progress'
+                alt='The BudgetBliss dashboard showing total available, net worth and card debt above a list of account balances, a spending-category breakdown, savings goals and recent transactions'
                 className='h-auto w-full rounded-xl object-cover md:rounded-2xl'
                 // Hero image is the LCP element — priority is correct here, and
                 // is the one place on the page it should be used.
@@ -166,12 +166,10 @@ export default async function Page() {
         <StaggerContainer className='grid grid-cols-1 gap-8 md:grid-cols-2'>
           {featureCards.map((feature, index) => (
             <StaggerItem key={index}>
-              <FeatureCard
-                title={feature.title}
-                description={feature.description}
-                imageUrl={feature.imageUrl}
-                imageAlt={feature.imageAlt}
-              />
+              {/* Spread rather than listed field by field: the card's props
+                  are exactly FeatureCardProps, and enumerating them here means
+                  every new one has to be threaded through by hand. */}
+              <FeatureCard {...feature} />
             </StaggerItem>
           ))}
         </StaggerContainer>
