@@ -76,8 +76,13 @@ export const siteConfig = {
    * Recency is a documented GEO ranking signal — content under three months
    * old is roughly 3x more likely to be cited. Bump on substantive edits.
    */
-  dateModified: '2026-07-26',
-  ogImage: '/images/hero-image.png'
+  dateModified: '2026-07-27',
+  /**
+   * JPEG at 1200x630 rather than the webp the page itself serves: some link
+   * unfurlers still skip a preview they cannot decode, and an OG image is only
+   * worth having if every one of them renders it.
+   */
+  ogImage: '/images/og-dashboard.jpg'
 } as const;
 
 /**
